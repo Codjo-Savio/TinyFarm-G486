@@ -3,23 +3,23 @@ Réunion numéro  : 1
 Date de réunion : 27 Janvier 2026 ( 14H00 - 15H20 )
 Auteur 		: CHUPIN Noa 486M
 ----------------------------------------------------
-		Objectif de la réunion
+# Objectif de la réunion
 		
-	1) Connaître l'avancer du FrontEnd sur la maquette du projet et répartition de l'équipe FrontEnd pour le début du code HTML
+	1-  Connaître l'avancer du FrontEnd sur la maquette du projet et répartition de l'équipe FrontEnd pour le début du code HTML
 	
-	2) Début de conception par l'équipe BackEnd ( BDD )
+	2- Début de conception par l'équipe BackEnd ( BDD )
 	
 ----------------------------------------------------
 
-I ) Présentation des maquettes du projet par Maël et Ethann.
+# I -  Présentation des maquettes du projet par Maël et Ethann.
 
 Les maquettes ont été réalisées par Maël et Ethann assistés par Mewenn, certains points de la maquette de Noah ont été ajouter dans la maquette du projet.
 
-I a ) Nouvelles idées de l'équipe pour l'interface :
+## 1-  Nouvelles idées de l'équipe pour l'interface :
 
-	- Noah propose une modification du classement : Ajoutant de nouvelle façon de classer les joueurs ( On conserve le classement par rang + rajout de tri/classement par colonnes [ Classement par Stockage / Production / Ecu ])
+* Noah propose une modification du classement : Ajoutant de nouvelle façon de classer les joueurs ( On conserve le classement par rang + rajout de tri/classement par colonnes [ Classement par Stockage / Production / Ecu ])
 	
-	-Idées reprises de la maquette de Noah : 
+	- Idées reprises de la maquette de Noah : 
 		- Ecran de base : Vu de la ferme avec les différents éléments la composant : Possibilité d'interagire avec ces éléments en glissant le curseur dessus afin de faire apparaître un pop-up affichant leur status. Lorsque l'on clique dessus redirige vers une nouvelle page avec les informations détaillées ( Poulailler / Pré / Clapier / ... ).
 		Après mise en commun avec l'équipe l'ajout d'un (!) dans les pop-ups est nécéssaire pour afficher les informations récentes ( Besoin de nourrir / Une vache est maintenant adulte ect...)
 		
@@ -29,9 +29,9 @@ I a ) Nouvelles idées de l'équipe pour l'interface :
 		
 --------------------------------------------------------------------------------
 
-II ) Organisation FrontEnd
+# II -  Organisation FrontEnd
 		
-	- Séparation en plusieurs groupes de 2 pour chaque pages. 
+* Séparation en plusieurs groupes de 2 pour chaque pages. 
 		-Devrait être prêt pour la dead-line.
 	- Envoi des groupes pour les pages le 28.
 	- Finalisation des affichages pour la Coopérative / Marché ( Maël )
@@ -44,17 +44,18 @@ II ) Organisation FrontEnd
 	
 -------------------------------------------------------------------------------
 
-III ) Organisation GitHub
+# III -  Organisation GitHub
 
-	- PUSH en plusieurs branches ? Pour l'instant non. Commit dans le 			fichier commun. 
-	- Organisation des noms des fichiers pour les liens de redirection.
+* PUSH en plusieurs branches ? Pour l'instant non. Commit dans le 			fichier commun. 
+
+* Organisation des noms des fichiers pour les liens de redirection.
 	
 ------------------------------------------------------------------------------
 
-IV ) Organisation BackEnd
+# IV -  Organisation BackEnd
 
 - Reflexion sur la conception du projet :
-	-Mewenn ( Chef de l'équipe BackEnd ) Propose de commencer par la BDD au vu du TD de ce matin
+	- Mewenn ( Chef de l'équipe BackEnd ) Propose de commencer par la BDD au vu du TD de ce matin
 		==> idée d'avoir rapidement un schéma de BDD cohérent et valider par l'équipe. Pour pouvoir commencer à travailler dessus et pouvoir se lancer
 		
 		- Groupe assigné à la BDD : Aubry - Savio - Noa
@@ -70,29 +71,28 @@ IV ) Organisation BackEnd
 			
 		L'idée de Savio est retenue pour le projet.
 		
-Parenthèse sur l'authentification github : 
-	- GitHub récupre : id password : vérifie l'intégrité
-	- Besoin de l'inséré dans notre BDD
-	- ID varchar() pour les users dans la BDD ? On s'occupera de ça un peu plus tard. Faire la BDD du jeu seulement pour le moment.
-					
-	- Précision Maël : GitHub revoie un Acces-Token. Besoin de refaire un requête a gitHub pour récup les infos utilisateurs.
+### Parenthèse sur l'authentification github : 
+* GitHub récupre : id password : vérifie l'intégrité
+* Besoin de l'insérer dans notre BDD
+* ID varchar() pour les users dans la BDD ? On s'occupera de ça un peu plus tard. Faire la BDD du jeu seulement pour le moment.			
+* Précision Maël : GitHub revoie un Acces-Token. Besoin de refaire un requête a gitHub pour récup les infos utilisateurs.
 
-IMPORTANT : Besoin de se documenter sur SpringBoot Maven ect CAPITAL pour pouvoir avancer !
+#### IMPORTANT : Besoin de se documenter sur SpringBoot Maven ect CAPITAL pour pouvoir avancer !
 
-V ) Début du travail sur la BDD
-	Rappel groupe assigné à la BDD ( Aubry - Savio - Noa )
+# V -  Début du travail sur la BDD
+##### Rappel groupe assigné à la BDD ( Aubry - Savio - Noa )
 	
-	a ) Informations supplémentaires et précisions sur les tables :
+### 1- Informations supplémentaires et précisions sur les tables :
 	
-	 Animal  ( ==> table générale ( avec les attributs communs aux animaux ) relié aux tables " plus spécialisé " ( poules / lapins / vaches ....)
-	 Rabbit  ()
-	 Cow     ()
-	 Chicken ()
-	 User    ()
-	 Stock   ()
-	 Product ()
-	 Market  ()
-	 Coop    ()
+	Animal  ==> table générale ( avec les attributs communs aux animaux ) relié aux tables " plus spécialisé " ( poules / lapins / vaches ....)
+	Rabbit  ()
+	Cow     ()
+	Chicken ()
+	User    ()
+	Stock   ()
+	Product ()
+	Market  ()
+	Coop    ()
 	 
-	 + Regarder Photo Schéma BDD réalisé pendant la réunion sur le discord channel ressource
+	+ Regarder Photo Schéma BDD réalisé pendant la réunion sur le discord channel ressource
 	 
