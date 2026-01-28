@@ -1,13 +1,11 @@
-# Mockup
+# Screens
+
+This directory contains an HTML/CSS based mockup.
 
 ## Launch the server
 
-```
-Go into the repertory of the project and enter the following command in the terminal :
+Move into the project directory and enter the following command:
 
-python3 -m http.server 8080
-
-Then in the navigator, enter this URL : 
-
-http://localhost:8080
+```bash
+python3 -m http.server 8080 --directory screens/
 ```
