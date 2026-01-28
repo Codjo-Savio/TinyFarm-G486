@@ -3,5 +3,7 @@
 ## Launch the server
 
 ```
-python -m http.server 8080 --bind 127.0.0.1 --directory mockup/
+python3 -m http.server 8080
+
+In the navigator : http://localhost:8080
 ```
