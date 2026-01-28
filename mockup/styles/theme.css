@@ -1,0 +1,21 @@
+:root {
+    --color-primary: #55361B;
+    --color-secondary: #F2D49F;
+    --color-surface: #FFF4E0;
+    --color-surface-dark: #FFEFCE;
+    --color-gold: #DB9519;
+    --color-gold-dark: #8E6317;
+
+    --font-size-title: 96px;
+    --font-size-subtitle: 48px;
+    --font-size-body-large: 32px;
+    --font-size-body: 24px;
+    --font-size-icon: 28px;
+    --font-size-icon-large: 40px;
+
+    --font-weight-title: bold;
+    --font-weight-subtitle: bold;
+    --font-weight-body-large: normal;
+    --font-weight-body: normal;
+    --font-weight-icon: bold;
+}
