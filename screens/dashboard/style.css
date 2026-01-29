@@ -1,0 +1,91 @@
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.appbar {
+    width: 100%;
+    background-color: var(--color-primary);
+    box-shadow: 0px 4px 4px 0px rgba(0,0,0,0.25);
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 24px;
+    padding: 24px;
+    flex-shrink: 0;
+}
+
+.appbar>.infos {
+    display: flex;
+    gap: 24px;
+    color: var(--color-surface);
+}
+
+.appbar>.infos>div {
+    font-size: var(--font-size-body-large);
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+main {
+    flex-grow: 1;
+    width: 100%;
+    background-image: url("/assets/dashboard-background.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: bottom;
+}
+
+.bottom-actions {
+    padding: 24px;
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    gap: 24px;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.bottom-actions>.links {
+    display: flex;
+    gap: 24px;
+}
+
+.bottom-actions>.links>a {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    background-color: var(--color-surface-dark);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    box-shadow: 0px 4px 4px 0px rgba(0,0,0,0.25);
+}
+
+.bottom-actions>.links>a>div {
+    display: flex;
+    flex-direction: column;
+}
+
+.bottom-actions>.links>a>div>.label {
+    font-size: var(--font-size-body-large);
+    font-weight: bold;
+}
+
+.bottom-actions>.links>a>span.material-symbols-rounded {
+    font-size: var(--font-size-icon-large);
+}
+
+.bottom-actions>#time {
+    box-shadow: 0px 4px 4px 0px rgba(0,0,0,0.25);
+    background-color: var(--color-surface-dark);
+    border-radius: 100px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    height: fit-content;
+    padding: 10px 20px 10px 10px;
+}

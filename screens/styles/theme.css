@@ -17,5 +17,6 @@
     --font-weight-subtitle: bold;
     --font-weight-body-large: normal;
     --font-weight-body: normal;
-    --font-weight-icon: bold;
+
+    --radius: 20px;
 }

@@ -10,18 +10,62 @@
     <!-- Global styles -->
     <link rel="stylesheet" href="/styles/global.css">
     <!-- Icons -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=home" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <!-- Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <!-- Specific styles -->
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    Example
-    <span class="material-symbols-rounded">
-        home
-    </span>
+    <div class="appbar">
+        <div class="infos">
+            <div>
+                <span class="material-symbols-rounded">
+                    leaderboard
+                </span>
+                <span>10/100</span>
+            </div>
+            <div>
+                <span class="material-symbols-rounded">
+                    crown
+                </span>
+                <span>Niveau 2</span>
+            </div>
+        </div>
+        <div class="account"></div>
+    </div>
+    <main></main>
+    <div class="bottom-actions">
+        <div class="links">
+            <a id="coop">
+                <span class="material-symbols-rounded">
+                    storefront
+                </span>
+                <div>
+                    <span class="label">Coopérative</span>
+                    <span class="infos">En stock : 100</span>
+                </div>
+            </a>
+            <a id="market">
+                <span class="material-symbols-rounded">
+                    groups
+                </span>
+                <div>
+                    <span class="label">Marché</span>
+                    <span class="infos">En stock : 2</span>
+                </div>
+            </a>
+        </div>
+        <div id="time">
+            <span class="material-symbols-rounded">
+                schedule
+            </span>
+            <span><b>23:47 AoE</b> • Fin du jour : <b>13 min</b></span>
+        </div>
+    </div>
 </body>
 
 </html>
