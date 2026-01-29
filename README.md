@@ -17,4 +17,4 @@ Here is the frameworks used in the project
 ## Design
 
 We work on the design in Figma
-[Lien Figma](https://www.figma.com/design/nO4maMQfMmHhVG4KkLaVPc/TinyFarm?node-id=0-1&p=f&t=OhETpBXVWBqiZEUs-0)
+[Figma](https://www.figma.com/design/nO4maMQfMmHhVG4KkLaVPc/TinyFarm?node-id=0-1&p=f&t=OhETpBXVWBqiZEUs-0)
