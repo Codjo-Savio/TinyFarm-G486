@@ -21,27 +21,38 @@
 
 <body>
     <div class="appbar">
-        <div class="infos">
-            <div>
+        <div class="infos-left">
+            <div id="rank">
                 <span class="material-symbols-rounded">
                     leaderboard
                 </span>
                 <span>10/100</span>
             </div>
-            <div>
+            <div id="level">
                 <span class="material-symbols-rounded">
-                    crown
+                    stars
                 </span>
                 <span>Niveau 2</span>
             </div>
         </div>
-        <div class="account"></div>
+        <div class="infos-right">
+            <div id="money">
+                <span class="material-symbols-rounded">
+                    paid
+                </span>
+                <span>1000</span>
+            </div>
+            <div id="account">
+                <span>Pascal</span>
+                <img src="/assets/farmer-icon.png" />
+            </div>
+        </div>
     </div>
     <main></main>
     <div class="bottom-actions">
         <div class="links">
-            <a id="coop">
-                <span class="material-symbols-rounded">
+            <a id="coop" href="/dashboard/cooperative">
+                <span class="material-symbols-rounded large">
                     storefront
                 </span>
                 <div>
@@ -49,8 +60,8 @@
                     <span class="infos">En stock : 100</span>
                 </div>
             </a>
-            <a id="market">
-                <span class="material-symbols-rounded">
+            <a id="market" href="/dashboard/market">
+                <span class="material-symbols-rounded large">
                     groups
                 </span>
                 <div>

@@ -6,27 +6,58 @@ body {
 .appbar {
     width: 100%;
     background-color: var(--color-primary);
-    box-shadow: 0px 4px 4px 0px rgba(0,0,0,0.25);
+    box-shadow: var(--shadow);
     position: relative;
     z-index: 1;
     display: flex;
     gap: 24px;
     padding: 24px;
     flex-shrink: 0;
+    color: var(--color-surface);
+    font-weight: bold;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.appbar>.infos {
+.appbar>.infos-left {
     display: flex;
     gap: 24px;
-    color: var(--color-surface);
 }
 
-.appbar>.infos>div {
-    font-size: var(--font-size-body-large);
-    font-weight: bold;
+.appbar>.infos-left>div {
     display: flex;
     align-items: center;
     gap: 12px;
+}
+
+.appbar>.infos-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.appbar>.infos-right>#account {
+    display: flex;
+    gap: 12px;
+    align-items: center
+}
+
+.appbar>.infos-right>#account>img {
+    height: 40px;
+    width: auto;
+    border-radius: 100px;
+}
+
+.appbar>.infos-right>#money {
+    border-radius: 100px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    height: fit-content;
+    padding: 6px 16px 6px 6px;
+    background-color: var(--color-gold);
+    color: var(--color-gold-dark);
+    line-height: 1;
 }
 
 main {
@@ -56,13 +87,19 @@ main {
 }
 
 .bottom-actions>.links>a {
+    text-decoration: none;
+    color: var(--color-primary);
     display: flex;
     align-items: center;
     gap: 24px;
     background-color: var(--color-surface-dark);
     border-radius: var(--radius);
-    padding: 24px 28px;
-    box-shadow: 0px 4px 4px 0px rgba(0,0,0,0.25);
+    padding: 16px 24px;
+    box-shadow: var(--shadow);
+}
+
+.bottom-actions>.links>a:hover {
+    background-color: var(--color-secondary);
 }
 
 .bottom-actions>.links>a>div {
@@ -73,19 +110,17 @@ main {
 .bottom-actions>.links>a>div>.label {
     font-size: var(--font-size-body-large);
     font-weight: bold;
-}
-
-.bottom-actions>.links>a>span.material-symbols-rounded {
-    font-size: var(--font-size-icon-large);
+    margin-bottom: 4px;
 }
 
 .bottom-actions>#time {
-    box-shadow: 0px 4px 4px 0px rgba(0,0,0,0.25);
+    box-shadow: var(--shadow);
     background-color: var(--color-surface-dark);
     border-radius: 100px;
     display: flex;
-    gap: 10px;
+    gap: 6px;
     align-items: center;
     height: fit-content;
-    padding: 10px 20px 10px 10px;
+    padding: 6px 16px 6px 6px;
+    line-height: 1;
 }
