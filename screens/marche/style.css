@@ -263,13 +263,11 @@ h1.page-title {
     background-color: var(--color-secondary);
     border-radius: var(--border-radius);
     
-    /* MODIFICATIONS ICI */
     display: flex;
-    flex-direction: row; /* Aligne l'icone et le texte horizontalement */
-    align-items: center; /* Centre verticalement */
-    justify-content: center; /* Centre le tout horizontalement */
-    gap: 15px; /* Espace entre l'icone et le texte */
-    /* FIN MODIFICATIONS */
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
     
     padding: 0 30px;
     cursor: pointer;
@@ -278,7 +276,6 @@ h1.page-title {
     box-shadow: 0 6px 15px rgba(85, 54, 27, 0.15);
 }
 
-/* On s'assure que le texte s'empile bien verticalement */
 .tab > div {
     display: flex;
     flex-direction: column;
