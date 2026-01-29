@@ -1,22 +1,27 @@
 :root {
-    --color-primary: #55361B;
-    --color-secondary: #F2D49F;
-    --color-surface: #FFF4E0;
-    --color-surface-dark: #FFEFCE;
-    --color-gold: #DB9519;
-    --color-gold-dark: #8E6317;
+    --color-primary: #55361b;
+    --color-secondary: #f2d49f;
+    --color-surface: #fff4e0;
+    --color-surface-dark: #ffefce;
+    --color-gold: #db9519;
+    --color-gold-dark: #8e6317;
 
-    --font-size-title: 96px;
-    --font-size-subtitle: 48px;
-    --font-size-body-large: 32px;
-    --font-size-body: 24px;
-    --font-size-icon: 28px;
-    --font-size-icon-large: 40px;
+    --font-size-title: 72px;
+    --font-size-subtitle: 32px;
+    --font-size-body-large: 24px;
+    --font-size-body: 18px;
+    --font-size-icon: 24px;
+    --font-size-icon-large: 32px;
 
     --font-weight-title: bold;
     --font-weight-subtitle: bold;
     --font-weight-body-large: normal;
     --font-weight-body: normal;
 
+    --font-var-icon: "FILL" 0, "wght" 600, "GRAD" 0, "opsz" 24;
+    --font-var-icon-large: "FILL" 0, "wght" 600, "GRAD" 0, "opsz" 32;
+
     --radius: 20px;
+
+    --shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
 }
