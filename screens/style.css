@@ -144,3 +144,46 @@ button {
     cursor: pointer;
     font-size: large;
 }
+
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24,
+}
+
+.material-symbols-outlined{
+    padding: 0;
+    margin-left: 0px;
+    vertical-align: middle;
+    min-width: 1px;
+}
+
+.rankingButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 0px;
+    vertical-align: middle;
+    min-width: 1px;
+}
+
+.rankingButton .material-symbols-outlined {
+    font-size: 18px;
+    color: #55361bd8;
+    font-weight: bold;
+}
+
+.rankingButton:hover .material-symbols-outlined {
+    color: #55361B;
+}
+
+.rankingButton:active .material-symbols-outlined {
+    color: #55361B;
+}
+
+.rankingButton[active="none"] .material-symbols-outlined {
+    color: #55361b75;
+}
