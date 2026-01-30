@@ -97,6 +97,18 @@
             <span><b>23:47 AoE</b> • Fin du jour : <b>13 min</b></span>
         </div>
     </div>
+    <script>
+        window.addEventListener("click", (e) => {
+            if (
+                document.getElementById("account-menu").classList.contains("open") &&
+                e.target !== document.getElementById("account-menu") &&
+                e.target.parentNode !== document.getElementById("account") &&
+                e.target !== document.getElementById("account")
+            ) {
+                document.getElementById("account-menu").classList.toggle("open");
+            }
+        })
+    </script>
 </body>
 
 </html>
