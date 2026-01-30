@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clapier - TinyFarm</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- NAVBAR FIXE -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <span class="rang">▶ Rang 10/100</span>
+        </div>
+        <div class="nav-right">
+            <div class="postal">
+                <span class="postal-icon">✉</span>
+                <span class="postal-count">10</span>
+            </div>
+            <div class="user-avatar">M</div>
+            <div class="ecus">€ 2 536</div>
+        </div>
+    </nav>
+
+    <!-- BOUTON RETOUR EN HAUT GAUCHE SOUS NAVBAR -->
+    <div class="retour-container">
+        <button class="btn-retour" onclick="goBack()">← Retour</button>
+    </div>
+
+    <main class="main-content">
+        <div class="header">
+            <div>
+                <div class="title-main">Clapier</div>
+                <div class="title-sub">Gestion des biens • Lapins</div>
+            </div>
+            <div class="total">€50</div>
+        </div>
+        
+        <div class="stocks">
+            <div class="stock-item">
+                <div class="stock-icon">○</div>
+                <div class="stock-label">Œufs</div>
+                <div class="stock-qty">×1</div>
+            </div>
+            <div class="stock-item">
+                <div class="stock-icon">●</div>
+                <div class="stock-label">Seringue</div>
+                <div class="stock-qty">×0</div>
+            </div>
+        </div>
+        
+        <div class="animal-grid">
+            <div class="animal-card">
+                <div class="animal-name">Lapereau 1</div>
+                <div class="animal-stats">0.5 kg • 2 j</div>
+                <div class="animal-actions">
+                    <button class="btn btn-small" onclick="action('nourrir')">Nourrir</button>
+                    <button class="btn btn-small" onclick="action('vendre')">Vendre</button>
+                </div>
+            </div>
+            <div class="animal-card">
+                <div class="animal-name">Lapin adulte M</div>
+                <div class="animal-stats">2.2 kg • 12 j</div>
+                <div class="animal-actions">
+                    <button class="btn btn-small" onclick="action('vendre')">Vendre (25€)</button>
+                </div>
+            </div>
+            <!-- Ajoute 6 lapereaux ici -->
+        </div>
+        
+        <div class="clapier-actions">
+            <button class="btn btn-clapier" onclick="actionClapier('nourrir')">Nourrir (5€)</button>
+            <button class="btn btn-clapier" onclick="actionClapier('abreuver')">Abreuver (2€)</button>
+            <button class="btn btn-clapier" onclick="actionClapier('nettoyer')">Nettoyer (3€)</button>
+            <button class="btn btn-clapier" onclick="actionClapier('soigner')">Soigner (6€)</button>
+        </div>
+        
+        <div class="sidebar">
+            <div class="sidebar-title">Panier (2)</div>
+            <div class="cart-item">
+                <span>Seringue</span>
+                <span>×1 15€</span>
+            </div>
+            <div class="cart-total">Acheter (15€)</div>
+            <button class="btn btn-buy">Acheter</button>
+        </div>
+    </main>
+
+    <script>
+        function action(type) { alert(`${type} activé sur lapin !`); }
+        function actionClapier(type) { alert(`${type} clapier activé !`); }
+        function goBack() { window.history.back(); }
+    </script>
+</body>
+</html>
