@@ -6,11 +6,6 @@ This is the repository of the group 486 for the TinyFarm game project
 ```
 
 ```
-
-## Subject
-Here is the 
-[Subject](https://madoc.univ-nantes.fr/mod/resource/view.php?id=2489320)
-
 ## Frameworks 
 
 Here is the frameworks used in the project
