@@ -25,6 +25,13 @@
     font-weight: bold;
     display: inline-block;
     margin-bottom: 20px;
+    border: none;
+    cursor: pointer;
+}
+
+.back-btn:hover {
+    background-color: var(--color-primary);
+    color: var(--color-surface);
 }
 
 h1 {
