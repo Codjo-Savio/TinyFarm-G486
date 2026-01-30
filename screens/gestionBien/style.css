@@ -1,0 +1,362 @@
+/* --- RESET ET BASE --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    font-family: 'Amaranth', sans-serif;
+    background-color: #FFF4E0;; /* Couleur crème de fond */
+    color: #4A2C1D;           /* Marron texte principal */
+}
+
+/* --- BARRE DU HAUT (APPBAR) --- */
+.appbar {
+    width: 100%;
+    background-color: #55361B; /* Marron foncé */
+    color: #FDF5E6;           /* Texte clair */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 32px;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.3);
+    z-index: 10;
+}
+
+.appbar .infos {
+    display: flex;
+    gap: 24px;
+}
+
+.stat-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.account {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.money-badge {
+    background-color: #DB9519; /* Jaune doré */
+    color: #4A2C1D;
+    padding: 6px 16px;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: bold;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #FDF5E6;
+    overflow: hidden;
+    background: #EEDCBE;
+}
+
+.avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* --- CONTENU PRINCIPAL --- */
+main {
+    flex-grow: 1;
+    padding: 30px 50px;
+    overflow-y: auto;
+}
+
+.btn-back {
+    background-color: #F2D49F;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    color: #4A2C1D;
+    font-family: 'Amaranth';
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.page-title {
+    font-size: 4rem;
+    margin-top: 20px;
+    color: #4A2C1D;
+}
+
+/* --- ACTIONS BAS DE PAGE --- */
+.bottom-actions {
+    padding: 24px 32px;
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    justify-content: space-between;
+    align-items: flex-end;
+    pointer-events: none; /* Permet de cliquer à travers la zone vide */
+}
+
+.bottom-actions > * {
+    pointer-events: auto; /* Réactive le clic sur les boutons */
+}
+
+.links {
+    display: flex;
+    gap: 20px;
+}
+
+.action-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background-color: #F2D49F; /* Beige foncé */
+    color: #4A2C1D;
+    padding: 16px 28px;
+    border-radius: 20px;
+    text-decoration: none;
+    box-shadow: 0px 4px 6px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+}
+
+.action-card .material-symbols-rounded {
+    font-size: 2.5rem;
+}
+
+.text-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.text-group .label {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.text-group .sub-infos {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.time-pill {
+    background-color: #F2D49F;
+    color: #4A2C1D;
+    padding: 10px 24px;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0px 4px 6px rgba(0,0,0,0.2);
+}
+
+/* --- RÉGLAGES ICÔNES --- */
+.material-symbols-rounded {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+}
+
+
+/* --- LAYOUT GRID --- */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 40px;
+    margin-top: 30px;
+}
+
+/* --- CARTE TOTAL (GAUCHE) --- */
+.total-card {
+    background-color: #FFEFCE; /* Beige très clair */
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.total-header {
+    background-color: #F2D49F;
+    padding: 15px;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.total-amount {
+    font-weight: bold;
+    flex-grow: 1;
+}
+
+.btn-sell {
+    background-color: #4A2C1D;
+    color: #FDF5E6;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-family: 'Amaranth';
+    cursor: pointer;
+}
+
+.item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 5px;
+    font-weight: bold;
+}
+
+.counter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-qty {
+    background: none;
+    border: 1px solid #4A2C1D;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* --- LISTES DES BIENS (DROITE) --- */
+.cat-title {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.category-section {
+    margin-bottom: 30px;
+}
+
+.item-card {
+    background-color: #FFEFCE;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    margin-bottom: 15px;
+    gap: 20px;
+}
+
+.stock-badge {
+    background-color: #EEDCBE;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.item-name {
+    flex-grow: 1;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.item-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.item-price {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.btn-add {
+    background-color: #4A2C1D;
+    color: #FDF5E6;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 10px;
+    font-family: 'Amaranth';
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Style pour le cercle de l'icône "Total/Vente" */
+.icon-circle {
+    background-color: transparent;
+    border: 2px solid #F2D49F; /* Bordure marron fine */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-circle .material-symbols-rounded {
+    color: #4A2C1D;
+    font-size: 24px;
+}
+
+/* Style pour les petits cercles dans la liste de droite */
+.icon-circle-small {
+    background-color: transparent;
+    border: 1.5px solid #4A2C1D;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-circle-small .material-symbols-rounded {
+    color: #4A2C1D;
+    font-size: 18px;
+    font-variation-settings: 'FILL' 0; /* Garde l'icône en contour si besoin */
+}
+
+/* Ajustement des compteurs +/- pour qu'ils soient aussi bien circulaires */
+.btn-qty {
+    background-color: transparent;
+    border: 2px solid #4A2C1D;
+    color: #4A2C1D;
+    border-radius: 50%;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.2rem;
+    transition: all 0.2s;
+}
+
+.btn-qty:hover {
+    background-color: #4A2C1D;
+    color: #FDF5E6;
+}
