@@ -1,0 +1,225 @@
+:root {
+    --font-size-mini: 18px;
+}
+
+main {
+    padding: 40px 40px 100px 40px;
+    width: 100%;
+    height: 100%;
+}
+
+
+
+a {
+    text-decoration: none;
+    color: var(--color-primary);
+}
+
+h1 {
+    font-size: var(--font-size-title);
+    font-weight: var(--font-weight-title);
+}
+
+h2 {
+    font-size: var(--font-size-subtitle);
+    font-weight: var(--font-weight-subtitle);
+    margin-block-end: auto;
+    margin-block-start: auto;
+}
+
+p {
+    margin-block-start: auto;
+    margin-block-end: auto;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-body);
+}
+
+.taskbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100px;
+}
+
+.taskbar-left {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-secondary);
+    padding: 13px;
+    border-radius: 10px;
+}
+
+.taskbar-left a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.taskbar-right {
+    display: flex;
+    align-items: center;
+    gap: 27px;
+}
+
+.taskbar-right div {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.taskbar-right button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+    cursor: pointer;
+}
+
+.taskbar-right .more-actions-button {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    padding: 0;
+    justify-content: center;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    position: absolute;
+    top: 90px;
+    right: 0px;
+    padding: 25px 30px 25px 30px;
+    display: none !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px !important;
+    background-color: var(--color-surface-dark);
+    border-radius: 20px;
+    box-shadow: 0px 8px 8px 0px rgba(0, 0, 0, 0.25);
+}
+
+.dropdown-content.grid {
+    display: grid !important;
+}
+
+.dropdown-content button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 13px 20px 13px 20px;
+    border-radius: 10px;
+    border: none;
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+    cursor: pointer;
+    font-size: var(--font-size-body);
+}
+
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.grid-item {
+    width: 100%;
+    height: 414px;
+    background-color: var(--color-surface-dark);
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.animal-title {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    justify-content: space-between;
+    align-items: center;
+}
+
+.animal-state-bar {
+    height: 1px;
+    position: relative;
+    top: 35px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+}
+
+.animal-state-bar div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 21px 10px 21px 10px;
+    border-radius: 100px;
+    background-color: var(--color-secondary);
+    font-size: var(--font-size-mini);
+}
+
+.animal-state-bar p {
+    line-height: 0px;
+}
+
+
+.animal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    margin-top: 75px;
+    margin-bottom: 60px;
+}
+
+.animal-content div {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.animal-weight-text {
+    display: flex;
+    align-items: center;
+    gap: 10px !important;
+}
+
+.food-state {
+    width: 50%;
+}
+
+.food-state-line-place-holder {
+    width: 50%;
+    height: 10px;
+    background-color: var(--color-secondary);
+    border-radius: 10px;
+}
+
+#food-state-line {
+    width: 50%;
+    height: 100%;
+    background-color: var(--color-primary);
+    border-radius: 10px;
+}
+
+.animal-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.animal-actions button {
+    background-color: var(--color-primary);
+    color: var(--color-secondary);
+    border: none;
+    padding: 15px 8px 15px 8px;
+    border-radius: 10px;
+    cursor: pointer;
+}
