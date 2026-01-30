@@ -8,7 +8,7 @@
     --color-gold: #DB9519;
     --color-gold-dark: #8E6317;
 
-    --font-size-title: 64px; 
+    --font-size-title: 64px;
     --font-size-subtitle: 32px;
     --font-size-body-large: 22px;
     --font-size-body: 16px;
@@ -58,7 +58,8 @@ body {
     flex-shrink: 0;
 }
 
-.top-left, .top-right {
+.top-left,
+.top-right {
     display: flex;
     align-items: center;
     gap: 25px;
@@ -102,7 +103,8 @@ body {
     gap: 20px;
 }
 
-.btn-back, .btn-sell {
+.btn-back,
+.btn-sell {
     background-color: var(--color-secondary);
     border: none;
     padding: 10px 25px;
@@ -113,6 +115,7 @@ body {
     color: var(--color-primary);
     display: flex;
     align-items: center;
+    text-decoration: none;
     gap: 10px;
 }
 
@@ -152,7 +155,7 @@ h1.page-title {
     flex-direction: column;
     height: 100%;
     padding-top: 0;
-    padding-bottom: 20px; 
+    padding-bottom: 20px;
     min-width: 0;
 }
 
@@ -160,10 +163,10 @@ h1.page-title {
     background-color: var(--color-surface-dark);
     border-radius: var(--border-radius);
     padding: 20px;
-    padding-bottom: 30px; 
+    padding-bottom: 30px;
     display: flex;
     flex-direction: column;
-    gap: 25px; 
+    gap: 25px;
     flex: 0;
 }
 
@@ -210,9 +213,9 @@ h1.page-title {
 .cart-list {
     display: flex;
     flex-direction: column;
-    gap: 12px; 
+    gap: 12px;
     padding: 0 5px;
-    height: 155px; 
+    height: 155px;
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 10px;
@@ -252,7 +255,7 @@ h1.page-title {
 .bottom-tabs {
     display: flex;
     gap: 25px;
-    margin-top: auto; 
+    margin-top: auto;
     flex-shrink: 0;
     flex-wrap: wrap;
 }
@@ -262,21 +265,23 @@ h1.page-title {
     height: 90px;
     background-color: var(--color-secondary);
     border-radius: var(--border-radius);
-    
+
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
     gap: 15px;
-    
+
     padding: 0 30px;
     cursor: pointer;
     font-size: var(--font-size-body);
     font-weight: var(--font-weight-subtitle);
     box-shadow: 0 6px 15px rgba(85, 54, 27, 0.15);
+    text-decoration: none;
+    color: inherit;
 }
 
-.tab > div {
+.tab>div {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -294,7 +299,7 @@ h1.page-title {
     padding-right: 15px;
     padding-bottom: 120px;
     min-width: 0;
-    
+
     -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 40px, black calc(100% - 40px), transparent 100%);
     mask-image: linear-gradient(to bottom, transparent 0%, black 40px, black calc(100% - 40px), transparent 100%);
 }
@@ -410,7 +415,7 @@ svg {
 }
 
 ::-webkit-scrollbar-track {
-    background: transparent; 
+    background: transparent;
     margin-bottom: 20px;
 }
 
@@ -484,18 +489,18 @@ svg {
         padding-top: 10px;
         padding-bottom: 10px;
     }
-    
+
     .sub-header {
         flex-direction: column;
         align-items: flex-start;
     }
-    
+
     .market-stats {
         width: 100%;
         justify-content: space-between;
         margin-top: 15px;
         gap: 15px;
-        font-size: 48px; 
+        font-size: 48px;
     }
 
     .product-row {
@@ -517,7 +522,7 @@ svg {
         padding: 20px;
         align-items: center;
     }
-    
+
     .bottom-tabs {
         flex-direction: column;
         gap: 15px;

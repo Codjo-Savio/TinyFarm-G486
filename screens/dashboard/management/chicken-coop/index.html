@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="/styles/theme.css">
     <!-- Global styles -->
     <link rel="stylesheet" href="/styles/global.css">
-    <!-- Poulallier styles -->
-    <link rel="stylesheet" href="/dashboard/poulallier/styles.css">
+    <!-- Chicken-coop styles -->
+    <link rel="stylesheet" href="/dashboard/management/chicken-coop/style.css">
     <!-- Icons -->
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
@@ -22,9 +22,34 @@
 </head>
 
 <body>
-    <header class="header">
-
-    </header>
+    <div class="appbar">
+        <div class="infos-left">
+            <div id="rank">
+                <span class="material-symbols-rounded">
+                    leaderboard
+                </span>
+                <span>10/100</span>
+            </div>
+            <div id="level">
+                <span class="material-symbols-rounded">
+                    stars
+                </span>
+                <span>Niveau 2</span>
+            </div>
+        </div>
+        <div class="infos-right">
+            <div id="money">
+                <span class="material-symbols-rounded">
+                    paid
+                </span>
+                <span>1000</span>
+            </div>
+            <div id="account">
+                <span>Pascal</span>
+                <img src="/assets/farmer-icon.png" />
+            </div>
+        </div>
+    </div>
     <main>
         <div class="taskbar">
             <div class="taskbar-left">
@@ -35,7 +60,7 @@
                     <span class="material-symbols-rounded">
                         pets
                     </span>
-                    <p id="chicken-count"> 1/60 </p>
+                    <p id="chicken-count">5</p>
                 </div>
                 <div>
                     <span class="material-symbols-rounded">
@@ -57,7 +82,7 @@
             </div>
         </div>
         <section>
-            <h1> Poulallier </h1>
+            <h1> Poulailler </h1>
             <div>
                 <div class="grid-container">
                     <div class="grid-item">
@@ -256,6 +281,34 @@
             </div>
         </section>
     </main>
+    <div class="bottom-actions">
+        <div class="links">
+            <a id="coop" href="/dashboard/management/cooperative/">
+                <span class="material-symbols-rounded large">
+                    storefront
+                </span>
+                <div>
+                    <span class="label">Coopérative</span>
+                    <span class="infos">En stock : 100</span>
+                </div>
+            </a>
+            <a id="market" href="/dashboard/management/market/">
+                <span class="material-symbols-rounded large">
+                    groups
+                </span>
+                <div>
+                    <span class="label">Marché</span>
+                    <span class="infos">En stock : 2</span>
+                </div>
+            </a>
+        </div>
+        <div id="time">
+            <span class="material-symbols-rounded">
+                schedule
+            </span>
+            <span><b>23:47 AoE</b> • Fin du jour : <b>13 min</b></span>
+        </div>
+    </div>
 </body>
 <script>
     const button = document.getElementById('more-actions-btn');
