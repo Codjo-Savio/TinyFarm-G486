@@ -34,18 +34,58 @@ body {
     display: flex;
     gap: 12px;
     align-items: center;
+    position: relative;
 }
 
 .appbar>.infos-right>#account {
     display: flex;
     gap: 12px;
-    align-items: center
+    align-items: center;
+    cursor: pointer;
 }
 
 .appbar>.infos-right>#account>img {
     height: 40px;
     width: auto;
     border-radius: 100px;
+}
+
+.appbar>.infos-right>#account-menu {
+    background-color: var(--color-surface-dark);
+    position: absolute;
+    top: 64px;
+    right: -16px;
+    margin-top: 8px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    font-weight: normal;
+    min-width: 264px;
+    max-height: 0px;
+    padding: 0px 6px;
+    overflow: hidden;
+    transition-duration: .3s;
+    transform: translateY(-8px);
+}
+
+.appbar>.infos-right>#account-menu.open {
+    max-height: 156px;
+    padding: 6px;
+    transform: translateY(0px);
+}
+
+.appbar>.infos-right>#account-menu>* {
+    display: flex;
+    gap: 16px;
+    padding: 12px;
+    border-radius: calc(var(--radius) - 6px);
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.appbar>.infos-right>#account-menu>*:hover {
+    background-color: var(--color-secondary);
 }
 
 .appbar>.infos-right>#money {

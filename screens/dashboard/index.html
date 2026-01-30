@@ -42,9 +42,29 @@
                 </span>
                 <span>1000</span>
             </div>
-            <div id="account">
+            <div id="account" onclick="document.getElementById('account-menu').classList.toggle('open')">
                 <span>Pascal</span>
                 <img src="/assets/farmer-icon.png" />
+            </div>
+            <div id="account-menu">
+                <a href="/doc/rules?from=/dashboard">
+                    <span class="material-symbols-rounded">
+                        book
+                    </span>
+                    <span>Règles du jeu</span>
+                </a>
+                <a href="#">
+                    <span class="material-symbols-rounded">
+                        pause_circle
+                    </span>
+                    <span>Hiberner</span>
+                </a>
+                <a href="/">
+                    <span class="material-symbols-rounded">
+                        logout
+                    </span>
+                    <span>Déconnexion</span>
+                </a>
             </div>
         </div>
     </div>
