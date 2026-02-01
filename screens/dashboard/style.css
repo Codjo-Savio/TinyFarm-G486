@@ -65,7 +65,7 @@ body {
     max-height: 0px;
     padding: 0px 6px;
     overflow: hidden;
-    transition-duration: .3s;
+    transition-duration: 0.3s;
     transform: translateY(-8px);
 }
 
@@ -103,10 +103,26 @@ body {
 main {
     flex-grow: 1;
     width: 100%;
-    background-image: url("/assets/dashboard-background.png");
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: bottom;
+    overflow: hidden;
+}
+
+main>svg {
+    height: auto;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+}
+
+@media (max-width: 1236px) {
+    main>svg {
+        left: -50px;
+        height: 100%;
+        width: auto;
+    }
+}
+
+main>svg>path {
+    cursor: pointer;
 }
 
 .bottom-actions {
@@ -136,10 +152,12 @@ main {
     border-radius: var(--radius);
     padding: 16px 24px;
     box-shadow: var(--shadow);
+    transition: transform .3s;
 }
 
 .bottom-actions>.links>a:hover {
     background-color: var(--color-secondary);
+    transform: translateY(-4px);
 }
 
 .bottom-actions>.links>a>div {
