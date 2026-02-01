@@ -13,7 +13,7 @@
 
 <body>
     <div class="container">
-        <button class="back-btn" onclick="window.location.href = window.location.search ? window.location.search.split('=')[1] : '/'">
+        <button class="back-btn" onclick="window.location.href = window.location.search ?  window.location.search.replace('?from=', '') : '/'">
             <span class="material-symbols-outlined">arrow_left_alt</span> 
             Retour
         </button>

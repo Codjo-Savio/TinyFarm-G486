@@ -83,14 +83,14 @@
             </defs>
             <script>
                 function handleClick(item) {
-                    window.location.href = `/dashboard/management/${item}`;
+                    window.location.href = `/dashboard/management/${item}?from=/dashboard`;
                 }
             </script>
         </svg>
     </main>
     <div class="bottom-actions">
         <div class="links">
-            <a id="coop" href="/dashboard/trade/cooperative">
+            <a id="coop" href="/dashboard/trade/cooperative?from=/dashboard">
                 <span class="material-symbols-rounded large">
                     storefront
                 </span>
@@ -99,7 +99,7 @@
                     <span class="infos">En stock : 100</span>
                 </div>
             </a>
-            <a id="marketplace" href="/dashboard/trade/marketplace">
+            <a id="marketplace" href="/dashboard/trade/marketplace?from=/dashboard">
                 <span class="material-symbols-rounded large">
                     groups
                 </span>
