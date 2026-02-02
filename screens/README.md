@@ -2,6 +2,10 @@
 
 This directory contains an HTML/CSS based mockup.
 
+## Preview
+
+You can access a preview [here](https://super-duper-guacamole-7j744ppp6vp2r454-8080.app.github.dev/).
+
 ## Launch the server
 
 1. Start a new codespace or connect to an existing one
