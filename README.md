@@ -4,7 +4,7 @@ This is the repository of the group 486 for the TinyFarm game project
 ## Launch the server
 ---
 ```
-
+python3 -m http.server 8080 --directory screens/
 ```
 ## Frameworks 
 

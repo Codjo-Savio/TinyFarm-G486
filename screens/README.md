@@ -13,7 +13,7 @@ You can access a preview [here](https://super-duper-guacamole-7j744ppp6vp2r454-8
 2. Move into the project directory and enter the following command in the shell:
 
 ```bash
-python3 -m http.server 8080 --directory screens/
+python3 -m http.server 8080
 ```
 
 3. Click the `Open in a browser` button in the bottom right popup
