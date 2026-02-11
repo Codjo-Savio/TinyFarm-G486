@@ -66,7 +66,7 @@ Auteur 		: CHUPIN Noa 486M
             Organisation : Répartition du code des tables par tous les membres backends.
             
             Répartition encore à faire.
-            Noa s'occupe de faire le nouveau schéma avec les nouveautées de la réunions.
+            Noa s'occupe de faire le nouveau schéma avec les nouveautées de la réunion.
 
     
 
