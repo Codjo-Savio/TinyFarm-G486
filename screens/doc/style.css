@@ -1,7 +1,17 @@
+html {
+    overflow-y: scroll !important;
+}
+
+body {
+    min-height: 100vh;
+    overflow-y: scroll !important;
+}
+
 .container {
     padding: 40px;
     margin-left: 5%;
     margin-right: 5%;
+    overflow-y: scroll;
 }
 
 .header-section {
