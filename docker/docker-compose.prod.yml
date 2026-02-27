@@ -6,22 +6,22 @@ services:
     container_name: postgres_prod
     environment:
       POSTGRES_DB: tinyfarm
-      POSTGRES_USERNAME_FILE: /secret/db_username.txt
-      POSTGRES_PASSWORD_FILE: /secret/db_password.txt
+      POSTGRES_USERNAME_FILE: secret/db_username.txt
+      POSTGRES_PASSWORD_FILE: secret/db_password.txt
     secrets:
       - db_username
       - db_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - tinyfarm_network
+      - tinyfarm
   backend:
-    build: ../backend
+    build: ../backend/tinyfarm
     container_name: backend_prod
     environment:
       SPRING_PROFILES_ACTIVE: prod
-      DB_USERNAME_FILE: /secret/db_username.txt
-      DB_PASSWORD_FILE: /secret/db_password.txt
+      DB_USERNAME_FILE: secret/db_username.txt
+      DB_PASSWORD_FILE: secret/db_password.txt
     secrets:
       - db_username
       - db_password
