@@ -4,8 +4,10 @@
 /*===========================================*/
 
 -- Ce script valide le bon fonctionnement de la base de données.
--- Il doit être exécuté APRÈS database.sql, tables.sql et insert_data.sql.
+-- Il doit être exécuté APRÈS database.sql, tables.sql, Ranking.sql et insert_data.sql.
 -- Chaque test affiche un message et le résultat attendu vs obtenu.
+
+SET search_path TO TinyFarm;
 
 /*===========================================*/
 /*  1. TESTS DE STRUCTURE DES TABLES         */
@@ -26,7 +28,8 @@ BEGIN
     FOREACH t IN ARRAY tables_attendues LOOP
         SELECT COUNT(*) INTO nb
         FROM information_schema.tables
-        WHERE table_name = lower(t);
+        WHERE table_schema = 'tinyfarm'
+        AND table_name = lower(t);
         IF nb = 1 THEN
             RAISE NOTICE '  [OK] Table "%" existe', t;
         ELSE
@@ -54,6 +57,78 @@ BEGIN
         RAISE NOTICE '  [OK] Type rabbit_type_enum existe';
     ELSE
         RAISE WARNING '  [ECHEC] Type rabbit_type_enum introuvable';
+    END IF;
+END $$;
+
+-- Test 1.3 : Vérifier que la colonne price existe dans Market
+DO $$
+DECLARE
+    nb INT;
+BEGIN
+    RAISE NOTICE '=== TEST 1.3 : Colonne price dans Market ===';
+    SELECT COUNT(*) INTO nb
+    FROM information_schema.columns
+    WHERE table_schema = 'tinyfarm'
+    AND table_name = 'market'
+    AND column_name = 'price';
+    IF nb = 1 THEN
+        RAISE NOTICE '  [OK] Colonne price existe dans Market';
+    ELSE
+        RAISE WARNING '  [ECHEC] Colonne price introuvable dans Market';
+    END IF;
+END $$;
+
+-- Test 1.4 : Vérifier que la colonne date_event existe dans Event
+DO $$
+DECLARE
+    nb INT;
+BEGIN
+    RAISE NOTICE '=== TEST 1.4 : Colonne date_event dans Event ===';
+    SELECT COUNT(*) INTO nb
+    FROM information_schema.columns
+    WHERE table_schema = 'tinyfarm'
+    AND table_name = 'event'
+    AND column_name = 'date_event';
+    IF nb = 1 THEN
+        RAISE NOTICE '  [OK] Colonne date_event existe dans Event';
+    ELSE
+        RAISE WARNING '  [ECHEC] Colonne date_event introuvable dans Event';
+    END IF;
+END $$;
+
+-- Test 1.5 : Vérifier que la colonne coef existe dans Product
+DO $$
+DECLARE
+    nb INT;
+BEGIN
+    RAISE NOTICE '=== TEST 1.5 : Colonne coef dans Product ===';
+    SELECT COUNT(*) INTO nb
+    FROM information_schema.columns
+    WHERE table_schema = 'tinyfarm'
+    AND table_name = 'product'
+    AND column_name = 'coef';
+    IF nb = 1 THEN
+        RAISE NOTICE '  [OK] Colonne coef existe dans Product';
+    ELSE
+        RAISE WARNING '  [ECHEC] Colonne coef introuvable dans Product';
+    END IF;
+END $$;
+
+-- Test 1.6 : Vérifier que les IDs sont auto-générés (IDENTITY)
+DO $$
+DECLARE
+    nb INT;
+BEGIN
+    RAISE NOTICE '=== TEST 1.6 : IDs auto-générés (IDENTITY) ===';
+    SELECT COUNT(*) INTO nb
+    FROM information_schema.columns
+    WHERE table_schema = 'tinyfarm'
+    AND is_identity = 'YES'
+    AND column_name IN ('u_id', 'productid', 't_id', 'a_id', 'e_id');
+    IF nb = 5 THEN
+        RAISE NOTICE '  [OK] 5 colonnes IDENTITY trouvées (attendu : 5)';
+    ELSE
+        RAISE WARNING '  [ECHEC] % colonnes IDENTITY trouvées (attendu : 5)', nb;
     END IF;
 END $$;
 
@@ -149,11 +224,39 @@ BEGIN
     END IF;
 END $$;
 
+-- Test 2.5 : Vérifier que les événements ont une date
+DO $$
+DECLARE
+    nb_sans_date INT;
+BEGIN
+    RAISE NOTICE '=== TEST 2.5 : Événements avec date ===';
+    SELECT COUNT(*) INTO nb_sans_date FROM Event WHERE date_event IS NULL;
+    IF nb_sans_date = 0 THEN
+        RAISE NOTICE '  [OK] Tous les événements ont une date';
+    ELSE
+        RAISE WARNING '  [ECHEC] % événements sans date', nb_sans_date;
+    END IF;
+END $$;
+
+-- Test 2.6 : Vérifier que les produits en Market ont un prix
+DO $$
+DECLARE
+    nb_sans_prix INT;
+BEGIN
+    RAISE NOTICE '=== TEST 2.6 : Produits Market avec prix ===';
+    SELECT COUNT(*) INTO nb_sans_prix FROM Market WHERE price IS NULL;
+    IF nb_sans_prix = 0 THEN
+        RAISE NOTICE '  [OK] Tous les produits du Market ont un prix';
+    ELSE
+        RAISE WARNING '  [ECHEC] % produits sans prix sur le Market', nb_sans_prix;
+    END IF;
+END $$;
+
 /*===========================================*/
 /*  3. TESTS DES CONTRAINTES D'INTÉGRITÉ     */
 /*===========================================*/
 
--- Test 3.1 : Contrainte CHECK sur quantity (Stock) — doit échouer
+-- Test 3.1 : Contrainte CHECK sur quantity (Stock) — quantité négative doit échouer
 DO $$
 BEGIN
     RAISE NOTICE '=== TEST 3.1 : Contrainte CHECK quantity >= 0 (Stock) ===';
@@ -165,7 +268,7 @@ BEGIN
     END;
 END $$;
 
--- Test 3.2 : Contrainte CHECK sur quantity (Desktop) — doit échouer
+-- Test 3.2 : Contrainte CHECK sur quantity (Desktop) — quantité négative doit échouer
 DO $$
 BEGIN
     RAISE NOTICE '=== TEST 3.2 : Contrainte CHECK quantity >= 0 (Desktop) ===';
@@ -177,36 +280,49 @@ BEGIN
     END;
 END $$;
 
--- Test 3.3 : Contrainte CHECK sur quantite (Transactions) — doit échouer
+-- Test 3.3 : Contrainte CHECK sur quantite (Transactions) — quantité 0 doit échouer
 DO $$
 BEGIN
     RAISE NOTICE '=== TEST 3.3 : Contrainte CHECK quantite > 0 (Transactions) ===';
     BEGIN
-        INSERT INTO Transactions (t_id, seller, buyer, product, quantite, prix_total)
-            VALUES (999, 2, 3, 1, 0, 0.0);
+        INSERT INTO Transactions (seller, buyer, product, quantite, prix_total)
+            VALUES (2, 3, 1, 0, 0.0);
         RAISE WARNING '  [ECHEC] L''insertion de quantité 0 aurait dû échouer';
     EXCEPTION WHEN check_violation THEN
         RAISE NOTICE '  [OK] Insertion de quantité 0 refusée';
     END;
 END $$;
 
--- Test 3.4 : Contrainte FK — utilisateur inexistant dans Animal
+-- Test 3.4 : Contrainte CHECK seller != buyer (Transactions) — auto-vente doit échouer
 DO $$
 BEGIN
-    RAISE NOTICE '=== TEST 3.4 : Contrainte FK utilisateur inexistant (Animal) ===';
+    RAISE NOTICE '=== TEST 3.4 : Contrainte CHECK seller != buyer (Transactions) ===';
+    BEGIN
+        INSERT INTO Transactions (seller, buyer, product, quantite, prix_total)
+            VALUES (2, 2, 1, 5, 50.0);
+        RAISE WARNING '  [ECHEC] L''insertion seller=buyer aurait dû échouer';
+    EXCEPTION WHEN check_violation THEN
+        RAISE NOTICE '  [OK] Auto-vente (seller = buyer) refusée';
+    END;
+END $$;
+
+-- Test 3.5 : Contrainte FK — utilisateur inexistant dans Animal
+DO $$
+BEGIN
+    RAISE NOTICE '=== TEST 3.5 : Contrainte FK utilisateur inexistant (Animal) ===';
     BEGIN
         INSERT INTO Animal (u_id, a_id, clean, healthy, age, weight, a_gender)
-            VALUES (999, 999, TRUE, TRUE, 10, 1.0, TRUE);
+            OVERRIDING SYSTEM VALUE VALUES (999, 999, TRUE, TRUE, 10, 1.0, TRUE);
         RAISE WARNING '  [ECHEC] L''insertion avec u_id=999 aurait dû échouer';
     EXCEPTION WHEN foreign_key_violation THEN
         RAISE NOTICE '  [OK] Insertion avec utilisateur inexistant refusée';
     END;
 END $$;
 
--- Test 3.5 : Contrainte FK — produit inexistant dans Stock
+-- Test 3.6 : Contrainte FK — produit inexistant dans Stock
 DO $$
 BEGIN
-    RAISE NOTICE '=== TEST 3.5 : Contrainte FK produit inexistant (Stock) ===';
+    RAISE NOTICE '=== TEST 3.6 : Contrainte FK produit inexistant (Stock) ===';
     BEGIN
         INSERT INTO Stock (u_id, productID, quantity) VALUES (2, 999, 10);
         RAISE WARNING '  [ECHEC] L''insertion avec productID=999 aurait dû échouer';
@@ -215,10 +331,10 @@ BEGIN
     END;
 END $$;
 
--- Test 3.6 : Contrainte FK — animal inexistant dans Chicken
+-- Test 3.7 : Contrainte FK — animal inexistant dans Chicken
 DO $$
 BEGIN
-    RAISE NOTICE '=== TEST 3.6 : Contrainte FK animal inexistant (Chicken) ===';
+    RAISE NOTICE '=== TEST 3.7 : Contrainte FK animal inexistant (Chicken) ===';
     BEGIN
         INSERT INTO Chicken (a_id, chicken_type, fasting) VALUES (999, 'poule', 0);
         RAISE WARNING '  [ECHEC] L''insertion avec a_id=999 aurait dû échouer';
@@ -227,26 +343,26 @@ BEGIN
     END;
 END $$;
 
--- Test 3.7 : Contrainte ENUM — type de poulet invalide
+-- Test 3.8 : Contrainte ENUM — type de poulet invalide
 DO $$
 BEGIN
-    RAISE NOTICE '=== TEST 3.7 : Contrainte ENUM chicken_type invalide ===';
+    RAISE NOTICE '=== TEST 3.8 : Contrainte ENUM chicken_type invalide ===';
     BEGIN
         INSERT INTO Animal (u_id, a_id, clean, healthy, age, weight, a_gender)
-            VALUES (2, 900, TRUE, TRUE, 10, 1.0, TRUE);
+            OVERRIDING SYSTEM VALUE VALUES (2, 900, TRUE, TRUE, 10, 1.0, TRUE);
         INSERT INTO Chicken (a_id, chicken_type, fasting) VALUES (900, 'canard', 0);
         RAISE WARNING '  [ECHEC] L''insertion du type "canard" aurait dû échouer';
     EXCEPTION WHEN invalid_text_representation THEN
         RAISE NOTICE '  [OK] Type de poulet invalide refusé';
-        -- Nettoyage
+        -- Nettoyage au cas où l'animal a été inséré
         DELETE FROM Animal WHERE a_id = 900;
     END;
 END $$;
 
--- Test 3.8 : Contrainte PK — doublon dans Stock
+-- Test 3.9 : Contrainte PK — doublon dans Stock
 DO $$
 BEGIN
-    RAISE NOTICE '=== TEST 3.8 : Contrainte PK doublon (Stock) ===';
+    RAISE NOTICE '=== TEST 3.9 : Contrainte PK doublon (Stock) ===';
     BEGIN
         INSERT INTO Stock (u_id, productID, quantity) VALUES (2, 2, 10);
         RAISE WARNING '  [ECHEC] Le doublon (u_id=2, productID=2) aurait dû échouer';
@@ -255,25 +371,38 @@ BEGIN
     END;
 END $$;
 
--- Test 3.9 : Cascade DELETE — supprimer un utilisateur supprime ses animaux
+-- Test 3.10 : Contrainte NOT NULL — price obligatoire dans Market
+DO $$
+BEGIN
+    RAISE NOTICE '=== TEST 3.10 : Contrainte NOT NULL price (Market) ===';
+    BEGIN
+        INSERT INTO Market (u_id, productID, price) VALUES (3, 1, NULL);
+        RAISE WARNING '  [ECHEC] L''insertion avec price=NULL aurait dû échouer';
+    EXCEPTION WHEN not_null_violation THEN
+        RAISE NOTICE '  [OK] Insertion avec price NULL refusée dans Market';
+    END;
+END $$;
+
+-- Test 3.11 : Cascade DELETE — supprimer un utilisateur supprime ses animaux
 DO $$
 DECLARE
     nb_animaux_avant INT;
     nb_animaux_apres INT;
+    temp_uid INT;
 BEGIN
-    RAISE NOTICE '=== TEST 3.9 : CASCADE DELETE utilisateur -> animaux ===';
+    RAISE NOTICE '=== TEST 3.11 : CASCADE DELETE utilisateur -> animaux ===';
 
     -- Insérer un utilisateur temporaire avec un animal
-    INSERT INTO "User" (u_id, nom, sexe, ecus, level) VALUES (100, 'Temp', 'M', 0, 1);
-    INSERT INTO Animal (u_id, a_id, clean, healthy, age, weight, a_gender)
-        VALUES (100, 900, TRUE, TRUE, 10, 1.0, TRUE);
+    INSERT INTO "User" (nom, sexe, ecus, level) VALUES ('Temp', 'M', 0, 1) RETURNING u_id INTO temp_uid;
+    INSERT INTO Animal (u_id, clean, healthy, age, weight, a_gender)
+        VALUES (temp_uid, TRUE, TRUE, 10, 1.0, TRUE);
 
-    SELECT COUNT(*) INTO nb_animaux_avant FROM Animal WHERE u_id = 100;
+    SELECT COUNT(*) INTO nb_animaux_avant FROM Animal WHERE u_id = temp_uid;
 
     -- Supprimer l'utilisateur
-    DELETE FROM "User" WHERE u_id = 100;
+    DELETE FROM "User" WHERE u_id = temp_uid;
 
-    SELECT COUNT(*) INTO nb_animaux_apres FROM Animal WHERE u_id = 100;
+    SELECT COUNT(*) INTO nb_animaux_apres FROM Animal WHERE u_id = temp_uid;
 
     IF nb_animaux_avant = 1 AND nb_animaux_apres = 0 THEN
         RAISE NOTICE '  [OK] Suppression en cascade fonctionne (1 animal supprimé)';
@@ -282,30 +411,50 @@ BEGIN
     END IF;
 END $$;
 
--- Test 3.10 : Cascade DELETE — supprimer un animal supprime sa sous-classe
+-- Test 3.12 : Cascade DELETE — supprimer un animal supprime sa sous-classe
 DO $$
 DECLARE
     nb_chicken_avant INT;
     nb_chicken_apres INT;
+    temp_aid INT;
 BEGIN
-    RAISE NOTICE '=== TEST 3.10 : CASCADE DELETE animal -> sous-classe ===';
+    RAISE NOTICE '=== TEST 3.12 : CASCADE DELETE animal -> sous-classe ===';
 
     -- Insérer un animal temporaire avec sous-classe
-    INSERT INTO Animal (u_id, a_id, clean, healthy, age, weight, a_gender)
-        VALUES (2, 901, TRUE, TRUE, 10, 1.0, TRUE);
-    INSERT INTO Chicken (a_id, chicken_type, fasting) VALUES (901, 'poule', 0);
+    INSERT INTO Animal (u_id, clean, healthy, age, weight, a_gender)
+        VALUES (2, TRUE, TRUE, 10, 1.0, TRUE) RETURNING a_id INTO temp_aid;
+    INSERT INTO Chicken (a_id, chicken_type, fasting) VALUES (temp_aid, 'poule', 0);
 
-    SELECT COUNT(*) INTO nb_chicken_avant FROM Chicken WHERE a_id = 901;
+    SELECT COUNT(*) INTO nb_chicken_avant FROM Chicken WHERE a_id = temp_aid;
 
-    DELETE FROM Animal WHERE a_id = 901;
+    DELETE FROM Animal WHERE a_id = temp_aid;
 
-    SELECT COUNT(*) INTO nb_chicken_apres FROM Chicken WHERE a_id = 901;
+    SELECT COUNT(*) INTO nb_chicken_apres FROM Chicken WHERE a_id = temp_aid;
 
     IF nb_chicken_avant = 1 AND nb_chicken_apres = 0 THEN
         RAISE NOTICE '  [OK] Suppression en cascade animal -> poulet fonctionne';
     ELSE
         RAISE WARNING '  [ECHEC] Avant: %, Après: %', nb_chicken_avant, nb_chicken_apres;
     END IF;
+END $$;
+
+-- Test 3.13 : Auto-incrément — insertion sans ID explicite
+DO $$
+DECLARE
+    new_uid INT;
+BEGIN
+    RAISE NOTICE '=== TEST 3.13 : Auto-incrément des IDs ===';
+
+    INSERT INTO "User" (nom, sexe, ecus, level) VALUES ('TestAuto', 'M', 100, 1) RETURNING u_id INTO new_uid;
+
+    IF new_uid IS NOT NULL AND new_uid > 5 THEN
+        RAISE NOTICE '  [OK] Utilisateur inséré avec u_id auto-généré = %', new_uid;
+    ELSE
+        RAISE WARNING '  [ECHEC] u_id auto-généré inattendu = %', new_uid;
+    END IF;
+
+    -- Nettoyage
+    DELETE FROM "User" WHERE u_id = new_uid;
 END $$;
 
 /*===========================================*/
@@ -365,12 +514,27 @@ BEGIN
     END IF;
 END $$;
 
--- Test 4.4 : getCoef() — coefficient d'un produit
+-- Test 4.4 : getScoreEcus() — ne doit pas faire de division par zéro
 DO $$
 DECLARE
     resultat INT;
 BEGIN
-    RAISE NOTICE '=== TEST 4.4 : getCoef() ===';
+    RAISE NOTICE '=== TEST 4.4 : getScoreEcus() — pas de division par zéro ===';
+    -- Avec des données existantes, le résultat doit être > 0
+    resultat := getScoreEcus(2);
+    IF resultat IS NOT NULL AND resultat >= 0 THEN
+        RAISE NOTICE '  [OK] getScoreEcus(2) = % (pas d''erreur)', resultat;
+    ELSE
+        RAISE WARNING '  [ECHEC] getScoreEcus(2) = % (inattendu)', resultat;
+    END IF;
+END $$;
+
+-- Test 4.5 : getCoef() — coefficient d'un produit
+DO $$
+DECLARE
+    resultat INT;
+BEGIN
+    RAISE NOTICE '=== TEST 4.5 : getCoef() ===';
 
     resultat := getCoef(1); -- Lapin, coef = 3
     IF resultat = 3 THEN
@@ -387,13 +551,13 @@ BEGIN
     END IF;
 END $$;
 
--- Test 4.5 : getVentesTotal() — total des ventes d'un produit
+-- Test 4.6 : getVentesTotal() — total des ventes d'un produit
 DO $$
 DECLARE
     resultat INT;
     attendu INT;
 BEGIN
-    RAISE NOTICE '=== TEST 4.5 : getVentesTotal() ===';
+    RAISE NOTICE '=== TEST 4.6 : getVentesTotal() ===';
     -- Oeufs (productID=2) : transaction 1 (10) + 3 (8) + 9 (12) = 30
     attendu := 30;
     resultat := getVentesTotal(2);
@@ -404,13 +568,13 @@ BEGIN
     END IF;
 END $$;
 
--- Test 4.6 : getVentesUserTotal() — ventes d'un produit pour un utilisateur
+-- Test 4.7 : getVentesUserTotal() — ventes d'un produit pour un utilisateur
 DO $$
 DECLARE
     resultat INT;
     attendu INT;
 BEGIN
-    RAISE NOTICE '=== TEST 4.6 : getVentesUserTotal() ===';
+    RAISE NOTICE '=== TEST 4.7 : getVentesUserTotal() ===';
     -- Alice (u_id=2) a vendu des Oeufs (productID=2) : transaction 1 (10) = 10
     attendu := 10;
     resultat := getVentesUserTotal(2, 2);
@@ -418,6 +582,87 @@ BEGIN
         RAISE NOTICE '  [OK] getVentesUserTotal(2, 2) = % (attendu : %)', resultat, attendu;
     ELSE
         RAISE WARNING '  [ECHEC] getVentesUserTotal(2, 2) = % (attendu : %)', resultat, attendu;
+    END IF;
+END $$;
+
+-- Test 4.8 : getVentesTotal() — produit sans ventes retourne 0 (pas d'erreur)
+DO $$
+DECLARE
+    resultat INT;
+BEGIN
+    RAISE NOTICE '=== TEST 4.8 : getVentesTotal() produit sans ventes ===';
+    -- productID=999 n'existe pas dans Transactions
+    resultat := getVentesTotal(999);
+    IF resultat = 0 THEN
+        RAISE NOTICE '  [OK] getVentesTotal(999) = 0 (pas de division par zéro)';
+    ELSE
+        RAISE WARNING '  [ECHEC] getVentesTotal(999) = % (attendu : 0)', resultat;
+    END IF;
+END $$;
+
+-- Test 4.9 : getScoreProduit() — protection division par zéro
+DO $$
+DECLARE
+    resultat INT;
+BEGIN
+    RAISE NOTICE '=== TEST 4.9 : getScoreProduit() division par zéro ===';
+    -- Produit 999 n'a aucune vente, VenteT = 0
+    resultat := getScoreProduit(999, 2);
+    IF resultat = 0 THEN
+        RAISE NOTICE '  [OK] getScoreProduit(999, 2) = 0 (division par zéro protégée)';
+    ELSE
+        RAISE WARNING '  [ECHEC] getScoreProduit(999, 2) = % (attendu : 0)', resultat;
+    END IF;
+END $$;
+
+-- Test 4.10 : getScoreVente() — dynamique sur tous les produits
+DO $$
+DECLARE
+    resultat INT;
+BEGIN
+    RAISE NOTICE '=== TEST 4.10 : getScoreVente() dynamique ===';
+    resultat := getScoreVente(2); -- Alice
+    IF resultat IS NOT NULL AND resultat >= 0 THEN
+        RAISE NOTICE '  [OK] getScoreVente(2) = % (pas d''erreur)', resultat;
+    ELSE
+        RAISE WARNING '  [ECHEC] getScoreVente(2) = % (inattendu)', resultat;
+    END IF;
+END $$;
+
+-- Test 4.11 : Vue Ranking — ne doit pas contenir la coopérative (u_id=1)
+DO $$
+DECLARE
+    nb_coop INT;
+    nb_total INT;
+BEGIN
+    RAISE NOTICE '=== TEST 4.11 : Vue Ranking exclut la coopérative ===';
+    SELECT COUNT(*) INTO nb_coop FROM Ranking WHERE u_id = 1;
+    SELECT COUNT(*) INTO nb_total FROM Ranking;
+
+    IF nb_coop = 0 THEN
+        RAISE NOTICE '  [OK] La coopérative (u_id=1) est exclue du Ranking';
+    ELSE
+        RAISE WARNING '  [ECHEC] La coopérative est présente dans le Ranking';
+    END IF;
+
+    IF nb_total = 4 THEN
+        RAISE NOTICE '  [OK] 4 utilisateurs dans le Ranking (attendu : 4)';
+    ELSE
+        RAISE WARNING '  [ECHEC] % utilisateurs dans le Ranking (attendu : 4)', nb_total;
+    END IF;
+END $$;
+
+-- Test 4.12 : getRank() — fonctionne sans erreur
+DO $$
+DECLARE
+    resultat INT;
+BEGIN
+    RAISE NOTICE '=== TEST 4.12 : getRank() ===';
+    resultat := getRank(2); -- Alice
+    IF resultat IS NOT NULL AND resultat >= 0 THEN
+        RAISE NOTICE '  [OK] getRank(2) = % (pas d''erreur)', resultat;
+    ELSE
+        RAISE WARNING '  [ECHEC] getRank(2) = % (inattendu)', resultat;
     END IF;
 END $$;
 
@@ -544,6 +789,58 @@ BEGIN
         RAISE NOTICE '  [OK] % produits sur le Market (attendu : 6)', nb;
     ELSE
         RAISE WARNING '  [ECHEC] % produits sur le Market (attendu : 6)', nb;
+    END IF;
+END $$;
+
+-- Test 5.8 : Vérifier que les prix du Market sont positifs
+DO $$
+DECLARE
+    nb_negatif INT;
+BEGIN
+    RAISE NOTICE '=== TEST 5.8 : Prix du Market positifs ===';
+    SELECT COUNT(*) INTO nb_negatif FROM Market WHERE price <= 0;
+    IF nb_negatif = 0 THEN
+        RAISE NOTICE '  [OK] Tous les prix du Market sont positifs';
+    ELSE
+        RAISE WARNING '  [ECHEC] % produits avec prix <= 0 sur le Market', nb_negatif;
+    END IF;
+END $$;
+
+-- Test 5.9 : Événements triés chronologiquement
+DO $$
+DECLARE
+    nb_total INT;
+    nb_ordonne INT;
+BEGIN
+    RAISE NOTICE '=== TEST 5.9 : Événements ordonnés par date ===';
+    SELECT COUNT(*) INTO nb_total FROM Event;
+
+    SELECT COUNT(*) INTO nb_ordonne
+    FROM (
+        SELECT date_event,
+               LAG(date_event) OVER (ORDER BY e_id) AS prev_date
+        FROM Event
+    ) sub
+    WHERE prev_date IS NULL OR date_event >= prev_date;
+
+    IF nb_ordonne = nb_total THEN
+        RAISE NOTICE '  [OK] Les % événements sont en ordre chronologique', nb_total;
+    ELSE
+        RAISE WARNING '  [ECHEC] Événements non ordonnés chronologiquement';
+    END IF;
+END $$;
+
+-- Test 5.10 : Aucune transaction où seller = buyer
+DO $$
+DECLARE
+    nb INT;
+BEGIN
+    RAISE NOTICE '=== TEST 5.10 : Pas d''auto-vente dans les transactions ===';
+    SELECT COUNT(*) INTO nb FROM Transactions WHERE seller = buyer;
+    IF nb = 0 THEN
+        RAISE NOTICE '  [OK] Aucune auto-vente trouvée';
+    ELSE
+        RAISE WARNING '  [ECHEC] % transactions avec seller = buyer', nb;
     END IF;
 END $$;
 

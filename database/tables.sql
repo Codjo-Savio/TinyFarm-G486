@@ -1,4 +1,8 @@
-/*CREATE THE TABLES HERE*/
+/*===========================================*/
+/*  CRÉATION DES TABLES - TinyFarm           */
+/*===========================================*/
+
+SET search_path TO TinyFarm;
 
 /* Enum types for animal subtypes */
 CREATE TYPE chicken_type_enum AS ENUM ('poussin', 'poule', 'coq');
@@ -6,7 +10,7 @@ CREATE TYPE rabbit_type_enum AS ENUM ('lapereau', 'lapin');
 
 CREATE TABLE IF NOT EXISTS "User"
 (
-    u_id INTEGER PRIMARY KEY,
+    u_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nom VARCHAR(20),
     sexe VARCHAR(20),
     ecus INTEGER,
@@ -15,7 +19,7 @@ CREATE TABLE IF NOT EXISTS "User"
 
 CREATE TABLE IF NOT EXISTS Product
 (
-    productID INTEGER PRIMARY KEY,
+    productID INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     description TEXT,
     collection BOOLEAN,
     price FLOAT,
@@ -24,13 +28,14 @@ CREATE TABLE IF NOT EXISTS Product
 
 CREATE TABLE IF NOT EXISTS Transactions
 (
-    t_id INTEGER PRIMARY KEY,
+    t_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     seller INTEGER NOT NULL REFERENCES "User"(u_id) ON DELETE CASCADE ON UPDATE CASCADE,
     buyer INTEGER NOT NULL REFERENCES "User"(u_id) ON DELETE CASCADE ON UPDATE CASCADE,
     product INTEGER NOT NULL REFERENCES Product(productID) ON DELETE CASCADE ON UPDATE CASCADE,
     quantite INTEGER NOT NULL CHECK (quantite > 0),
     prix_total FLOAT NOT NULL CHECK (prix_total >= 0),
-    date_transaction TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    date_transaction TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CHECK (seller != buyer)
 );
 
 CREATE TABLE IF NOT EXISTS Stock
@@ -52,7 +57,7 @@ CREATE TABLE IF NOT EXISTS Desktop
 CREATE TABLE IF NOT EXISTS Animal
 (
     u_id INTEGER NOT NULL REFERENCES "User"(u_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    a_id INTEGER PRIMARY KEY,
+    a_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     clean BOOLEAN,
     healthy BOOLEAN,
     age INTEGER,
@@ -80,15 +85,17 @@ CREATE TABLE IF NOT EXISTS Cow
 
 CREATE TABLE IF NOT EXISTS Event
 (
-    e_id INTEGER PRIMARY KEY,
+    e_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     u_id INTEGER NOT NULL REFERENCES "User"(u_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    text VARCHAR(200) NOT NULL
+    text VARCHAR(200) NOT NULL,
+    date_event TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS Market
 (
     u_id INTEGER NOT NULL REFERENCES "User"(u_id) ON DELETE CASCADE ON UPDATE CASCADE,
     productID INTEGER NOT NULL REFERENCES Product(productID) ON DELETE CASCADE ON UPDATE CASCADE,
+    price FLOAT NOT NULL,
     PRIMARY KEY (u_id, productID)
 );
 
