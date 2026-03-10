@@ -47,18 +47,7 @@ CREATE TABLE IF NOT EXISTS Stock
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     quantity INTEGER DEFAULT 0 CHECK (quantity >= 0),
-    PRIMARY KEY (u_id, productID)
-);
-
-CREATE TABLE IF NOT EXISTS Desktop
-(
-    u_id INTEGER NOT NULL REFERENCES "User"(u_id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    productID INTEGER NOT NULL REFERENCES Product(productID)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE,
-    quantity INTEGER NOT NULL DEFAULT 0 CHECK (quantity >= 0),
+    collectible BOOLEAN DEFAULT 0,
     PRIMARY KEY (u_id, productID)
 );
 
