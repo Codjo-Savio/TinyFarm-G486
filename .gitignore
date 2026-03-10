@@ -1,2 +1,4 @@
 ### Ignore Docker secrets
 docker/secrets/
+.vscode/*
+.idea/*
