@@ -1,11 +1,21 @@
 import express from "express";
+import liveReload from "livereload";
+import connectLiveReload from "connect-livereload";
 
 const app = express();
-const port = 3000;
+const PORT = 3000;
+
+if (process.env.NODE_ENV === "development") {
+    const liveReloadServer = liveReload.createServer({
+        applyCSSLive: false,
+    });
+    liveReloadServer.watch("src");
+
+    app.use(connectLiveReload());
+}
 
 app.use(express.static("src"));
 
-app.listen(port, () => {
-    console.log(`Listening on port ${port}!`);
-    console.log("Visit http://localhost:3000 to view the frontend.");
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
 });
