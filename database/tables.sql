@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS "User"
     nom VARCHAR(20),
     sexe VARCHAR(20),
     ecus INTEGER,
-    level INTEGER
+    level INTEGER DEFAULT 1
 );
 
 CREATE TABLE IF NOT EXISTS Product
