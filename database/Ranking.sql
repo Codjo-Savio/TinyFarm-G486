@@ -1,115 +1,133 @@
--- Nombre d'utilisateur
-CREATE FUNCTION getNbUser() RETURNS INT
-    SELECT COUNT(*) AS result
-    FROM User
-    WHERE u_id != 1 -- pour ne pas prendre la coopérative
-    LANGUAGE SQL;
+/*===========================================*/
+/*  FONCTIONS DE CLASSEMENT - TinyFarm       */
+/*===========================================*/
 
--- Nombre d'ecus totaux
-CREATE FUNCTION getEcusTotaux() RETURNS INT
-    SELECT SUM(ecus) AS result
-    FROM Users
-    WHERE u_id != 1 -- pour ne pas prendre les écus de la coopérative
-    LANGUAGE SQL;
+SET search_path TO TinyFarm;
+
+-- Nombre d'utilisateurs (sans la coopérative)
+CREATE FUNCTION getNbUser() RETURNS INT AS $$
+    SELECT COUNT(*)::INT
+    FROM "User"
+    WHERE u_id != 1; -- pour ne pas prendre la coopérative
+$$ LANGUAGE SQL;
+
+-- Nombre d'ecus totaux (sans la coopérative)
+CREATE FUNCTION getEcusTotaux() RETURNS INT AS $$
+    SELECT COALESCE(SUM(ecus), 0)::INT
+    FROM "User"
+    WHERE u_id != 1; -- pour ne pas prendre les écus de la coopérative
+$$ LANGUAGE SQL;
 
 -- Nombre d'ecus d'un utilisateur
-CREATE FUNCTION getEcusUser(user int) RETURNS INT
-    SELECT ecus AS result
-    FROM Users u
-    WHERE u.u_id = user
-    LANGUAGE SQL;
+CREATE FUNCTION getEcusUser(p_user INT) RETURNS INT AS $$
+    SELECT COALESCE(ecus, 0)
+    FROM "User" u
+    WHERE u.u_id = p_user;
+$$ LANGUAGE SQL;
 
 -- Score d'écus
-CREATE FUNCTION getScoreEcus(user int) RETURNS INT
-    DECLARE EcusU INT;
-    DECLARE EcusT INT;
-    DECLARE NbU INT;
-    BEGIN
-        SET EcusU = getEcusUser(user);
-        SET EcusT = getEcusTotaux();
-        SET NbU = getNbUser();
-        RETURN (EcusU/EcusT)*100*(30*NbU)
-    LANGUAGE SQL;
+CREATE FUNCTION getScoreEcus(p_user INT) RETURNS INT AS $$
+DECLARE
+    EcusU INT;
+    EcusT INT;
+    NbU INT;
+BEGIN
+    EcusU := getEcusUser(p_user);
+    EcusT := getEcusTotaux();
+    NbU := getNbUser();
+    IF EcusT = 0 OR NbU = 0 THEN
+        RETURN 0;
+    END IF;
+    RETURN (EcusU * 100 / EcusT) * (30 * NbU);
+END;
+$$ LANGUAGE plpgsql;
 
 -- Coefficient du score d'un produit
-CREATE FUNCTION getCoef(prod INT) RETURNS INT
-    SELECT coef AS result
-    FROM Products
-    WHERE p-id = prod
-    LANGUAGE SQL;
-
--- /!\ NE FONCTIONNE PAS A PARTIR D'ICI /!\ ----------------------------------------------
+CREATE FUNCTION getCoef(prod INT) RETURNS INT AS $$
+    SELECT COALESCE(coef, 1)
+    FROM Product
+    WHERE productID = prod;
+$$ LANGUAGE SQL;
 
 -- Total des ventes du produit
-CREATE FUNCTION getVentesTotal(prod INT) RETURNS INT
-    SELECT SUM(quantite) AS result
+CREATE FUNCTION getVentesTotal(prod INT) RETURNS INT AS $$
+    SELECT COALESCE(SUM(quantite), 0)::INT
     FROM Transactions
-    WHERE product = prod
-    LANGUAGE SQL;
+    WHERE product = prod;
+$$ LANGUAGE SQL;
 
 -- Total des ventes du produit pour l'utilisateur
-CREATE FUNCTION getVentesTotal(prod INT, user INT) RETURNS INT
-    SELECT SUM(quantite) AS result
+CREATE FUNCTION getVentesUserTotal(prod INT, p_user INT) RETURNS INT AS $$
+    SELECT COALESCE(SUM(quantite), 0)::INT
     FROM Transactions
     WHERE product = prod
-    AND seller = user
-    LANGUAGE SQL;
+    AND seller = p_user;
+$$ LANGUAGE SQL;
 
 -- Score de ventes pour un produit et un utilisateur
-CREATE FUNCTION getScoreProduit(prod INT,user INT) RETURNS INT
-    DECLARE VenteU INT;
-    DECLARE VenteT INT;
-    DECLARE coef INT;
-    DECLARE NbU INT;
-    BEGIN
-        SET VenteU = getEcusUser(prod, user);
-        SET VenteT = getEcusTotaux(prod);
-        SET coef = getCoef(prod);
-        SET NbU = getNbUser();
-        RETURN (VenteU/VenteT)*100*(coef*NbU)
-    LANGUAGE SQL;
+CREATE FUNCTION getScoreProduit(prod INT, p_user INT) RETURNS INT AS $$
+DECLARE
+    VenteU INT;
+    VenteT INT;
+    v_coef INT;
+    NbU INT;
+BEGIN
+    VenteU := getVentesUserTotal(prod, p_user);
+    VenteT := getVentesTotal(prod);
+    v_coef := getCoef(prod);
+    NbU := getNbUser();
+    IF VenteT = 0 OR NbU = 0 THEN
+        RETURN 0;
+    END IF;
+    RETURN (VenteU * 100 / VenteT) * (v_coef * NbU);
+END;
+$$ LANGUAGE plpgsql;
 
--- Score de ventes pour un utilisateur
-CREATE FUNCTION getScoreVente(user INT) RETURNS INT
-    DECLARE ScoreL INT;
-    DECLARE ScoreP INT;
-    DECLARE ScoreV INT;
-    BEGIN
-        SET ScoreL = getScoreProduit(1, user); -- remplacer 1 par le p_id des lapins
-        SET ScoreP = getScoreProduit(2, user); -- remplacer 2 par le p_id des oeufs
-        SET ScoreV = getScoreProduit(3, user); -- remplacer 1 par le p_id du lait
-        RETURN ScoreL + ScoreP + ScoreL
-    LANGUAGE SQL;
+-- Score de ventes pour un utilisateur (dynamique sur tous les produits)
+CREATE FUNCTION getScoreVente(p_user INT) RETURNS INT AS $$
+DECLARE
+    total_score INT := 0;
+    prod RECORD;
+BEGIN
+    FOR prod IN SELECT productID FROM Product LOOP
+        total_score := total_score + getScoreProduit(prod.productID, p_user);
+    END LOOP;
+    RETURN total_score;
+END;
+$$ LANGUAGE plpgsql;
+
+-- la vue Ranking (exclut la coopérative u_id=1)
+CREATE VIEW Ranking AS
+    SELECT u_id, getScoreEcus(u_id) AS scoreEcus, getScoreVente(u_id) AS scoreVente
+    FROM "User"
+    WHERE u_id != 1;
 
 -- Rang dans le classement des écus d'un utilisateur
-CREATE FUNCTION getRankEcus(user INT) RETURNS INT
-    SELECT COUNT(*) AS result
+CREATE FUNCTION getRankEcus(p_user INT) RETURNS INT AS $$
+    SELECT COUNT(*)::INT
     FROM Ranking r
     WHERE r.scoreEcus > (SELECT scoreEcus
                          FROM Ranking
-                         WHERE u_id = user);
-    LANGUAGE SQL;
+                         WHERE u_id = p_user);
+$$ LANGUAGE SQL;
 
 -- Rang dans le classement des ventes d'un utilisateur
-CREATE FUNCTION getRankVente(user INT) RETURNS INT
-    SELECT COUNT(*) AS result
+CREATE FUNCTION getRankVente(p_user INT) RETURNS INT AS $$
+    SELECT COUNT(*)::INT
     FROM Ranking r
     WHERE r.scoreVente > (SELECT scoreVente
                          FROM Ranking
-                         WHERE u_id = user);
-    LANGUAGE SQL;
+                         WHERE u_id = p_user);
+$$ LANGUAGE SQL;
 
 -- Rang global de l'utilisateur
-CREATE FUNCTION getRank(user INT) RETURNS INT
-    DECLARE RankV INT;
-    DECLARE RankE INT;
-    BEGIN
-        SET RankE = getRankEcus(user);
-        SET RankV = getRankVente(user);
-        RETURN (RankE + RankV)/2 -- Possibilité d'égalité, à résoudre ?
-    LANGUAGE SQL;
-
--- la vue Ranking
-CREATE VIEW Ranking AS
-    SELECT u_id, getScoreEcus(u_id) AS scoreEcus, getScoreVente(u_id) AS scoreVente
-    FROM Users;
+CREATE FUNCTION getRank(p_user INT) RETURNS INT AS $$
+DECLARE
+    RankV INT;
+    RankE INT;
+BEGIN
+    RankE := getRankEcus(p_user);
+    RankV := getRankVente(p_user);
+    RETURN (RankE + RankV) / 2; -- Possibilité d'égalité, à résoudre ?
+END;
+$$ LANGUAGE plpgsql;
