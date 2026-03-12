@@ -8,12 +8,14 @@ import java.nio.file.Path;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Data
 @Configuration
+@Profile("prod")
 public class MainConfiguration {
 
-    @Value("${secrets.username-path}")
+    @Value("${secrets.username}")
     private String usernameFilePath;
 
     @Value("${secrets.password-path}")
