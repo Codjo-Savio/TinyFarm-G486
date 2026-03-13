@@ -1,0 +1,9 @@
+{
+    "user": "Pascal",
+    "level": 2,
+    "rank": {
+        "current": 10,
+        "max": 100
+    },
+    "money": 1000
+}
