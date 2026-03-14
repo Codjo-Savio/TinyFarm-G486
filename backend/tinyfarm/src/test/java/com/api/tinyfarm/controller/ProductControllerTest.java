@@ -9,44 +9,43 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public class UserControllerTest {
+public class ProductControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    // tests of the POST  
+    // tests of the POST
     @Test
-    void shouldCreateUser() throws Exception{
-        mockMvc.perform(post("/users"))
+    void shouldCreateProduct() throws Exception{
+        mockMvc.perform(post("/products"))
                 .andExpect(status().isOk());
     }
 
     // tests of the GET
     @Test
-    void shouldReturnUsers() throws Exception{
-        mockMvc.perform(get("/users"))
+    void shouldReturnAllProducts() throws  Exception{
+        mockMvc.perform(get("/products"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void shouldReturnUserByName() throws  Exception{
-        mockMvc.perform(get("/users/eldoraldo"))
+    void shouldReturnProductByName() throws  Exception{
+        mockMvc.perform(get("/products/foin"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void userShouldNotBeFoundByName() throws  Exception{
-        mockMvc.perform(get("/users/bigfarm"))
+    void productShouldNotBeFoundByName() throws  Exception{
+         mockMvc.perform(get("/products/viande"))
                 .andExpect(status().isNotFound());
     }
 
     // test of the DELETE
     @Test
-    void shouldDeleteUserByName() throws  Exception{
-        mockMvc.perform(delete("/users/eldoraldo"))
+    void shouldDeleteProductByName() throws  Exception{
+        mockMvc.perform(delete("/products/foin"))
                 .andExpect(status().isNoContent());
     }
 }
