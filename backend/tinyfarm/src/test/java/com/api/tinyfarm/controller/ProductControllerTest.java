@@ -1,9 +1,11 @@
 package com.api.tinyfarm.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -16,9 +18,35 @@ public class ProductControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    // setup
+    @BeforeEach
+    void setup() throws  Exception{
+        String json = """
+                {
+                    "id" : 1,
+                     "description" : "foin",
+                     "collection" : "false",
+                     "price" : "20"
+                }
+        """;
+        mockMvc.perform(
+                post("/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+        );
+    }
+
     // tests of the POST
     @Test
     void shouldCreateProduct() throws Exception{
+        String json = """
+                {
+                    "id" : 2,
+                     "description" : "paille",
+                     "collection" : "false",
+                     "price" : "20"
+                }
+        """;
         mockMvc.perform(post("/products"))
                 .andExpect(status().isOk());
     }
@@ -31,21 +59,21 @@ public class ProductControllerTest {
     }
 
     @Test
-    void shouldReturnProductByName() throws  Exception{
-        mockMvc.perform(get("/products/foin"))
+    void shouldReturnProductById() throws  Exception{
+        mockMvc.perform(get("/products/1"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void productShouldNotBeFoundByName() throws  Exception{
-         mockMvc.perform(get("/products/viande"))
+    void productShouldNotBeFoundById() throws  Exception{
+         mockMvc.perform(get("/products/3"))
                 .andExpect(status().isNotFound());
     }
 
     // test of the DELETE
     @Test
-    void shouldDeleteProductByName() throws  Exception{
-        mockMvc.perform(delete("/products/foin"))
+    void shouldDeleteProductById() throws  Exception{
+        mockMvc.perform(delete("/products/1"))
                 .andExpect(status().isNoContent());
     }
 }

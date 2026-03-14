@@ -1,9 +1,11 @@
 package com.api.tinyfarm.controller;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -16,10 +18,38 @@ public class ChickenControllerTest {
     @Autowired
     MockMvc mockMvc;
 
+    // setup
+    @BeforeEach
+    void setup() throws  Exception{
+        String json = """
+                {
+                    "id" : 1,
+                     "type" : "poule",
+                     "fasting" : "false"
+                }
+        """;
+        mockMvc.perform(
+                post("/chickens")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+        );
+    }
+
     // tests of the POST
     @Test
     void shouldCreateChicken() throws Exception{
-        mockMvc.perform(post("/chickens"))
+        String json = """
+                {
+                    "id" : 2,
+                     "type" : "poule",
+                     "fasting" : "false"
+                }
+        """;
+        mockMvc.perform(
+                        post("/chickens")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(json)
+                )
                 .andExpect(status().isOk());
     }
 
@@ -31,21 +61,21 @@ public class ChickenControllerTest {
     }
 
     @Test
-    void shouldReturnChickenByName() throws  Exception{
-        mockMvc.perform(get("/chickens/Hermine"))
+    void shouldReturnChickenById() throws  Exception{
+        mockMvc.perform(get("/chickens/1"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void chickenShouldNotBeFoundByName() throws  Exception{
-        mockMvc.perform(get("/chickens/Clochette"))
+    void chickenShouldNotBeFoundById() throws  Exception{
+        mockMvc.perform(get("/chickens/3"))
                 .andExpect(status().isNotFound());
     }
 
     // test of the DELETE
     @Test
-    void shouldDeleteChickenByName() throws  Exception{
-        mockMvc.perform(delete("/chickens/Hermine"))
+    void shouldDeleteChickenById() throws  Exception{
+        mockMvc.perform(delete("/chickens/1"))
                 .andExpect(status().isNoContent());
     }
 }
