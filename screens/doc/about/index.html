@@ -1,32 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>À propos - TinyFarm</title>
-    <link rel="stylesheet" href="../style.css">
-    <link rel="stylesheet" href="../../styles/global.css">
-    <link rel="stylesheet" href="../../styles/theme.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_left_alt" />
-</head>
-<body>
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="../../styles/global.css" />
+    <link rel="stylesheet" href="../../styles/theme.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_left_alt"
+    />
+  </head>
+  <body>
     <div class="container">
-        <a href="../../index.html" class="back-btn"><span class="material-symbols-outlined">arrow_left_alt</span> Retour</a>
-        <h1>À propos</h1>
+      <button
+        class="back-btn"
+        onclick="
+          window.location.href = window.location.search
+            ? window.location.search.replace('?from=', '')
+            : '/'
+        "
+      >
+        <span class="material-symbols-outlined">arrow_left_alt</span>
+        Retour
+      </button>
+      <h1>À propos</h1>
 
-        <div class="header-section">
-            <img src="../../assets/teteVache.svg" class="cow-img">
-            <div>
-                <p><strong>TinyFarm</strong> est un site web développé par des étudiants de l'Université de Nantes dans le cadre de l'Unité d'Enseignement Développement Web Client. Il permet de mettre en pratique les concepts étudiés depuis le début du cursus de Licence Informatique.</p>
-                <p>Ce projet s'inspire librement des principes du jeu My e-Farm.</p>
-            </div>
+      <div class="header-section">
+        <img src="../../assets/teteVache.svg" class="cow-img" />
+        <div>
+          <p>
+            <strong>TinyFarm</strong> est un site web développé par des
+            étudiants de l'Université de Nantes dans le cadre de l'Unité
+            d'Enseignement Développement Web Client. Il permet de mettre en
+            pratique les concepts étudiés depuis le début du cursus de Licence
+            Informatique.
+          </p>
+          <p>Ce projet s'inspire librement des principes du jeu My e-Farm.</p>
         </div>
+      </div>
 
-        <h2>Technologies</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sapien lectus, tincidunt lacinia pellentesque eu, rhoncus eu nibh. Aliquam tempus a urna ac ultrices. Mauris porttitor pharetra lacus ut viverra. Integer vel metus quis lacus viverra lobortis. Nullam vehicula felis sit amet dolor faucibus bibendum. Ut feugiat est ut ex vestibulum, eget cursus nisi sodales. Praesent consectetur tellus eu magna facilisis, at cursus turpis pharetra. Aenean laoreet, ante non blandit mattis, tortor nulla placerat eros, id rutrum tellus ex in turpis. Fusce ut ex vitae magna tristique posuere id eu dolor. Praesent lacus turpis, malesuada a quam vel, ornare tempus ipsum. Vivamus in est quis urna malesuada pulvinar ac in arcu. Aenean vitae accumsan sem, vitae congue elit. Nullam sed nisi lobortis justo scelerisque suscipit. Cras dignissim risus a vestibulum accumsan. Duis euismod, tortor in finibus vestibulum, ex ligula pellentesque lectus, vel auctor ipsum nunc vitae lorem. Nulla interdum arcu lorem, id fringilla magna malesuada porttitor.</p>
+      <h2>Technologies</h2>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sapien
+        lectus, tincidunt lacinia pellentesque eu, rhoncus eu nibh. Aliquam
+        tempus a urna ac ultrices. Mauris porttitor pharetra lacus ut viverra.
+        Integer vel metus quis lacus viverra lobortis. Nullam vehicula felis sit
+        amet dolor faucibus bibendum. Ut feugiat est ut ex vestibulum, eget
+        cursus nisi sodales. Praesent consectetur tellus eu magna facilisis, at
+        cursus turpis pharetra. Aenean laoreet, ante non blandit mattis, tortor
+        nulla placerat eros, id rutrum tellus ex in turpis. Fusce ut ex vitae
+        magna tristique posuere id eu dolor. Praesent lacus turpis, malesuada a
+        quam vel, ornare tempus ipsum. Vivamus in est quis urna malesuada
+        pulvinar ac in arcu. Aenean vitae accumsan sem, vitae congue elit.
+        Nullam sed nisi lobortis justo scelerisque suscipit. Cras dignissim
+        risus a vestibulum accumsan. Duis euismod, tortor in finibus vestibulum,
+        ex ligula pellentesque lectus, vel auctor ipsum nunc vitae lorem. Nulla
+        interdum arcu lorem, id fringilla magna malesuada porttitor.
+      </p>
 
-        <h2>Contributeurs</h2>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sapien lectus, tincidunt lacinia pellentesque eu, rhoncus eu nibh. Aliquam tempus a urna ac ultrices. Mauris porttitor pharetra lacus ut viverra. Integer vel metus quis lacus viverra lobortis. Nullam vehicula felis sit amet dolor faucibus bibendum. Ut feugiat est ut ex vestibulum, eget cursus nisi sodales. Praesent consectetur tellus eu magna facilisis, at cursus turpis pharetra. Aenean laoreet, ante non blandit mattis, tortor nulla placerat eros, id rutrum tellus ex in turpis. Fusce ut ex vitae magna tristique posuere id eu dolor. Praesent lacus turpis, malesuada a quam vel, ornare tempus ipsum. Vivamus in est quis urna malesuada pulvinar ac in arcu. Aenean vitae accumsan sem, vitae congue elit. Nullam sed nisi lobortis justo scelerisque suscipit. Cras dignissim risus a vestibulum accumsan. Duis euismod, tortor in finibus vestibulum, ex ligula pellentesque lectus, vel auctor ipsum nunc vitae lorem. Nulla interdum arcu lorem, id fringilla magna malesuada porttitor.</p>
+      <h2>Contributeurs</h2>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sapien
+        lectus, tincidunt lacinia pellentesque eu, rhoncus eu nibh. Aliquam
+        tempus a urna ac ultrices. Mauris porttitor pharetra lacus ut viverra.
+        Integer vel metus quis lacus viverra lobortis. Nullam vehicula felis sit
+        amet dolor faucibus bibendum. Ut feugiat est ut ex vestibulum, eget
+        cursus nisi sodales. Praesent consectetur tellus eu magna facilisis, at
+        cursus turpis pharetra. Aenean laoreet, ante non blandit mattis, tortor
+        nulla placerat eros, id rutrum tellus ex in turpis. Fusce ut ex vitae
+        magna tristique posuere id eu dolor. Praesent lacus turpis, malesuada a
+        quam vel, ornare tempus ipsum. Vivamus in est quis urna malesuada
+        pulvinar ac in arcu. Aenean vitae accumsan sem, vitae congue elit.
+        Nullam sed nisi lobortis justo scelerisque suscipit. Cras dignissim
+        risus a vestibulum accumsan. Duis euismod, tortor in finibus vestibulum,
+        ex ligula pellentesque lectus, vel auctor ipsum nunc vitae lorem. Nulla
+        interdum arcu lorem, id fringilla magna malesuada porttitor.
+      </p>
     </div>
-</body>
+  </body>
 </html>

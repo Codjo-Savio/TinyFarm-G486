@@ -1,0 +1,72 @@
+[
+    {
+        "rang": { "current": 1, "max": 10 },
+        "nom": "John",
+        "production": 98,
+        "capacite": 340,
+        "ecus": 18100
+    },
+    {
+        "rang": { "current": 2, "max": 10 },
+        "nom": "Hala",
+        "production": 128,
+        "capacite": 300,
+        "ecus": 17600
+    },
+    {
+        "rang": { "current": 3, "max": 10 },
+        "nom": "Diana",
+        "production": 134,
+        "capacite": 260,
+        "ecus": 17250
+    },
+    {
+        "rang": { "current": 4, "max": 10 },
+        "nom": "Pascal",
+        "production": 145,
+        "capacite": 250,
+        "ecus": 16800
+    },
+    {
+        "rang": { "current": 5, "max": 10 },
+        "nom": "Bob",
+        "production": 112,
+        "capacite": 275,
+        "ecus": 16600
+    },
+    {
+        "rang": { "current": 6, "max": 10 },
+        "nom": "Eva",
+        "production": 90,
+        "capacite": 310,
+        "ecus": 16050
+    },
+    {
+        "rang": { "current": 7, "max": 10 },
+        "nom": "Marie",
+        "production": 170,
+        "capacite": 220,
+        "ecus": 15900
+    },
+    {
+        "rang": { "current": 8, "max": 10 },
+        "nom": "Charlie",
+        "production": 185,
+        "capacite": 190,
+        "ecus": 15400
+    },
+    {
+        "rang": { "current": 9, "max": 10 },
+        "nom": "Alice",
+        "production": 155,
+        "capacite": 210,
+        "ecus": 14900
+    },
+    {
+        "rang": { "current": 10, "max": 10 },
+        "nom": "Frank",
+        "production": 162,
+        "capacite": 205,
+        "ecus": 14700
+    }
+]
