@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS transaction
     product INTEGER NOT NULL REFERENCES product(productID)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    quantity INTEGER NOT NULL CHECK (quantite > 0),
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
     totalPrice FLOAT NOT NULL CHECK (totalPrice >= 0),
     transactionDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CHECK (seller != buyer)
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS stock
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     quantity INTEGER DEFAULT 0 CHECK (quantity >= 0),
-    collectible BOOLEAN DEFAULT 0,
+    collectible BOOLEAN DEFAULT FALSE,
     PRIMARY KEY (uid, productID)
 );
 

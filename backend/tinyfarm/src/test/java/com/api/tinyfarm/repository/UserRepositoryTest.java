@@ -3,6 +3,7 @@ package com.api.tinyfarm.repository;
 import com.api.tinyfarm.model.User;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,7 +11,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Optional;
 import java.util.List;
 
-@DataJpaTest
+
+@SpringBootTest
 @ActiveProfiles("test")
 public class UserRepositoryTest {
 
@@ -27,7 +29,7 @@ public class UserRepositoryTest {
         // ARRANGE
         User user = new User();
         user.setName("Marcel");
-        user.setGender("M");
+        user.setGender(User.Gender.M);
         user.setEcus(1500);
         user.setLevel(1);
 
@@ -61,9 +63,11 @@ public class UserRepositoryTest {
         // ARRANGE
         User u1 = new User();
         u1.setName("Marcel");
+        u1.setGender(User.Gender.M);
 
         User u2 = new User();
         u2.setName("Huguette");
+        u2.setGender(User.Gender.F);
 
         userRepository.save(u1);
         userRepository.save(u2);

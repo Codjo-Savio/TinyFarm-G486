@@ -25,6 +25,7 @@ public class ChickenControllerTest {
                 {
                     "id" : 1,
                      "type" : "poule",
+                     "name" : "Hermine",
                      "fasting" : "false"
                 }
         """;
@@ -42,6 +43,7 @@ public class ChickenControllerTest {
                 {
                     "id" : 2,
                      "type" : "poule",
+                     "name" : "Clochette",
                      "fasting" : "false"
                 }
         """;
@@ -61,14 +63,14 @@ public class ChickenControllerTest {
     }
 
     @Test
-    void shouldReturnChickenById() throws  Exception{
-        mockMvc.perform(get("/chickens/1"))
+    void shouldReturnChickenByName() throws  Exception{
+        mockMvc.perform(get("/chickens/Hermine"))
                 .andExpect(status().isOk());
     }
 
     @Test
     void chickenShouldNotBeFoundById() throws  Exception{
-        mockMvc.perform(get("/chickens/3"))
+        mockMvc.perform(get("/chickens/Hermine"))
                 .andExpect(status().isNotFound());
     }
 

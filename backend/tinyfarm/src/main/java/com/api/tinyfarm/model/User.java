@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "user")
+@Table(name = "`user`")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,18 +14,41 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "uid", nullable = false)
+    @Column(name = "uid")
     private Integer id;
+
+    public enum Gender {
+        M("Masculine"),
+        F("Feminine");
+
+        private String wording;
+
+        Gender(String wording) {
+            this.wording = wording;
+        }
+
+        String getWording() {
+            return this.wording;
+        }
+    }
 
     @Column(name = "name", length = 20)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "gender", length = 20)
-    private String gender;
+    private Gender gender;
 
     @Column(name = "ecus")
-    private Integer ecus = 1500; // la banque prête 1500 écus au départ
+    private Integer ecus;
 
     @Column(name = "level")
-    private Integer level = 1; // On commence au niveau 1
+    private Integer level;
+
+    // default values for ecus and level
+    @PrePersist
+    public void prePersist(){
+        this.ecus = 1500;
+        this.level = 1;
+    }
 }

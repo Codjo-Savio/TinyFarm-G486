@@ -25,14 +25,14 @@ public class UserControllerTest {
         String json = """
                 {
                      "id" : 1,
-                     "nom" : "Eldoraldo",
-                     "sexe" : "F",
+                     "name" : "Eldoraldo",
+                     "gender" : "F",
                      "ecus" : "10",
                      "level" : "1"
                 }
         """;
         mockMvc.perform(
-                        post("/users")
+                        post("/api/users")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(json)
         );
@@ -43,14 +43,15 @@ public class UserControllerTest {
     void shouldCreateUser() throws Exception{
         String json = """
                 {
-                     "nom" : "Bigfarm",
-                     "sexe" : "F",
+                    "id" : 2,
+                     "name" : "Bigfarm",
+                     "gender" : "M",
                      "ecus" : "10",
                      "level" : "1"
                 }
         """;
         mockMvc.perform(
-                        post("/users")
+                        post("/api/users")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(json)
                 )
@@ -60,26 +61,26 @@ public class UserControllerTest {
     // tests of the GET
     @Test
     void shouldReturnUsers() throws Exception{
-        mockMvc.perform(get("/users"))
+        mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void shouldReturnUserByName() throws  Exception{
-        mockMvc.perform(get("/users/Eldoraldo"))
+    void shouldReturnUserById() throws  Exception{
+        mockMvc.perform(get("/api/users/1"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void userShouldNotBeFoundByName() throws  Exception{
-        mockMvc.perform(get("/users/unknown"))
+    void userShouldNotBeFoundById() throws  Exception{
+        mockMvc.perform(get("/api/users/0"))
                 .andExpect(status().isNotFound());
     }
 
     // test of the DELETE
     @Test
-    void shouldDeleteUserByName() throws  Exception{
-        mockMvc.perform(delete("/users/Eldoraldo"))
+    void shouldDeleteUserById() throws  Exception{
+        mockMvc.perform(delete("/api/users/1"))
                 .andExpect(status().isNoContent());
     }
 }

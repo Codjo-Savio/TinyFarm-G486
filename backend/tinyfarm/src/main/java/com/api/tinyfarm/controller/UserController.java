@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/users")
+@RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
 
@@ -16,45 +16,45 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
+    @GetMapping("")
     public ResponseEntity<List<User>> getAll() {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    @GetMapping("/{uId}")
-    public ResponseEntity<User> getById(@PathVariable Integer uId) {
-        return ResponseEntity.ok(userService.findById(uId));
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getById(@PathVariable Integer id) {
+        return ResponseEntity.ok(userService.findById(id));
     }
 
-    @PostMapping
+    @PostMapping("")
     public ResponseEntity<User> create(@RequestBody User user) {
         return ResponseEntity.ok(userService.create(user));
     }
 
-    @PutMapping("/{uId}")
-    public ResponseEntity<User> update(@PathVariable Integer uId,
+    @PutMapping("/{id}")
+    public ResponseEntity<User> update(@PathVariable Integer id,
                                        @RequestBody User user) {
-        return ResponseEntity.ok(userService.update(uId, user));
+        return ResponseEntity.ok(userService.update(id, user));
     }
 
     // DELETE /users/1 → supprimer un user
-    @DeleteMapping("/{uId}")
-    public ResponseEntity<Void> delete(@PathVariable Integer uId) {
-        userService.delete(uId);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
+        userService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     // PATCH /users/1/ecus?amount=8 → ajouter des écus (vente d'un oeuf)
-    @PatchMapping("/ecus/add/{uId}")
-    public ResponseEntity<User> addEcus(@PathVariable Integer uId,
+    @PatchMapping("/ecus/add/{id}")
+    public ResponseEntity<User> addEcus(@PathVariable Integer id,
                                              @RequestParam Integer amount) {
-        return ResponseEntity.ok(userService.addEcus(uId, amount));
+        return ResponseEntity.ok(userService.addEcus(id, amount));
     }
 
     // PATCH /users/1/ecus/retirer?amount=3 → retirer des écus (nourrir un animal)
-    @PatchMapping("/ecus/withdraw/{uId}")
-    public ResponseEntity<User> withdrawEcus(@PathVariable Integer uId,
+    @PatchMapping("/ecus/withdraw/{id}")
+    public ResponseEntity<User> withdrawEcus(@PathVariable Integer id,
                                              @RequestParam Integer amount) {
-        return ResponseEntity.ok(userService.withdrawEcus(uId, amount));
+        return ResponseEntity.ok(userService.withdrawEcus(id, amount));
     }
 }
