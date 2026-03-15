@@ -6,12 +6,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> { // Integer car u_id est un INTEGER
+public interface UserRepository extends JpaRepository<User, Integer> {
 
-    // Chercher un user par son nom
-    Optional<User> findByNom(String nom);
-
-    // Chercher tous les users d'un niveau donné
-    // Utile pour le classement du PDF (section 2.2)
+    Optional<User> findByName(String name);
+    Optional<User> findById(Integer id);
     java.util.List<User> findByLevel(Integer level);
 }

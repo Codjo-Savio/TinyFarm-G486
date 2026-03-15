@@ -26,8 +26,8 @@ public class UserRepositoryTest {
     void shouldSaveUser() {
         // ARRANGE
         User user = new User();
-        user.setNom("Marcel");
-        user.setSexe("M");
+        user.setName("Marcel");
+        user.setGender("M");
         user.setEcus(1500);
         user.setLevel(1);
 
@@ -35,8 +35,8 @@ public class UserRepositoryTest {
         User saved = userRepository.save(user);
 
         // ASSERT
-        assertNotNull(saved.getUId()); // PK = u_id
-        assertEquals("Marcel", saved.getNom());
+        assertNotNull(saved.getId()); // PK = u_id
+        assertEquals("Marcel", saved.getName());
         assertEquals(1500, saved.getEcus());
         assertEquals(1, saved.getLevel());
     }
@@ -45,25 +45,25 @@ public class UserRepositoryTest {
     void shouldFindUserById() {
         // ARRANGE
         User user = new User();
-        user.setNom("Huguette");
+        user.setName("Huguette");
         userRepository.save(user);
 
         // ACT
-        Optional<User> found = userRepository.findById(user.getUId());
+        Optional<User> found = userRepository.findById(user.getId());
 
         // ASSERT
         assertTrue(found.isPresent());
-        assertEquals("Huguette", found.get().getNom());
+        assertEquals("Huguette", found.get().getName());
     }
 
     @Test
     void shouldFindAllUsers() {
         // ARRANGE
         User u1 = new User();
-        u1.setNom("Marcel");
+        u1.setName("Marcel");
 
         User u2 = new User();
-        u2.setNom("Huguette");
+        u2.setName("Huguette");
 
         userRepository.save(u1);
         userRepository.save(u2);
@@ -97,10 +97,10 @@ public class UserRepositoryTest {
         userRepository.save(user);
 
         // ACT
-        userRepository.deleteById(user.getUId());
+        userRepository.deleteById(user.getId());
 
         // ASSERT
-        Optional<User> found = userRepository.findById(user.getUId());
+        Optional<User> found = userRepository.findById(user.getId());
         assertFalse(found.isPresent());
     }
 }

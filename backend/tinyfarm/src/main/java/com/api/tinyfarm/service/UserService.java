@@ -15,62 +15,52 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    // Récupérer tous les users
     public List<User> findAll() {
         return userRepository.findAll();
     }
 
-    // Récupérer un user par son id
-    public User findById(Integer uId) {
-        return userRepository.findById(uId)
-            .orElseThrow(() -> new RuntimeException("User introuvable : " + uId));
+    public User findById(Integer id) {
+        return userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Utilisateur introuvale : " + id));
     }
 
-    // Créer un user — le PDF dit : démarre avec 1500 écus et niveau 1
     public User create(User user) {
-        user.setEcus(1500); // Emprunt de départ obligatoire
-        user.setLevel(1);   // Toujours niveau 1 au départ
+        user.setEcus(1500);
+        user.setLevel(1);
         return userRepository.save(user);
     }
 
-    // Mettre à jour un user
-    public User update(Integer uId, User userModifie) {
-        User existing = findById(uId);
-        existing.setNom(userModifie.getNom());
-        existing.setSexe(userModifie.getSexe());
-        existing.setEcus(userModifie.getEcus());
-        existing.setLevel(userModifie.getLevel());
+    public User update(Integer id, User modificatedUser) {
+        User existing = findById(id);
+        existing.setName(modificatedUser.getName());
+        existing.setGender(modificatedUser.getGender());
+        existing.setEcus(modificatedUser.getEcus());
+        existing.setLevel(modificatedUser.getLevel());
         return userRepository.save(existing);
     }
 
-    // Supprimer un user
-    public void delete(Integer uId) {
-        userRepository.deleteById(uId);
+    public void delete(Integer id) {
+        userRepository.deleteById(id);
     }
 
-    // Ajouter des écus (vente d'oeufs, lapins, lait...)
-    // PDF : oeuf = 8 écus, lapin = 25 écus, lait = 2 écus/litre
-    public User ajouterEcus(Integer uId, Integer montant) {
-        User user = findById(uId);
-        user.setEcus(user.getEcus() + montant);
+    public User addEcus(Integer id, Integer amount) {
+        User user = findById(id);
+        user.setEcus(user.getEcus() + amount);
         return userRepository.save(user);
     }
 
-    // Retirer des écus (nourrir animaux, achats coopérative...)
-    public User retirerEcus(Integer uId, Integer montant) {
-        User user = findById(uId);
-        if (user.getEcus() < montant) {
+    public User withdrawEcus(Integer id, Integer amount) {
+        User user = findById(id);
+        if (user.getEcus() < amount) {
             throw new RuntimeException("Pas assez d'écus !");
         }
-        user.setEcus(user.getEcus() - montant);
+        user.setEcus(user.getEcus() - amount);
         return userRepository.save(user);
     }
 
-    // Vérifier si le user peut encore acheter aujourd'hui
-    // PDF : niveau 1 = max 12 achats par jour
-    public boolean peutAcheter(Integer uId, Integer nbAchatsAujourdhui) {
-        User user = findById(uId);
-        int maxAchats = user.getLevel() * 12; // niveau 1 = 12 achats
-        return nbAchatsAujourdhui < maxAchats;
+    public boolean canBuy(Integer id, Integer purchaseNumberForToday) {
+        User user = findById(id);
+        int maxPurchase = user.getLevel() * 12; // niveau 1 = 12 achats  par jour
+        return purchaseNumberForToday < maxPurchase;
     }
 }
