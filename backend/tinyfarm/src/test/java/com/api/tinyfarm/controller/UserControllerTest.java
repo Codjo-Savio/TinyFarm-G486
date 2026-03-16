@@ -80,7 +80,21 @@ public class UserControllerTest {
     // test of the DELETE
     @Test
     void shouldDeleteUserById() throws  Exception{
-        mockMvc.perform(delete("/api/users/1"))
+        String json = """
+                {
+                    "id" : 3,
+                     "name" : "Colorado",
+                     "gender" : "F",
+                     "ecus" : "100",
+                     "level" : "1"
+                }
+        """;
+        mockMvc.perform(
+                post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+        );
+        mockMvc.perform(delete("/api/users/3"))
                 .andExpect(status().isNoContent());
     }
 }

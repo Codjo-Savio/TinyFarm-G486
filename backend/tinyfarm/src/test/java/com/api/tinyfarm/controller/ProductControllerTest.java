@@ -73,7 +73,20 @@ public class ProductControllerTest {
     // test of the DELETE
     @Test
     void shouldDeleteProductById() throws  Exception{
-        mockMvc.perform(delete("/products/1"))
+        String json = """
+                {
+                    "id" : 4,
+                     "description" : "blé",
+                     "collection" : "false",
+                     "price" : "20"
+                }
+        """;
+        mockMvc.perform(
+                post("/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json)
+        );
+        mockMvc.perform(delete("/products/4"))
                 .andExpect(status().isNoContent());
     }
 }

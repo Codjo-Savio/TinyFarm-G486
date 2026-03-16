@@ -69,15 +69,23 @@ public class ChickenControllerTest {
     }
 
     @Test
-    void chickenShouldNotBeFoundById() throws  Exception{
+    void chickenShouldNotBeFoundByName() throws  Exception{
         mockMvc.perform(get("/chickens/Hermine"))
                 .andExpect(status().isNotFound());
     }
 
     // test of the DELETE
     @Test
-    void shouldDeleteChickenById() throws  Exception{
-        mockMvc.perform(delete("/chickens/1"))
+    void shouldDeleteChickenByName() throws  Exception{
+        String json = """
+                {
+                    "id" : 4,
+                     "type" : "poule",
+                     "name" : "Clémentine",
+                     "fasting" : "false"
+                }
+        """;
+        mockMvc.perform(delete("/chickens/Clémentine"))
                 .andExpect(status().isNoContent());
     }
 }

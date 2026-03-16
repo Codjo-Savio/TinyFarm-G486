@@ -1,4 +1,4 @@
-/*package com.api.tinyfarm.repository;
+package com.api.tinyfarm.repository;
 
 import com.api.tinyfarm.model.Chicken;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -115,4 +115,4 @@ public class ChickenRepositoryTest {
         Optional<Chicken> found = chickenRepository.findById(chicken.getAId());
         assertFalse(found.isPresent());
     }
-}*/
+}
