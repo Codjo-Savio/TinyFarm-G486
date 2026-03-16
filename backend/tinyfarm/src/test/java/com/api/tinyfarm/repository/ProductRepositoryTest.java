@@ -34,7 +34,7 @@ public class ProductRepositoryTest {
         Product saved = productRepository.save(product);
 
         // ASSERT
-        assertNotNull(saved.getProductId()); // PK = productID
+        assertNotNull(saved.getId()); // PK = productID
         assertEquals("Sac de grains", saved.getDescription());
         assertEquals(3.0f, saved.getPrice());
         assertFalse(saved.getCollection());
@@ -49,7 +49,7 @@ public class ProductRepositoryTest {
         productRepository.save(product);
 
         // ACT
-        Optional<Product> found = productRepository.findById(product.getProductId());
+        Optional<Product> found = productRepository.findById(product.getId());
 
         // ASSERT
         assertTrue(found.isPresent());
@@ -97,10 +97,10 @@ public class ProductRepositoryTest {
         productRepository.save(product);
 
         // ACT
-        productRepository.deleteById(product.getProductId());
+        productRepository.deleteById(product.getId());
 
         // ASSERT
-        Optional<Product> found = productRepository.findById(product.getProductId());
+        Optional<Product> found = productRepository.findById(product.getId());
         assertFalse(found.isPresent());
     }
 }

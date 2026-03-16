@@ -24,7 +24,6 @@ public class ChickenRepositoryTest {
 
     @Test
     void shouldSaveChicken() {
-        // ARRANGE — Chicken hérite de Animal, donc on remplit les deux
         Chicken chicken = new Chicken();
         // Champs Animal
         chicken.setClean(true);
@@ -32,8 +31,10 @@ public class ChickenRepositoryTest {
         chicken.setAge(0);
         chicken.setWeight(0.05f);
         chicken.setAGender(false);
+
         // Champs Chicken
         chicken.setChickenType("POUSSIN");
+        chicken.setName("Clochette");
         chicken.setFasting(false);
 
         // ACT
@@ -51,6 +52,7 @@ public class ChickenRepositoryTest {
         // ARRANGE
         Chicken chicken = new Chicken();
         chicken.setChickenType("POULE");
+        chicken.setName("Clochette");
         chicken.setAge(5);
         chicken.setWeight(2.5f);
         chickenRepository.save(chicken);
@@ -69,10 +71,12 @@ public class ChickenRepositoryTest {
         // ARRANGE
         Chicken c1 = new Chicken();
         c1.setChickenType("COQ");
+        chicken.setName("Pierre");
         c1.setWeight(3.0f);
 
         Chicken c2 = new Chicken();
         c2.setChickenType("POULE");
+        chicken.setName("Clochette");
         c2.setWeight(2.5f);
 
         chickenRepository.save(c1);
@@ -91,6 +95,7 @@ public class ChickenRepositoryTest {
         Chicken chicken = new Chicken();
         chicken.setWeight(0.05f);
         chicken.setChickenType("POUSSIN");
+        chicken.setName("Clochette");
         chickenRepository.save(chicken);
 
         // ACT — il mange, il grossit
@@ -106,6 +111,7 @@ public class ChickenRepositoryTest {
         // ARRANGE
         Chicken chicken = new Chicken();
         chicken.setChickenType("COQ");
+        chicken.setName("Marc");
         chickenRepository.save(chicken);
 
         // ACT
