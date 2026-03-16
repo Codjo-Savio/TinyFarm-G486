@@ -19,18 +19,20 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User findById(Integer id) {
+    public void deleteAllUsers(){
+       userRepository.deleteAll();
+    }
+
+    public User findById(Long id) {
         return userRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Utilisateur introuvale : " + id));
     }
 
     public User create(User user) {
-        user.setEcus(1500);
-        user.setLevel(1);
         return userRepository.save(user);
     }
 
-    public User update(Integer id, User modificatedUser) {
+    public User update(Long id, User modificatedUser) {
         User existing = findById(id);
         existing.setName(modificatedUser.getName());
         existing.setGender(modificatedUser.getGender());
@@ -39,17 +41,17 @@ public class UserService {
         return userRepository.save(existing);
     }
 
-    public void delete(Integer id) {
+    public void delete(Long id) {
         userRepository.deleteById(id);
     }
 
-    public User addEcus(Integer id, Integer amount) {
+    public User addEcus(Long id, Integer amount) {
         User user = findById(id);
         user.setEcus(user.getEcus() + amount);
         return userRepository.save(user);
     }
 
-    public User withdrawEcus(Integer id, Integer amount) {
+    public User withdrawEcus(Long id, Integer amount) {
         User user = findById(id);
         if (user.getEcus() < amount) {
             throw new RuntimeException("Pas assez d'écus !");
@@ -58,7 +60,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public boolean canBuy(Integer id, Integer purchaseNumberForToday) {
+    public boolean canBuy(Long id, Integer purchaseNumberForToday) {
         User user = findById(id);
         int maxPurchase = user.getLevel() * 12; // niveau 1 = 12 achats  par jour
         return purchaseNumberForToday < maxPurchase;

@@ -1,9 +1,66 @@
 package com.api.tinyfarm.service;
 
+import com.api.tinyfarm.model.User;
+import com.api.tinyfarm.model.Product;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @ActiveProfiles("test")
 public class ProductServiceTest {
+    @Autowired
+    ProductService productService;
+
+    @BeforeEach
+    void setUp(){
+        productService.deleteAllProducts();
+    }
+
+    @Test
+    void shouldCreateProduct() {
+        Product product = new Product();
+        product.setDescription("blé");
+        product.setPrice(25);
+
+        Product created = productService.add(product);
+
+        assertNotNull(created.getId());
+        assertEquals(false, created.getCollectible);
+        assertEquals(1, created.getCoefficient);
+    }
+
+    @Test
+    void shouldReturnProducts() {
+        Product product = new Product();
+        product.setDescription("blé");
+        product.setPrice(25);
+
+        Product created = productService.add(product);
+
+        Product anotherProduct = new Product();
+        product.setDescription("foin");
+        product.setPrice(25);
+
+        Product anotherProductCreated = productService.add(anotherProduct);
+
+        assertNotNull(productService.findAll());
+    }
+
+    @Test
+    void shouldDeleteUser(){
+        Product product = new Product();
+        product.setDescription("blé");
+        product.setPrice(25);
+
+        productService.delete(created.getId());
+
+        assertEquals(0, productService.findAll().size());
+    }
+
 }

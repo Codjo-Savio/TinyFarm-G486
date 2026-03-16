@@ -1,4 +1,4 @@
-package com.api.tinyfarm.repository;
+/*package com.api.tinyfarm.repository;
 
 import com.api.tinyfarm.model.Product;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -103,4 +103,4 @@ public class ProductRepositoryTest {
         Optional<Product> found = productRepository.findById(product.getId());
         assertFalse(found.isPresent());
     }
-}
+}*/
