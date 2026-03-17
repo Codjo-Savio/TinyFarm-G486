@@ -1,4 +1,25 @@
 package com.api.tinyfarm.model;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-public class Chicken {
+@Entity
+@Table(name = "chicken")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+
+public class Chicken extends Animal{
+
+    enum chickenTypeEnum{poussin,poule,coq}
+
+    @Column(name = "chicken_type")
+    private chickenTypeEnum chickenType;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "fasting")
+    private Integer fasting;
 }
