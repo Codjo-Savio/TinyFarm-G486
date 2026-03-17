@@ -1,3 +1,5 @@
+const API_URL = "/fakeapi/";
+
 class AppBar extends HTMLElement {
     constructor() {
         super();
@@ -9,7 +11,12 @@ class AppBar extends HTMLElement {
         this.setupEventListeners();
     }
 
-    render() {
+    async fetchUser() {
+        const res = await fetch(API_URL + "/user.json");
+        return await res.json();
+    }
+
+    async render() {
         const style = document.createElement("style");
         style.textContent = `
         .material-symbols-rounded {
@@ -40,6 +47,15 @@ class AppBar extends HTMLElement {
             font-weight: bold;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .appbar>* {
+            opacity: 0;
+            transition: opacity .3s;
+        }
+
+        .appbar.ready>* {
+            opacity: 1;
         }
 
         .appbar > .infos-left {
@@ -129,34 +145,34 @@ class AppBar extends HTMLElement {
         template.innerHTML = `
         <div class="appbar">
             <div class="infos-left">
-                <div id="rank">
+                <div>
                     <span class="material-symbols-rounded">leaderboard</span>
-                    <span>${this.getAttribute("rank") || "10/100"}</span>
+                    <span id="rank">-/-</span>
                 </div>
-                <div id="level">
+                <div>
                     <span class="material-symbols-rounded">stars</span>
-                    <span>${this.getAttribute("level") || "Niveau 2"}</span>
+                    <span id="level">Niveau -</span>
                 </div>
             </div>
             <div class="infos-right">
                 <div id="money">
                     <span class="material-symbols-rounded">paid</span>
-                    <span>${this.getAttribute("money") || "1000"}</span>
+                    <span id="money-level">-</span>
                 </div>
                 <div id="account">
-                    <span>${this.getAttribute("username") || "Pascal"}</span>
-                    <img src="${this.getAttribute("avatar") || "/assets/farmer-icon.png"}" alt="Avatar" />
+                    <span id="username">-</span>
+                    <img src="/assets/farmer-icon.png" alt="Avatar" />
                 </div>
                 <div id="account-menu">
-                    <a href="${this.getAttribute("rules-link") || "/doc/rules?from=/dashboard"}">
+                    <a href="/doc/rules?from=/dashboard">
                         <span class="material-symbols-rounded">book</span>
                         <span>Règles du jeu</span>
                     </a>
-                    <a href="${this.getAttribute("hibernate-link") || "#"}">
+                    <a href="#">
                         <span class="material-symbols-rounded">pause_circle</span>
                         <span>Hiberner</span>
                     </a>
-                    <a href="${this.getAttribute("logout-link") || "/"}">
+                    <a href="#">
                         <span class="material-symbols-rounded">logout</span>
                         <span>Déconnexion</span>
                     </a>
@@ -165,6 +181,18 @@ class AppBar extends HTMLElement {
         </div>
         `;
         this.shadowRoot.appendChild(template.content.cloneNode(true));
+
+        // Fetch data
+        const user = await this.fetchUser();
+        this.shadowRoot.querySelector("#rank").textContent =
+            `${user.rank.current}/${user.rank.max}`;
+        this.shadowRoot.querySelector("#level").textContent = this.shadowRoot
+            .querySelector("#level")
+            .textContent.replace("-", user.level);
+        this.shadowRoot.querySelector("#username").textContent = user.username;
+        this.shadowRoot.querySelector("#money-level").textContent = user.money;
+        // Set as ready
+        this.shadowRoot.querySelector(".appbar").classList.add("ready");
     }
 
     setupEventListeners() {
