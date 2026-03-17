@@ -20,7 +20,6 @@ public class ChickenService {
         return chickenRepository.findAll();
     }
 
-
     public Chicken findById(Long id) {
         return chickenRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Poulet introuvale : " + id));
@@ -50,6 +49,7 @@ public class ChickenService {
     public void deleteByName(String name){
         chickenRepository.deleteByName(name);
     }
+
 
     public void deleteAll(){
         chickenRepository.deleteAll();
