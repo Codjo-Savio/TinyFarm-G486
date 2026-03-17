@@ -32,7 +32,6 @@ public class ChickenService {
 
     public Chicken update(Long id, Chicken modificatedChicken) {
         Chicken existing = findById(id);
-        existing.setAid(modificatedChicken.getAid());
         existing.setChickenType(modificatedChicken.getChickenType());
         existing.setName(modificatedChicken.getName());
         existing.setFasting(modificatedChicken.getFasting());
