@@ -18,7 +18,7 @@ public class AnimalController {
 
     @GetMapping("")
     public ResponseEntity<List<Animal>> getAll() {
-        return ResponseEntity.ok(animalService.findAll());
+        return ResponseEntity.ok(animalService.getAll());
     }
     
     @GetMapping("/{id}")

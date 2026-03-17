@@ -24,25 +24,28 @@ public class ProductService {
        productRepository.deleteAll();
     }
 
-    public User findById(Long id) {
+    public Product findById(Long id) {
         return productRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Produit introuvale : " + id));
     }
 
-    public User create(Product product) {
-        return userRepository.save(product);
+    public Product add(Product product) {
+        return productRepository.save(product);
     }
-    /* TODO
-    public User update(Long id, User modificatedProduct) {
+    public Product update(Long id, Product modificatedProduct) {
         Product existing = findById(id);
-        existing.setName(modificatedUser.getName());
-        existing.setGender(modificatedUser.getGender());
-        existing.setEcus(modificatedUser.getEcus());
-        existing.setLevel(modificatedUser.getLevel());
+        existing.setDescription(modificatedProduct.getDescription());
+        existing.setPrice(modificatedProduct.getPrice());
+        existing.setCollectible(modificatedProduct.getCollectible());
+        existing.setCoefficient(modificatedProduct.getCoefficient());
         return productRepository.save(existing);
-    } */
+    }
 
     public void delete(Long id) {
         productRepository.deleteById(id);
+    }
+
+    public void deleteAllProducts(){
+        productRepository.deleteAll();
     }
 }

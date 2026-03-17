@@ -24,16 +24,16 @@ public class Product {
     String description;
 
     @Column(name = "collection")
-    Boolean collection;
+    Boolean collectible;
 
     @Column(name = "price")
     Float price;
 
     @Column(name = "coef")
-    Integer coef;
+    Integer coefficient;
 
     @PrePersist
     public void prePersist() {
-        this.coef = 1;
+        this.coefficient = 1;
     }
 }

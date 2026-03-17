@@ -17,10 +17,10 @@ public class Animal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "a_id")
-    private Integer aId;
+    private Long id;
 
     @Column(name = "u_id")
-    private Integer uId;
+    private Long userId;
 
     @Column(name = "clean")
     private Boolean clean;

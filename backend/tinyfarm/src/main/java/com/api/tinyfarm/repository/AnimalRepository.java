@@ -7,14 +7,17 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AnimalRepository {
+public interface AnimalRepository extends JpaRepository<Animal, Long>{
     // Animal
 
     Optional<Animal> findByName(String name);
-    Optional<Animal> findByUID(int UID);
+    Optional<Animal> findById(Long id);
+    Optional<Animal> findByUserId(Long userId);
     Optional<List<Animal>> findByClean(Boolean clean);
     Optional<List<Animal>> findByHealthy(Boolean healthy);
     Optional<List<Animal>> findByAge(int age);
     Optional<List<Animal>> findByWeight(float weight);
     Optional<List<Animal>> findByGender(Boolean gender);
+    void deleteAll();
+    void deleteById(Long id);
 }

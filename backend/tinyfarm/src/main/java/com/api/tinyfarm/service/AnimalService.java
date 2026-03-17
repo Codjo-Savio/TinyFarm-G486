@@ -3,6 +3,8 @@ package com.api.tinyfarm.service;
 import com.api.tinyfarm.model.Animal;
 import com.api.tinyfarm.repository.AnimalRepository;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,7 +16,7 @@ public class AnimalService {
         this.animalRepository = animalRepository;
     }
 
-    public List<Animal> findAll() {
+    public List<Animal> getAll() {
         return animalRepository.findAll();
     }
 
@@ -31,6 +33,7 @@ public class AnimalService {
     }
 
     public Animal create(Animal animal) {
+
         return animalRepository.save(animal);
     }
 
