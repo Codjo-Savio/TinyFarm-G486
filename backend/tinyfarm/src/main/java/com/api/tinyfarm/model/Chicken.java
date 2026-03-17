@@ -11,11 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class Chicken {
-
-    @Id
-    @Column(name = "a_id")
-    private Integer aId;
+public class Chicken extends Animal{
 
     enum chickenTypeEnum{poussin,poule,coq}
 
