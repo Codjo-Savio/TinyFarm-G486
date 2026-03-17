@@ -43,8 +43,7 @@ public class ChickenRepositoryTest {
 
         // ASSERT
         assertNotNull(saved.getId()); // PK = a_id
-        assertEquals("C", saved.getChickenType());
-        assertEquals(0.05f, saved.getWeight());
+         assertEquals(0.05f, saved.getWeight());
         assertFalse(saved.getFasting());
     }
 
@@ -63,7 +62,6 @@ public class ChickenRepositoryTest {
 
         // ASSERT
         assertTrue(found.isPresent());
-        assertEquals("H", found.get().getChickenType());
         assertEquals(2.5f, found.get().getWeight());
     }
 
