@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 public class Rabbit extends Animal {
 
     public enum RabbitEnumType {
-        Lapin("Lapin"),
-        Lapereau("Lapereau");
+        R("Rabbit"),
+        B("Babby Rabbit");
 
         private String wording;
 
@@ -32,13 +32,13 @@ public class Rabbit extends Animal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "a_id")
+    @Column(name = "aid")
     private Long id;
 
     @Column(name = "name")
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "rabbit_enum_type")
-    private RabbitEnumType rabbitEnumType;
+    @Column(name = "rabbitType")
+    private RabbitEnumType rabbitType;
 }
