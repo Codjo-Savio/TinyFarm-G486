@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS "user"
     name VARCHAR(20),
     gender genderEnum,
     ecus INTEGER,
+    hibernation BOOLEAN DEFAULT FALSE,
     level INTEGER DEFAULT 1
 );
 
