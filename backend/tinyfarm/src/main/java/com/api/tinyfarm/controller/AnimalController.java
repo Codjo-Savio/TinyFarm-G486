@@ -26,7 +26,7 @@ public class AnimalController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<Animal> getById(@PathVariable Long id) {
         try{
             return ResponseEntity.ok(animalService.findById(id));
@@ -47,7 +47,7 @@ public class AnimalController {
 
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/id/{id}")
     public ResponseEntity<Animal> update(@PathVariable Long id, @RequestBody Animal animal) {
         try{
             return ResponseEntity.ok(animalService.update(id, animal));
@@ -57,7 +57,7 @@ public class AnimalController {
 
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/id/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
             animalService.delete(id);

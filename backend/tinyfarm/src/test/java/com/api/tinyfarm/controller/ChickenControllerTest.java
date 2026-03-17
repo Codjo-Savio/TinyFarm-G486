@@ -24,7 +24,7 @@ public class ChickenControllerTest {
         String json = """
                 {
                     "id" : 1,
-                     "type" : "poule",
+                     "type" : "H",
                      "name" : "Hermine",
                      "fasting" : "false"
                 }
@@ -42,7 +42,7 @@ public class ChickenControllerTest {
         String json = """
                 {
                     "id" : 2,
-                     "type" : "poule",
+                     "type" : "H",
                      "name" : "Clochette",
                      "fasting" : "false"
                 }
@@ -64,13 +64,13 @@ public class ChickenControllerTest {
 
     @Test
     void shouldReturnChickenByName() throws  Exception{
-        mockMvc.perform(get("/api/chickens/Hermine"))
+        mockMvc.perform(get("/api/chickens/name/Hermine"))
                 .andExpect(status().isOk());
     }
 
     @Test
     void chickenShouldNotBeFoundByName() throws  Exception{
-        mockMvc.perform(get("/api/chickens/unknown"))
+        mockMvc.perform(get("/api/chickens/name/unknown"))
                 .andExpect(status().isNotFound());
 
     }
@@ -81,12 +81,12 @@ public class ChickenControllerTest {
         String json = """
                 {
                     "id" : 4,
-                     "type" : "poule",
+                     "type" : "H",
                      "name" : "Clémentine",
                      "fasting" : "false"
                 }
         """;
-        mockMvc.perform(delete("/api/chickens/Clémentine"))
+        mockMvc.perform(delete("/api/chickens/name/Clémentine"))
                 .andExpect(status().isNoContent());
     }
 }

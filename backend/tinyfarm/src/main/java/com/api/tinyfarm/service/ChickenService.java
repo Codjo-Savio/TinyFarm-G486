@@ -47,6 +47,10 @@ public class ChickenService {
         chickenRepository.deleteById(id);
     }
 
+    public void deleteByName(String name){
+        chickenRepository.deleteByName(name);
+    }
+
     public void deleteAll(){
         chickenRepository.deleteAll();
     }

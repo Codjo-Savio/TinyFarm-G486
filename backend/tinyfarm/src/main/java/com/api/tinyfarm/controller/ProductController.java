@@ -27,7 +27,7 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<Product> getById(@PathVariable Long id) {
         try{
             return ResponseEntity.ok(productService.findById(id));
@@ -36,10 +36,10 @@ public class ProductController {
         }
     }
 
-    @PostMapping
+    @PostMapping("")
     public ResponseEntity<Product> create(@RequestBody Product product) {
         try{
-            return ResponseEntity.status(HttpStatus.CREATED).body(
+            return ResponseEntity.ok(
                     productService.add(product)
             );
         }catch (IllegalArgumentException e){
@@ -49,7 +49,7 @@ public class ProductController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/id/{id}")
     public ResponseEntity<Product> update(
         @PathVariable Long id,
         @RequestBody Product product
@@ -61,7 +61,7 @@ public class ProductController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/id/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.delete(id);
         try {

@@ -28,7 +28,7 @@ public class ChickenController{
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<Chicken> getById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(chickenService.findById(id));
@@ -37,7 +37,7 @@ public class ChickenController{
         }
     }
 
-    @GetMapping("/{name}")
+    @GetMapping("/name/{name}")
     public ResponseEntity<Chicken> getByName(@PathVariable String name) {
         try {
             return ResponseEntity.ok(chickenService.getByName(name));
@@ -46,10 +46,10 @@ public class ChickenController{
         }
     }
 
-    @PostMapping
+    @PostMapping("")
     public ResponseEntity<Chicken> create(@RequestBody Chicken chicken) {
         try{
-            return ResponseEntity.status(HttpStatus.CREATED).body(
+            return ResponseEntity.ok(
                     chickenService.create(chicken)
             );
         }catch (IllegalArgumentException e){
@@ -60,7 +60,7 @@ public class ChickenController{
 
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/id/{id}")
     public ResponseEntity<Chicken> update(@PathVariable Long id, @RequestBody Chicken chicken) {
         try {
             return ResponseEntity.ok(chickenService.update(id, chicken));
@@ -69,10 +69,21 @@ public class ChickenController{
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/id/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
             chickenService.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
+    @DeleteMapping("/name/{name}")
+    public ResponseEntity<Void> deleteByName(@PathVariable String name) {
+        try {
+            chickenService.deleteByName(name);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.notFound().build();

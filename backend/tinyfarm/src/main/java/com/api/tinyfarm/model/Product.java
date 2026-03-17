@@ -35,5 +35,6 @@ public class Product {
     @PrePersist
     public void prePersist() {
         this.coefficient = 1;
+        this.collectible = false;
     }
 }

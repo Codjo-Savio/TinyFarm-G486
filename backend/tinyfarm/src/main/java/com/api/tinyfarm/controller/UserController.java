@@ -27,7 +27,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<User> getById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(userService.findById(id));
@@ -48,7 +48,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/id/{id}")
     public ResponseEntity<User> update(@PathVariable Long id,
                                        @RequestBody User user) {
         try {
@@ -59,7 +59,7 @@ public class UserController {
     }
 
     // DELETE /users/1 → supprimer un user
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/id/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
             userService.delete(id);
@@ -70,7 +70,7 @@ public class UserController {
     }
 
     // PATCH /users/1/ecus?amount=8 → ajouter des écus (vente d'un oeuf)
-    @PatchMapping("/ecus/add/{id}")
+    @PatchMapping("/ecus/add/id/{id}")
     public ResponseEntity<User> addEcus(@PathVariable Long id,
                                              @RequestParam Integer amount) {
         try {
@@ -81,7 +81,7 @@ public class UserController {
     }
 
     // PATCH /users/1/ecus/retirer?amount=3 → retirer des écus (nourrir un animal)
-    @PatchMapping("/ecus/withdraw/{id}")
+    @PatchMapping("/ecus/withdraw/id/{id}")
     public ResponseEntity<User> withdrawEcus(@PathVariable Long id,
                                              @RequestParam Integer amount) {
         try {
