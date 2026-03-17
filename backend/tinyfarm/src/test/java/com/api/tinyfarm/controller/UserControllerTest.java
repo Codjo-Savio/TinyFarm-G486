@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @ActiveProfiles("test")
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc
 public class UserControllerTest {
     @Autowired
     MockMvc mockMvc;
@@ -67,13 +67,13 @@ public class UserControllerTest {
 
     @Test
     void shouldReturnUserById() throws  Exception{
-        mockMvc.perform(get("/api/users/1"))
+        mockMvc.perform(get("/api/users/id/1"))
                 .andExpect(status().isOk());
     }
 
     @Test
     void userShouldNotBeFoundById() throws  Exception{
-        mockMvc.perform(get("/api/users/0"))
+        mockMvc.perform(get("/api/users/id/0"))
                 .andExpect(status().isNotFound());
     }
 
@@ -94,7 +94,7 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
         );
-        mockMvc.perform(delete("/api/users/3"))
+        mockMvc.perform(delete("/api/users/id/3"))
                 .andExpect(status().isNoContent());
     }
 }

@@ -42,7 +42,7 @@ public class AnimalService {
         existingAnimal.setHealthy(animal.getHealthy());
         existingAnimal.setAge(animal.getAge());
         existingAnimal.setWeight(animal.getWeight());
-        existingAnimal.setAGender(animal.getAGender());
+        existingAnimal.setGender(animal.getGender());
         return animalRepository.save(existingAnimal);
     }
 

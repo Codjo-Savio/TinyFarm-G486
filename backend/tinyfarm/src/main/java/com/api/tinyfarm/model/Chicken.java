@@ -2,8 +2,10 @@ package com.api.tinyfarm.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "chicken")
 @Data
@@ -12,14 +14,37 @@ import lombok.NoArgsConstructor;
 
 public class Chicken extends Animal{
 
-    enum chickenTypeEnum{poussin,poule,coq}
+    public enum ChickenType{
+        C("Chick"),
+        H("Hen"),
+        R("Rooster");
 
-    @Column(name = "chicken_type")
-    private chickenTypeEnum chickenType;
+        String wording;
+
+        ChickenType(String wording){
+            this.wording = wording;
+        }
+
+        String getWording(){
+            return  this.wording;
+        }
+    }
+
+    @Column(name = "aid")
+    Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "chickenType")
+    private ChickenType chickenType;
 
     @Column(name = "name")
     private String name;
 
     @Column(name = "fasting")
-    private Integer fasting;
+    private Boolean fasting;
+
+    @PrePersist
+    public void prePersist(){
+        this.fasting = false;
+    }
 }

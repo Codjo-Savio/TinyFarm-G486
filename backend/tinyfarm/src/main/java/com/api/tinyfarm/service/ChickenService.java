@@ -1,7 +1,7 @@
 package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Chicken;
-import com.api.tinyfarm.repository.Chickenepository;
+import com.api.tinyfarm.repository.ChickenRepository;
 
 import org.springframework.stereotype.Service;
 
@@ -20,10 +20,14 @@ public class ChickenService {
         return chickenRepository.findAll();
     }
 
-
     public Chicken findById(Long id) {
-        return ChickenRepository.findById(id)
+        return chickenRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Poulet introuvale : " + id));
+    }
+
+    public Chicken getByName(String name) {
+        return chickenRepository.findByName(name)
+                .orElseThrow(() -> new RuntimeException("Poulet introuvale : " + name));
     }
 
     public Chicken create(Chicken chicken) {
@@ -40,6 +44,15 @@ public class ChickenService {
 
     public void delete(Long id) {
         chickenRepository.deleteById(id);
+    }
+
+    public void deleteByName(String name){
+        chickenRepository.deleteByName(name);
+    }
+
+
+    public void deleteAll(){
+        chickenRepository.deleteAll();
     }
 }
 

@@ -2,6 +2,7 @@ package com.api.tinyfarm.controller;
 
 import com.api.tinyfarm.model.Animal;
 import com.api.tinyfarm.service.AnimalService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,27 +19,51 @@ public class AnimalController {
 
     @GetMapping("")
     public ResponseEntity<List<Animal>> getAll() {
-        return ResponseEntity.ok(animalService.findAll());
+        try {
+            return ResponseEntity.ok(animalService.findAll());
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/id/{id}")
     public ResponseEntity<Animal> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(animalService.findById(id));
+        try{
+            return ResponseEntity.ok(animalService.findById(id));
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping("")
     public ResponseEntity<Animal> create(@RequestBody Animal animal) {
-        return ResponseEntity.ok(animalService.create(animal));
+        try{
+            return ResponseEntity.ok(animalService.create(animal));
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/id/{id}")
     public ResponseEntity<Animal> update(@PathVariable Long id, @RequestBody Animal animal) {
-        return ResponseEntity.ok(animalService.update(id, animal));
+        try{
+            return ResponseEntity.ok(animalService.update(id, animal));
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/id/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        animalService.delete(id);
-        return ResponseEntity.noContent().build();
+        try {
+            animalService.delete(id);
+            return ResponseEntity.noContent().build();
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
     }
 }
