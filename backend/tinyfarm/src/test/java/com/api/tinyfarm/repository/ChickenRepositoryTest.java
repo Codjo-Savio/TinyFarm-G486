@@ -1,15 +1,16 @@
 package com.api.tinyfarm.repository;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.api.tinyfarm.model.Animal;
 import com.api.tinyfarm.model.Chicken;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ActiveProfiles;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
-import static org.junit.jupiter.api.Assertions.*;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
 @ActiveProfiles("test")
@@ -36,15 +37,15 @@ public class ChickenRepositoryTest {
         // Champs Chicken
         chicken.setChickenType(Chicken.ChickenType.C);
         chicken.setName("Clochette");
-        chicken.setFasting(false);
+        chicken.setFastingDays(0);
 
         // ACT
         Chicken saved = chickenRepository.save(chicken);
 
         // ASSERT
         assertNotNull(saved.getId()); // PK = a_id
-         assertEquals(0.05f, saved.getWeight());
-        assertFalse(saved.getFasting());
+        assertEquals(0.05f, saved.getWeight());
+        assertEquals(0, saved.getFastingDays());
     }
 
     @Test

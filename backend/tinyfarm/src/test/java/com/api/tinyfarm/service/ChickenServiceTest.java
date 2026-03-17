@@ -1,5 +1,8 @@
 package com.api.tinyfarm.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import com.api.tinyfarm.model.Animal;
 import com.api.tinyfarm.model.Chicken;
 import com.api.tinyfarm.model.User;
@@ -10,29 +13,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 @SpringBootTest
 @ActiveProfiles("test")
 public class ChickenServiceTest {
+
     @Autowired
     ChickenService chickenService;
+
     @Autowired
     AnimalService animalService;
+
     @Autowired
     UserRepository userRepository;
 
     @BeforeEach
-    void setup(){
+    void setup() {
         chickenService.deleteAll();
         animalService.deleteAllAnimals();
         userRepository.deleteAll();
     }
 
     @Test
-    void shouldCreateChicken(){
-        User user = new User(2L, "Brad", User.Gender.M,  2000, false,  1);
+    void shouldCreateChicken() {
+        User user = new User(2L, "Brad", User.Gender.M, 2000, false, 1);
 
         Animal animal = new Animal();
         animal.setUserId(2L);
@@ -42,6 +45,10 @@ public class ChickenServiceTest {
 
         Chicken chicken = new Chicken();
         chicken.setId(1L);
+        chicken.setUserId(2L);
+        chicken.setAge(1);
+        chicken.setWeight(0.5f);
+        chicken.setGender(Animal.AnimalGender.F);
         chicken.setChickenType(Chicken.ChickenType.H);
         chicken.setName("Clochette");
 
@@ -51,8 +58,8 @@ public class ChickenServiceTest {
     }
 
     @Test
-    void shouldReturnAllChickens(){
-        User user = new User(2L, "Brad", User.Gender.M,  2000, false,  1);
+    void shouldReturnAllChickens() {
+        User user = new User(2L, "Brad", User.Gender.M, 2000, false, 1);
 
         Animal animal = new Animal();
         animal.setUserId(2L);
@@ -62,6 +69,10 @@ public class ChickenServiceTest {
 
         Chicken chicken = new Chicken();
         chicken.setId(1L);
+        chicken.setUserId(2L);
+        chicken.setAge(1);
+        chicken.setWeight(0.5f);
+        chicken.setGender(Animal.AnimalGender.F);
         chicken.setChickenType(Chicken.ChickenType.C);
         chicken.setName("Clochette");
 
@@ -71,8 +82,8 @@ public class ChickenServiceTest {
     }
 
     @Test
-    void shouldDeleteChicken(){
-        User user = new User(2L, "Brad", User.Gender.M,  2000, false,  1);
+    void shouldDeleteChicken() {
+        User user = new User(2L, "Brad", User.Gender.M, 2000, false, 1);
 
         Animal animal = new Animal();
         animal.setUserId(2L);
@@ -82,6 +93,10 @@ public class ChickenServiceTest {
 
         Chicken chicken = new Chicken();
         chicken.setId(1L);
+        chicken.setUserId(2L);
+        chicken.setAge(1);
+        chicken.setWeight(0.5f);
+        chicken.setGender(Animal.AnimalGender.F);
         chicken.setChickenType(Chicken.ChickenType.H);
         chicken.setName("Clochette");
 
@@ -90,5 +105,4 @@ public class ChickenServiceTest {
         chickenService.delete(created.getId());
         assertEquals(0, chickenService.findAll().size());
     }
-
 }
