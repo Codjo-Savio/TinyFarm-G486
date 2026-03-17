@@ -22,7 +22,10 @@
                 <div class="rankingTableContainer">
                     <h2 class="rankingTableTitle">Classement des joueurs</h2>
                     <div class="rankingTable">
-                        <table class="rankingTableContent">
+                        <table
+                            class="rankingTableContent is-loading"
+                            aria-busy="true"
+                        >
                             <tr>
                                 <th>
                                     Rang
@@ -227,10 +230,10 @@
                     </div>
                 </div>
                 <div class="button-group">
-                    <a href="/frontend/src/doc/about/index.html">
+                    <a href="/doc/about/index.html">
                         <button id="about">À propos</button>
                     </a>
-                    <a href="/frontend/src/doc/rules/index.html">
+                    <a href="/doc/rules/index.html">
                         <button id="rules">Règles du jeu</button>
                     </a>
                 </div>
@@ -240,14 +243,14 @@
                 <h1 class="welcome-text">
                     Bienvenue sur <br /><span>Tiny Farm</span>
                 </h1>
-                <img
-                    src="/frontend/src/assets/teteVache.svg"
-                    alt="TinyFarm Cow"
-                    class="cow-img"
-                />
-                <a
-                    href="/frontend/src/dashboard/management/chicken-coop/index.html"
-                >
+                <div class="img-container">
+                    <img
+                        src="/assets/teteVache.svg"
+                        alt="TinyFarm Cow"
+                        class="cow-img"
+                    />
+                </div>
+                <a href="/dashboard/management/chicken-coop/index.html">
                     <button id="github">Connexion avec Github</button>
                 </a>
             </div>
