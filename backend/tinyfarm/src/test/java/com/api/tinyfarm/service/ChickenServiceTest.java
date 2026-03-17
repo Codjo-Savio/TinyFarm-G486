@@ -1,4 +1,4 @@
-/*package com.api.tinyfarm.service;
+package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Animal;
 import com.api.tinyfarm.model.Chicken;
@@ -26,23 +26,23 @@ public class ChickenServiceTest {
     @BeforeEach
     void setup(){
         chickenService.deleteAll();
-        animalService.deleteAll();
+        animalService.deleteAllAnimals();
         userRepository.deleteAll();
     }
 
     @Test
     void shouldCreateChicken(){
-        User user = new User(2L, "Brad", User.Gender.M, 2000, 1);
+        User user = new User(2L, "Brad", User.Gender.M,  2000, false,  1);
 
         Animal animal = new Animal();
-        animal.setUserId(2);
+        animal.setUserId(2L);
         animal.setAge(1);
-        animal.setWeight(0.5);
-        animal.setGender(AnimalGender.F);
+        animal.setWeight(0.5f);
+        animal.setGender(Animal.AnimalGender.F);
 
         Chicken chicken = new Chicken();
-        chicken.setId(1);
-        chicken.setChickenType(ChickenType.poussin);
+        chicken.setId(1L);
+        chicken.setChickenType(Chicken.ChickenType.H);
         chicken.setName("Clochette");
 
         Chicken created = chickenService.create(chicken);
@@ -52,42 +52,43 @@ public class ChickenServiceTest {
 
     @Test
     void shouldReturnAllChickens(){
-        User user = new User(2L, "Brad", User.Gender.M, 2000, 1);
+        User user = new User(2L, "Brad", User.Gender.M,  2000, false,  1);
 
         Animal animal = new Animal();
-        animal.setUserId(2);
+        animal.setUserId(2L);
         animal.setAge(1);
-        animal.setWeight(0.5);
-        animal.setGender(AnimalGender.F);
+        animal.setWeight(0.5f);
+        animal.setGender(Animal.AnimalGender.F);
 
         Chicken chicken = new Chicken();
-        chicken.setId(1);
-        chicken.setChickenType(ChickenType.poussin);
+        chicken.setId(1L);
+        chicken.setChickenType(Chicken.ChickenType.C);
         chicken.setName("Clochette");
 
         Chicken created = chickenService.create(chicken);
 
-        assertNotNull(chickenService.getAll());
+        assertNotNull(chickenService.findAll());
     }
 
     @Test
     void shouldDeleteChicken(){
-        User user = new User(2L, "Brad", User.Gender.M, 2000, 1);
+        User user = new User(2L, "Brad", User.Gender.M,  2000, false,  1);
 
         Animal animal = new Animal();
-        animal.setUserId(2);
+        animal.setUserId(2L);
         animal.setAge(1);
-        animal.setWeight(0.5);
-        animal.setGender(AnimalGender.F);
+        animal.setWeight(0.5f);
+        animal.setGender(Animal.AnimalGender.F);
 
         Chicken chicken = new Chicken();
-        chicken.setId(1);
-        chicken.setChickenType(ChickenType.poussin);
+        chicken.setId(1L);
+        chicken.setChickenType(Chicken.ChickenType.H);
         chicken.setName("Clochette");
 
         Chicken created = chickenService.create(chicken);
 
-        assertEquals(0, chickenService.deleteAll());
+        chickenService.delete(created.getId());
+        assertEquals(0, chickenService.findAll().size());
     }
 
-}*/
+}

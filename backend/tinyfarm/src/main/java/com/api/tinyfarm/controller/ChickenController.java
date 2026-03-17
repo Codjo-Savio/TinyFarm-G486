@@ -21,32 +21,62 @@ public class ChickenController{
 
     @GetMapping
     public ResponseEntity<List<Chicken>> getAll() {
-        return ResponseEntity.ok(chickenService.findAll());
+        try {
+            return ResponseEntity.ok(chickenService.findAll());
+        }catch (Exception e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Chicken> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(chickenService.findById(id));
+        try {
+            return ResponseEntity.ok(chickenService.findById(id));
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/{name}")
+    public ResponseEntity<Chicken> getByName(@PathVariable String name) {
+        try {
+            return ResponseEntity.ok(chickenService.getByName(name));
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
     public ResponseEntity<Chicken> create(@RequestBody Chicken chicken) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-            chickenService.create(chicken)
-        );
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(
+                    chickenService.create(chicken)
+            );
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Chicken> update(
-        @PathVariable Long id,
-        @RequestBody Chicken chicken
-    ) {
-        return ResponseEntity.ok(chickenService.update(id, chicken));
+    public ResponseEntity<Chicken> update(@PathVariable Long id, @RequestBody Chicken chicken) {
+        try {
+            return ResponseEntity.ok(chickenService.update(id, chicken));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        chickenService.delete(id);
-        return ResponseEntity.noContent().build();
+        try {
+            chickenService.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+
     }
 }

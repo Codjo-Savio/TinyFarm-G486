@@ -1,5 +1,6 @@
-/*package com.api.tinyfarm.repository;
+package com.api.tinyfarm.repository;
 
+import com.api.tinyfarm.model.Animal;
 import com.api.tinyfarm.model.Chicken;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +31,10 @@ public class ChickenRepositoryTest {
         chicken.setHealthy(true);
         chicken.setAge(0);
         chicken.setWeight(0.05f);
-        chicken.setAGender(false);
+        chicken.setGender(Animal.AnimalGender.F);
 
         // Champs Chicken
-        chicken.setChickenType("POUSSIN");
+        chicken.setChickenType(Chicken.ChickenType.C);
         chicken.setName("Clochette");
         chicken.setFasting(false);
 
@@ -41,8 +42,8 @@ public class ChickenRepositoryTest {
         Chicken saved = chickenRepository.save(chicken);
 
         // ASSERT
-        assertNotNull(saved.getAId()); // PK = a_id
-        assertEquals("POUSSIN", saved.getChickenType());
+        assertNotNull(saved.getId()); // PK = a_id
+        assertEquals("C", saved.getChickenType());
         assertEquals(0.05f, saved.getWeight());
         assertFalse(saved.getFasting());
     }
@@ -51,36 +52,36 @@ public class ChickenRepositoryTest {
     void shouldFindChickenById() {
         // ARRANGE
         Chicken chicken = new Chicken();
-        chicken.setChickenType("POULE");
+        chicken.setChickenType(Chicken.ChickenType.H);
         chicken.setName("Clochette");
         chicken.setAge(5);
         chicken.setWeight(2.5f);
         chickenRepository.save(chicken);
 
         // ACT
-        Optional<Chicken> found = chickenRepository.findById(chicken.getAId());
+        Optional<Chicken> found = chickenRepository.findById(chicken.getId());
 
         // ASSERT
         assertTrue(found.isPresent());
-        assertEquals("POULE", found.get().getChickenType());
+        assertEquals("H", found.get().getChickenType());
         assertEquals(2.5f, found.get().getWeight());
     }
 
     @Test
     void shouldFindAllChickens() {
         // ARRANGE
-        Chicken c1 = new Chicken();
-        c1.setChickenType("COQ");
+        Chicken chicken = new Chicken();
+        chicken.setChickenType(Chicken.ChickenType.R);
         chicken.setName("Pierre");
-        c1.setWeight(3.0f);
+        chicken.setWeight(3.0f);
 
-        Chicken c2 = new Chicken();
-        c2.setChickenType("POULE");
-        chicken.setName("Clochette");
-        c2.setWeight(2.5f);
+        Chicken anotherChicken = new Chicken();
+        anotherChicken.setChickenType(Chicken.ChickenType.H);
+        anotherChicken.setName("Clochette");
+        anotherChicken.setWeight(2.5f);
 
-        chickenRepository.save(c1);
-        chickenRepository.save(c2);
+        chickenRepository.save(chicken);
+        chickenRepository.save(anotherChicken);
 
         // ACT
         List<Chicken> chickens = chickenRepository.findAll();
@@ -94,7 +95,7 @@ public class ChickenRepositoryTest {
         // ARRANGE — poussin qui grandit
         Chicken chicken = new Chicken();
         chicken.setWeight(0.05f);
-        chicken.setChickenType("POUSSIN");
+        chicken.setChickenType(Chicken.ChickenType.C);
         chicken.setName("Clochette");
         chickenRepository.save(chicken);
 
@@ -110,15 +111,15 @@ public class ChickenRepositoryTest {
     void shouldDeleteChicken() {
         // ARRANGE
         Chicken chicken = new Chicken();
-        chicken.setChickenType("COQ");
+        chicken.setChickenType(Chicken.ChickenType.R);
         chicken.setName("Marc");
         chickenRepository.save(chicken);
 
         // ACT
-        chickenRepository.deleteById(chicken.getAId());
+        chickenRepository.deleteById(chicken.getId());
 
         // ASSERT
-        Optional<Chicken> found = chickenRepository.findById(chicken.getAId());
+        Optional<Chicken> found = chickenRepository.findById(chicken.getId());
         assertFalse(found.isPresent());
     }
-}*/
+}

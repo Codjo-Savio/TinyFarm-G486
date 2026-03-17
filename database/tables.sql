@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS chicken
         ON UPDATE CASCADE,
     chickenType chickenTypeEnum,
     name VARCHAR(50),
-    fasting INTEGER DEFAULT FALSE
+    fasting BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS rabbit

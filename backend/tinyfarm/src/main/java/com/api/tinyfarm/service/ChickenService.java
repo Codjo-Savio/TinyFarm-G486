@@ -26,6 +26,11 @@ public class ChickenService {
             .orElseThrow(() -> new RuntimeException("Poulet introuvale : " + id));
     }
 
+    public Chicken getByName(String name) {
+        return chickenRepository.findByName(name)
+                .orElseThrow(() -> new RuntimeException("Poulet introuvale : " + name));
+    }
+
     public Chicken create(Chicken chicken) {
         return chickenRepository.save(chicken);
     }
@@ -40,6 +45,10 @@ public class ChickenService {
 
     public void delete(Long id) {
         chickenRepository.deleteById(id);
+    }
+
+    public void deleteAll(){
+        chickenRepository.deleteAll();
     }
 }
 

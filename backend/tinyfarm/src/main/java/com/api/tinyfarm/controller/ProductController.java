@@ -19,19 +19,34 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<Product>> getAll() {
-        return ResponseEntity.ok(productService.findAll());
+
+        try{
+            return ResponseEntity.ok(productService.findAll());
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Product> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(productService.findById(id));
+        try{
+            return ResponseEntity.ok(productService.findById(id));
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
     public ResponseEntity<Product> create(@RequestBody Product product) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-            productService.add(product)
-        );
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(
+                    productService.add(product)
+            );
+        }catch (IllegalArgumentException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @PutMapping("/{id}")
@@ -39,19 +54,21 @@ public class ProductController {
         @PathVariable Long id,
         @RequestBody Product product
     ) {
-        return ResponseEntity.ok(productService.update(id, product));
+        try{
+            return ResponseEntity.ok(productService.update(id, product));
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/all")
-    public ResponseEntity<Void> deleteAll() {
-        productService.deleteAllProducts();
-        return ResponseEntity.noContent().build();
+        try {
+            return ResponseEntity.noContent().build();
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
     // --- Custom Filters ---
@@ -60,13 +77,21 @@ public class ProductController {
     public ResponseEntity<List<Product>> getByCollectible(
         @PathVariable Boolean collectible
     ) {
-        return ResponseEntity.ok(productService.findByCollectible(collectible));
+        try{
+            return ResponseEntity.ok(productService.findByCollectible(collectible));
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping("/filter/coefficient/{coefficient}")
     public ResponseEntity<List<Product>> getByCoefficient(
         @PathVariable Integer coefficient
     ) {
-        return ResponseEntity.ok(productService.findByCoefficient(coefficient));
+        try {
+            return ResponseEntity.ok(productService.findByCoefficient(coefficient));
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
     }
 }

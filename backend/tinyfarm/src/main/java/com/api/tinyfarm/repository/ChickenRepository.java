@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface ChickenRepository extends JpaRepository<Chicken, Long> {
 
     Optional<Chicken> findById(Long id);
+    Optional<Chicken> findByName(String name);
 }
