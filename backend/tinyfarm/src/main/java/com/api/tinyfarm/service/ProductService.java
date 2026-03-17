@@ -2,9 +2,8 @@ package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Product;
 import com.api.tinyfarm.repository.ProductRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 @Service
 public class ProductService {
@@ -15,34 +14,49 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-
     public List<Product> findAll() {
         return productRepository.findAll();
     }
 
-    public void deleteAllUsers(){
-       productRepository.deleteAll();
+    public Product findById(Long id) {
+        return productRepository
+            .findById(id)
+            .orElseThrow(() ->
+                new RuntimeException("Produit introuvable : " + id)
+            );
     }
 
-    public User findById(Long id) {
-        return productRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Produit introuvale : " + id));
+    public Product add(Product product) {
+        return productRepository.save(product);
     }
 
-    public User create(Product product) {
-        return userRepository.save(product);
-    }
-    /* TODO
-    public User update(Long id, User modificatedProduct) {
+    public Product update(Long id, Product modifiedProduct) {
         Product existing = findById(id);
-        existing.setName(modificatedUser.getName());
-        existing.setGender(modificatedUser.getGender());
-        existing.setEcus(modificatedUser.getEcus());
-        existing.setLevel(modificatedUser.getLevel());
+
+        // Update fields
+        existing.setDescription(modifiedProduct.getDescription());
+        existing.setPrice(modifiedProduct.getPrice());
+        existing.setCollectible(modifiedProduct.getCollectible());
+        existing.setCoefficient(modifiedProduct.getCoefficient());
+
         return productRepository.save(existing);
-    } */
+    }
 
     public void delete(Long id) {
         productRepository.deleteById(id);
+    }
+
+    public void deleteAllProducts() {
+        productRepository.deleteAll();
+    }
+
+    // --- Custom Queries ---
+
+    public List<Product> findByCollectible(Boolean collectible) {
+        return productRepository.findByCollectible(collectible);
+    }
+
+    public List<Product> findByCoefficient(Integer coefficient) {
+        return productRepository.findByCoefficient(coefficient);
     }
 }

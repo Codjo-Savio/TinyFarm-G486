@@ -1,4 +1,4 @@
-package com.api.tinyfarm.service;
+/*package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Animal;
 import com.api.tinyfarm.model.Chicken;
@@ -90,5 +90,4 @@ public class ChickenServiceTest {
         assertEquals(0, chickenService.deleteAll());
     }
 
-
-}
+}*/

@@ -1,4 +1,4 @@
-/*package com.api.tinyfarm.repository;
+package com.api.tinyfarm.repository;
 
 import com.api.tinyfarm.model.Product;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -28,7 +28,7 @@ public class ProductRepositoryTest {
         Product product = new Product();
         product.setDescription("Sac de grains");
         product.setPrice(3.0f);
-        product.setCollection(false);
+        product.setCollectible(false);
 
         // ACT
         Product saved = productRepository.save(product);
@@ -37,7 +37,7 @@ public class ProductRepositoryTest {
         assertNotNull(saved.getId()); // PK = productID
         assertEquals("Sac de grains", saved.getDescription());
         assertEquals(3.0f, saved.getPrice());
-        assertFalse(saved.getCollection());
+        assertFalse(saved.getCollectible());
     }
 
     @Test
@@ -103,4 +103,4 @@ public class ProductRepositoryTest {
         Optional<Product> found = productRepository.findById(product.getId());
         assertFalse(found.isPresent());
     }
-}*/
+}

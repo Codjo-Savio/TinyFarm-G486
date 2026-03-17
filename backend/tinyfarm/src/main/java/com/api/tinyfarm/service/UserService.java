@@ -2,9 +2,8 @@ package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.UserRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
@@ -19,13 +18,16 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public void deleteAllUsers(){
-       userRepository.deleteAll();
+    public void deleteAllUsers() {
+        userRepository.deleteAll();
     }
 
     public User findById(Long id) {
-        return userRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Utilisateur introuvale : " + id));
+        return userRepository
+            .findById(id)
+            .orElseThrow(() ->
+                new RuntimeException("Utilisateur introuvale : " + id)
+            );
     }
 
     public User create(User user) {
@@ -37,6 +39,7 @@ public class UserService {
         existing.setName(modificatedUser.getName());
         existing.setGender(modificatedUser.getGender());
         existing.setEcus(modificatedUser.getEcus());
+        existing.setHibernation(modificatedUser.getHibernation());
         existing.setLevel(modificatedUser.getLevel());
         return userRepository.save(existing);
     }
