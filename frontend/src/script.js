@@ -2,30 +2,32 @@ let usersData = [];
 
 function displayUsers(users) {
   for (let i = 0; i < 10; i++) {
-    const user = users[i];
+    if (i < users.length) {
+      const user = users[i];
 
-    if (!user) {
-      document.getElementById(i + "-0").textContent = "";
-      document.getElementById(i + "-1").textContent = "";
-      document.getElementById(i + "-2").textContent = "";
-      document.getElementById(i + "-3").textContent = "";
-      document.getElementById(i + "-4").textContent = "";
-      continue;
-    }
+      if (!user) {
+        document.getElementById(i + "-0").textContent = "";
+        document.getElementById(i + "-1").textContent = "";
+        document.getElementById(i + "-2").textContent = "";
+        document.getElementById(i + "-3").textContent = "";
+        document.getElementById(i + "-4").textContent = "";
+        continue;
+      }
 
-    if (user.rang.current < 4) {
-      document.getElementById(i + "-0").innerHTML =
-        user.rang.current +
-        ' <span class="material-symbols-outlined">crown</span>';
-    } else {
-      document.getElementById(i + "-0").innerHTML =
-        user.rang.current +
-        ' <span class="material-symbols-outlined">workspace_premium</span>';
+      if (user.rang.current < 4) {
+        document.getElementById(i + "-0").innerHTML =
+          user.rang.current +
+          ' <span class="material-symbols-outlined">crown</span>';
+      } else {
+        document.getElementById(i + "-0").innerHTML =
+          user.rang.current +
+          ' <span class="material-symbols-outlined">workspace_premium</span>';
+      }
+      document.getElementById(i + "-1").textContent = user.nom;
+      document.getElementById(i + "-2").textContent = user.production;
+      document.getElementById(i + "-3").textContent = user.capacite;
+      document.getElementById(i + "-4").textContent = user.ecus;
     }
-    document.getElementById(i + "-1").textContent = user.nom;
-    document.getElementById(i + "-2").textContent = user.production;
-    document.getElementById(i + "-3").textContent = user.capacite;
-    document.getElementById(i + "-4").textContent = user.ecus;
   }
 }
 
@@ -72,7 +74,7 @@ fetch("api/classement")
   })
   .catch((error) => {
     console.error("Error fetching user data from api/classement:", error);
-    return fetch("../frontend/src/fakeapi/users.json").then((response) => {
+    return fetch("/frontend/src/fakeapi/users.json").then((response) => {
       if (!response.ok) {
         throw new Error(`Fallback HTTP ${response.status}`);
       }
