@@ -34,6 +34,20 @@ public class Animal {
     @Column(name = "weight")
     private Float weight;
 
-    @Column(name = "a_gender")
-    private Boolean aGender;
+    public enum AnimalGender {
+        M("Male"),
+        F("Female");
+        String wording;
+
+        AnimalGender(String wording){
+            this.wording = wording;
+        }
+
+        String getWording(){
+            return  this.wording;
+        }
+    }
+
+    @Column(name = "gender")
+    private AnimalGender gender;
 }
