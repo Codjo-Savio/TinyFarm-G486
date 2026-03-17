@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>TinyFarm</title>
     <link
       rel="stylesheet"
       href="style.css"
@@ -14,7 +14,6 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
     />
-    <script src="script.js" defer></script>
   </head>
   <body>
     <div class="parent">
@@ -26,21 +25,7 @@
               <tr>
                 <th>
                   Rang
-                  <button
-                    class="rankingButton"
-                    id="rangButton"
-                    active="active"
-                    onclick="
-                      sortTable(
-                        'rang',
-                        document
-                          .getElementById('rangButton')
-                          .innerHTML.includes('arrow_upward_alt')
-                          ? 1
-                          : -1,
-                      )
-                    "
-                  >
+                  <button class="rankingButton" id="rangButton" active="active">
                     <span class="material-symbols-outlined"
                       >arrow_upward_alt</span
                     >
@@ -48,21 +33,7 @@
                 </th>
                 <th>
                   Nom
-                  <button
-                    class="rankingButton"
-                    id="nomButton"
-                    active="false"
-                    onclick="
-                      sortTable(
-                        'nom',
-                        document
-                          .getElementById('nomButton')
-                          .innerHTML.includes('arrow_upward_alt')
-                          ? 1
-                          : -1,
-                      )
-                    "
-                  >
+                  <button class="rankingButton" id="nomButton" active="false">
                     <span class="material-symbols-outlined">unfold_more</span>
                   </button>
                 </th>
@@ -72,16 +43,6 @@
                     class="rankingButton"
                     id="productionButton"
                     active="false"
-                    onclick="
-                      sortTable(
-                        'production',
-                        document
-                          .getElementById('productionButton')
-                          .innerHTML.includes('arrow_upward_alt')
-                          ? 1
-                          : -1,
-                      )
-                    "
                   >
                     <span class="material-symbols-outlined">unfold_more</span>
                   </button>
@@ -92,37 +53,13 @@
                     class="rankingButton"
                     id="capaciteButton"
                     active="false"
-                    onclick="
-                      sortTable(
-                        'capacite',
-                        document
-                          .getElementById('capaciteButton')
-                          .innerHTML.includes('arrow_upward_alt')
-                          ? 1
-                          : -1,
-                      )
-                    "
                   >
                     <span class="material-symbols-outlined">unfold_more</span>
                   </button>
                 </th>
                 <th>
                   Écus
-                  <button
-                    class="rankingButton"
-                    id="ecusButton"
-                    active="false"
-                    onclick="
-                      sortTable(
-                        'ecus',
-                        document
-                          .getElementById('ecusButton')
-                          .innerHTML.includes('arrow_upward_alt')
-                          ? 1
-                          : -1,
-                      )
-                    "
-                  >
+                  <button class="rankingButton" id="ecusButton" active="false">
                     <span class="material-symbols-outlined">unfold_more</span>
                   </button>
                 </th>
@@ -212,7 +149,11 @@
 
       <div class="div2">
         <h1 class="welcome-text">Bienvenue sur <br /><span>Tiny Farm</span></h1>
-        <img src="../assets/teteVache.svg" alt="TinyFarm Cow" class="cow-img" />
+        <img
+          src="/screens/assets/teteVache.svg"
+          alt="TinyFarm Cow"
+          class="cow-img"
+        />
         <a href="/screens/dashboard/index.html">
           <button id="github">Connexion avec Github</button>
         </a>
