@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Animal {
 
     @Id
@@ -34,17 +33,24 @@ public class Animal {
     @Column(name = "weight")
     private Float weight;
 
+    @Column(name = "fed_today")
+    private Boolean fedToday = false;
+
+    @Column(name = "watered_today")
+    private Boolean wateredToday = false;
+
     public enum AnimalGender {
         M("Male"),
         F("Female");
+
         String wording;
 
-        AnimalGender(String wording){
+        AnimalGender(String wording) {
             this.wording = wording;
         }
 
-        String getWording(){
-            return  this.wording;
+        String getWording() {
+            return this.wording;
         }
     }
 

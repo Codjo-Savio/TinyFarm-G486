@@ -8,7 +8,14 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RabbitRepository extends JpaRepository<Rabbit, Long> {
-    Optional<Rabbit> findById(Long id);
-    List<Rabbit> findByName(String name);
-    void deleteAll();
+    Optional<Rabbit> findByName(String name);
+
+    List<Rabbit> findByRabbitType(Rabbit.RabbitTypeEnum rabbitType);
+
+    List<Rabbit> findByUserId(Long userId);
+
+    List<Rabbit> findByUserIdAndRabbitType(
+        Long userId,
+        Rabbit.RabbitTypeEnum rabbitType
+    );
 }

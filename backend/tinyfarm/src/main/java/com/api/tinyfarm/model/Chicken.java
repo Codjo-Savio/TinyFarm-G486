@@ -1,4 +1,5 @@
 package com.api.tinyfarm.model;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,22 +12,21 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+public class Chicken extends Animal {
 
-public class Chicken extends Animal{
-
-    public enum ChickenType{
+    public enum ChickenType {
         C("Chick"),
         H("Hen"),
         R("Rooster");
 
         String wording;
 
-        ChickenType(String wording){
+        ChickenType(String wording) {
             this.wording = wording;
         }
 
-        String getWording(){
-            return  this.wording;
+        String getWording() {
+            return this.wording;
         }
     }
 
@@ -40,11 +40,15 @@ public class Chicken extends Animal{
     @Column(name = "name")
     private String name;
 
-    @Column(name = "fasting")
-    private Boolean fasting;
+    @Column(name = "fasting_days")
+    private Integer fastingDays;
+
+    @Column(name = "sick_days")
+    private Integer sickDays;
 
     @PrePersist
-    public void prePersist(){
-        this.fasting = false;
+    public void prePersist() {
+        this.fastingDays = 0;
+        this.sickDays = 0;
     }
 }

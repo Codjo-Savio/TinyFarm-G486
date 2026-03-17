@@ -6,39 +6,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Rabbit")
-@Inheritance(strategy = InheritanceType.JOINED)
+@Table(name = "rabbit")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Rabbit extends Animal {
 
-    public enum RabbitEnumType {
-        R("Rabbit"),
-        B("Babby Rabbit");
-
-        private String wording;
-
-        RabbitEnumType(String wording) {
-            this.wording = wording;
-        }
-
-        String getWording() {
-            return this.wording;
-        }
+    public enum RabbitTypeEnum {
+        lapereau,
+        lapin,
     }
 
-    // ID NAME RABBITENUMTYPE
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "aid")
-    private Long id;
-
-    @Column(name = "name")
+    @Column(name = "name", length = 50)
     private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "rabbitType")
-    private RabbitEnumType rabbitType;
+    private RabbitTypeEnum rabbitType;
 }

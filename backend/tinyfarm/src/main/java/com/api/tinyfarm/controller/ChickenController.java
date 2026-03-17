@@ -9,9 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/chickens")
-public class ChickenController{
-
-
+public class ChickenController {
 
     private final ChickenService chickenService;
 
@@ -23,7 +21,7 @@ public class ChickenController{
     public ResponseEntity<List<Chicken>> getAll() {
         try {
             return ResponseEntity.ok(chickenService.findAll());
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -32,7 +30,7 @@ public class ChickenController{
     public ResponseEntity<Chicken> getById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(chickenService.findById(id));
-        }catch(Exception e){
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -41,27 +39,29 @@ public class ChickenController{
     public ResponseEntity<Chicken> getByName(@PathVariable String name) {
         try {
             return ResponseEntity.ok(chickenService.getByName(name));
-        }catch(Exception e){
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping("")
     public ResponseEntity<Chicken> create(@RequestBody Chicken chicken) {
-        try{
-            return ResponseEntity.ok(
-                    chickenService.create(chicken)
-            );
-        }catch (IllegalArgumentException e){
+        try {
+            return ResponseEntity.ok(chickenService.create(chicken));
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }catch (Exception e){
-            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(
+                HttpStatus.INTERNAL_SERVER_ERROR
+            ).build();
         }
-
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<Chicken> update(@PathVariable Long id, @RequestBody Chicken chicken) {
+    public ResponseEntity<Chicken> update(
+        @PathVariable Long id,
+        @RequestBody Chicken chicken
+    ) {
         try {
             return ResponseEntity.ok(chickenService.update(id, chicken));
         } catch (Exception e) {
@@ -77,7 +77,6 @@ public class ChickenController{
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
-
     }
 
     @DeleteMapping("/name/{name}")
@@ -88,6 +87,45 @@ public class ChickenController{
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
+    }
 
+    // --- Actions ---
+
+    @PostMapping("/{id}/feed")
+    public ResponseEntity<Chicken> feedChicken(
+        @PathVariable Long id,
+        @RequestParam Long userId
+    ) {
+        return ResponseEntity.ok(chickenService.feedChicken(id, userId));
+    }
+
+    @PostMapping("/{id}/water")
+    public ResponseEntity<Chicken> waterChicken(
+        @PathVariable Long id,
+        @RequestParam Long userId
+    ) {
+        return ResponseEntity.ok(chickenService.waterChicken(id, userId));
+    }
+
+    @PostMapping("/{id}/clean")
+    public ResponseEntity<Chicken> cleanChicken(
+        @PathVariable Long id,
+        @RequestParam Long userId
+    ) {
+        return ResponseEntity.ok(chickenService.cleanChicken(id, userId));
+    }
+
+    @PostMapping("/{id}/heal")
+    public ResponseEntity<Chicken> healChicken(
+        @PathVariable Long id,
+        @RequestParam Long userId
+    ) {
+        return ResponseEntity.ok(chickenService.healChicken(id, userId));
+    }
+
+    @PostMapping("/endOfDay")
+    public ResponseEntity<Void> processEndOfDay(@RequestParam Long userId) {
+        chickenService.processEndOfDay(userId);
+        return ResponseEntity.ok().build();
     }
 }
