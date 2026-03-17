@@ -1,7 +1,7 @@
 package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Chicken;
-import com.api.tinyfarm.repository.Chickenepository;
+import com.api.tinyfarm.repository.ChickenRepository;
 
 import org.springframework.stereotype.Service;
 
@@ -22,7 +22,7 @@ public class ChickenService {
 
 
     public Chicken findById(Long id) {
-        return ChickenRepository.findById(id)
+        return chickenRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Poulet introuvale : " + id));
     }
 
