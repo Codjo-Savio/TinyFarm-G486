@@ -48,6 +48,7 @@ public class Animal {
         }
     }
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "gender")
     private AnimalGender gender;
 }

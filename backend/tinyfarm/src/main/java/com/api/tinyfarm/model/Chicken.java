@@ -33,6 +33,7 @@ public class Chicken extends Animal{
     @Column(name = "aid")
     Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "chickenType")
     private ChickenType chickenType;
 
