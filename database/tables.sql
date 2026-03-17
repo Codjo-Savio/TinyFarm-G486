@@ -59,8 +59,8 @@ CREATE TABLE IF NOT EXISTS animal
     uid INTEGER NOT NULL REFERENCES "user"(uid)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    clean BOOLEAN,
-    healthy BOOLEAN,
+    clean BOOLEAN DEFAULT TRUE,
+    healthy BOOLEAN DEFAULT TRUE,
     age INTEGER,
     weight FLOAT,
     gender genderEnum
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS chicken
         ON UPDATE CASCADE,
     chickenType chickenTypeEnum,
     name VARCHAR(50),
-    fasting INTEGER DEFAULT 0
+    fasting INTEGER DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS rabbit
