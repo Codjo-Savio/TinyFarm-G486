@@ -1,6 +1,6 @@
-const API_URL = "/fakeapi/";
-
 class AppBar extends HTMLElement {
+    API_URL = "http://localhost:8080/api";
+
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
@@ -12,8 +12,12 @@ class AppBar extends HTMLElement {
     }
 
     async fetchUser() {
-        const res = await fetch(API_URL + "/user.json");
-        return await res.json();
+        const userId = localStorage.getItem("tinyfarm-user-id");
+        if (userId) {
+            const res = await fetch(this.API_URL + `/users/id/${userId}`);
+            return await res.json();
+        }
+        window.href.location = "/";
     }
 
     async render() {
@@ -182,15 +186,15 @@ class AppBar extends HTMLElement {
         `;
         this.shadowRoot.appendChild(template.content.cloneNode(true));
 
-        // Fetch data
+        // Fetch user data
         const user = await this.fetchUser();
-        this.shadowRoot.querySelector("#rank").textContent =
-            `${user.rank.current}/${user.rank.max}`;
+        // this.shadowRoot.querySelector("#rank").textContent =
+        //     `${user.rank.current}/${user.rank.max}`;
         this.shadowRoot.querySelector("#level").textContent = this.shadowRoot
             .querySelector("#level")
             .textContent.replace("-", user.level);
-        this.shadowRoot.querySelector("#username").textContent = user.username;
-        this.shadowRoot.querySelector("#money-level").textContent = user.money;
+        this.shadowRoot.querySelector("#username").textContent = user.name;
+        this.shadowRoot.querySelector("#money-level").textContent = user.ecus;
         // Set as ready
         this.shadowRoot.querySelector(".appbar").classList.add("ready");
     }
