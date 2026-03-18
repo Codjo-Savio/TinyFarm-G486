@@ -1,0 +1,66 @@
+body {
+    min-height: 100vh;
+    overflow-y: auto !important;
+}
+
+.container {
+    padding: 40px;
+    margin-left: 5%;
+    margin-right: 5%;
+}
+
+.header-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.cow-img {
+    width: 200px;
+    height: auto;
+}
+
+.back-btn {
+    background-color: var(--color-secondary);
+    padding: 10px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--color-primary);
+    font-weight: bold;
+    display: inline-flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border: none;
+    cursor: pointer;
+}
+
+.back-btn:hover {
+    background-color: var(--color-primary);
+    color: var(--color-surface);
+}
+
+h1 {
+    font-size: var(--font-size-title);
+    color: var(--color-primary);
+    margin: 10px 0;
+}
+
+h2 {
+    font-size: var(--font-size-subtitle);
+    color: var(--color-primary);
+    margin-top: 50px;
+}
+
+p {
+    line-height: 1.6;
+    text-align: justify;
+    margin-bottom: 20px;
+}
+
+.material-symbols-outlined {
+    padding: 0;
+    margin-left: 0px;
+    vertical-align: middle;
+    min-width: 1px;
+}
