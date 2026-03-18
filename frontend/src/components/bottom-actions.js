@@ -1,4 +1,6 @@
 class BottomActions extends HTMLElement {
+    API_URL = "/fakeapi";
+
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
@@ -8,7 +10,17 @@ class BottomActions extends HTMLElement {
         this.render();
     }
 
-    render() {
+    async fetchTradeOverview() {
+        const res = await fetch(this.API_URL + "/trade/overview.json");
+        return await res.json();
+    }
+
+    async fetchTime() {
+        const res = await fetch(this.API_URL + "/time.json");
+        return await res.json();
+    }
+
+    async render() {
         const style = document.createElement("style");
         style.textContent = `
 		.material-symbols-rounded {
@@ -24,11 +36,7 @@ class BottomActions extends HTMLElement {
             direction: ltr;
             -webkit-font-feature-settings: "liga";
             -webkit-font-smoothing: antialiased;
-			font-variation-settings:
-				"FILL" 0,
-				"wght" 400,
-				"GRAD" 0,
-				"opsz" 24;
+			font-variation-settings:var(--font-var-icon);
         }
 
 		.bottom-actions {
@@ -97,6 +105,19 @@ class BottomActions extends HTMLElement {
 			font-size: 40px;
 		}
 
+        .bottom-actions #coop .infos,
+        .bottom-actions #marketplace .infos,
+        .bottom-actions #time {
+            opacity: 0;
+            transition: opacity .3s;
+        }
+
+        .bottom-actions.ready #coop .infos,
+        .bottom-actions.ready #marketplace .infos,
+        .bottom-actions.ready #time {
+            opacity: 1;
+        }
+
 		@media (max-width: 900px) {
 			.bottom-actions {
 				flex-direction: column;
@@ -118,22 +139,22 @@ class BottomActions extends HTMLElement {
         template.innerHTML = `
 		<div class="bottom-actions">
 			<div class="links">
-				<a id="coop" href="${this.getAttribute("coop-link") || "/dashboard/trade/cooperative?from=/dashboard"}">
+				<a id="coop" href="/dashboard/trade/cooperative?from=/dashboard">
 					<span class="material-symbols-rounded large">
 						storefront
 					</span>
 					<div>
-						<span class="label">${this.getAttribute("coop-label") || "Coopérative"}</span>
-						<span class="infos">${this.getAttribute("coop-infos") || "En stock : 100"}</span>
+						<span class="label">Coopérative</span>
+						<span class="infos">En stock : -</span>
 					</div>
 				</a>
-				<a id="marketplace" href="${this.getAttribute("marketplace-link") || "/dashboard/trade/marketplace?from=/dashboard"}">
+				<a id="marketplace" href="/dashboard/trade/marketplace?from=/dashboard">
 					<span class="material-symbols-rounded large">
 						groups
 					</span>
 					<div>
-						<span class="label">${this.getAttribute("marketplace-label") || "Marché"}</span>
-						<span class="infos">${this.getAttribute("marketplace-infos") || "En stock : 2"}</span>
+						<span class="label">Marché</span>
+						<span class="infos">En stock : -</span>
 					</div>
 				</a>
 			</div>
@@ -141,11 +162,40 @@ class BottomActions extends HTMLElement {
 				<span class="material-symbols-rounded">
 					schedule
 				</span>
-				<span><b>${this.getAttribute("current-time") || "23:47 AoE"}</b> • Fin du jour : <b>${this.getAttribute("day-end") || "13 min"}</b></span>
+				<span><b class="current">- AoE</b> • Fin du jour : <b class="remaining">${this.getAttribute("day-end") || "13 min"}</b></span>
 			</div>
 		</div>
 		`;
         this.shadowRoot.appendChild(template.content.cloneNode(true));
+
+        try {
+            // Fetch cooperative and marketplace data
+            const overview = await this.fetchTradeOverview();
+            this.shadowRoot.querySelector("#coop .infos").textContent =
+                this.shadowRoot
+                    .querySelector("#coop .infos")
+                    .textContent.replace("-", overview.cooperative.stock);
+            this.shadowRoot.querySelector("#marketplace .infos").textContent =
+                this.shadowRoot
+                    .querySelector("#marketplace .infos")
+                    .textContent.replace("-", overview.marketplace.stock);
+
+            // Fetch time data
+            const time = await this.fetchTime();
+            const displayTime = new Date(time.aoeTs).toLocaleTimeString();
+            this.shadowRoot.querySelector("#time .current").textContent =
+                this.shadowRoot
+                    .querySelector("#time .current")
+                    .textContent.replace(
+                        "-",
+                        displayTime.substring(0, displayTime.length - 3),
+                    );
+        } finally {
+            // Set as ready
+            this.shadowRoot
+                .querySelector(".bottom-actions")
+                .classList.add("ready");
+        }
     }
 }
 
