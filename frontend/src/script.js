@@ -171,21 +171,27 @@ fetch("api/classement")
 
 // Section de code pour la connexion avec Github (à implémenter)
 // Fake pour l'instant, à remplacer par une vraie fonction d'authentification avec Github
-function auth() {
+async function auth() {
     // Appel à l'API de création d'un utilisateur de test (à remplacer par une vraie fonction d'authentification avec Github)
+    let user;
 
-    fetch("/api/users", {
-        method: "POST",
-        body: JSON.stringify({ name: "Test User", gender: "F" }),
-    })
-        .then(function (res) {
-            // Stocker la réponse dans localStorage
-            localStorage.setItem("user", JSON.stringify(res));
+    try {
+        const userRes = await fetch("http://localhost:8080/api/users/id/1");
+        user = await userRes.json();
+    } catch (e) {
+        user = await (
+            await fetch("http://localhost:8080/api/users", {
+                method: "POST",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ name: "Test User", gender: "F" }),
+            })
+        ).json();
+    }
 
-            // Rediriger vers la page d'accueil dashboard
-            window.location.href = "/dashboard";
-        })
-        .catch(function (res) {
-            console.log(res);
-        });
+    localStorage.setItem("tinyfarm-user-id", user.id);
+
+    window.location.href = "/dashboard";
 }
