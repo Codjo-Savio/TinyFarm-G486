@@ -1,0 +1,11 @@
+User
+    - tester le username
+    - tester le gain d'écus
+    - vérifier que le niveau soit
+
+Product
+    -
+
+Animal (chicken)
+    - tester le poids, l'âge et la santé
+
