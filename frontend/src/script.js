@@ -168,3 +168,24 @@ fetch("api/classement")
     .finally(() => {
         setLoadingState(false);
     });
+
+// Section de code pour la connexion avec Github (à implémenter)
+// Fake pour l'instant, à remplacer par une vraie fonction d'authentification avec Github
+function auth() {
+    // Appel à l'API de création d'un utilisateur de test (à remplacer par une vraie fonction d'authentification avec Github)
+
+    fetch("/api/users", {
+        method: "POST",
+        body: JSON.stringify({ name: "Test User", gender: "F" }),
+    })
+        .then(function (res) {
+            // Stocker la réponse dans localStorage
+            localStorage.setItem("user", JSON.stringify(res));
+
+            // Rediriger vers la page d'accueil dashboard
+            window.location.href = "/src/dashboard/index.html";
+        })
+        .catch(function (res) {
+            console.log(res);
+        });
+}
