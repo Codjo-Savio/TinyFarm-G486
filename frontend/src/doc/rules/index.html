@@ -1,75 +1,84 @@
 <!doctype html>
 <html lang="fr">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Règles du jeu - TinyFarm</title>
-    <link rel="stylesheet" href="../style.css" />
-    <link rel="stylesheet" href="../../styles/global.css" />
-    <link rel="stylesheet" href="../../styles/theme.css" />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_left_alt"
-    />
-  </head>
+    <!-- Theme -->
+    <link rel="stylesheet" href="/styles/theme.css">
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <!-- Custom page style -->
+    <link rel="stylesheet" href="../style.css">
+</head>
 
-  <body>
+<body>
     <div class="container">
-      <button
-        class="back-btn"
-        onclick="
-          window.location.href = window.location.search
-            ? window.location.search.replace('?from=', '')
-            : '/'
-        "
-      >
-        <span class="material-symbols-outlined">arrow_left_alt</span>
-        Retour
-      </button>
-      <h1>Règles du jeu</h1>
+        <button class="back-btn" onclick="
+                    window.location.href = window.location.search
+                        ? window.location.search.replace('?from=', '')
+                        : '/'
+                ">
+            <span class="material-symbols-rounded">arrow_left_alt</span>
+            Retour
+        </button>
+        <h1>Règles du jeu</h1>
 
-      <p>
-        Bienvenue dans TinyFarm ! Le but est de construire et gérer votre propre
-        exploitation agricole virtuelle.
-      </p>
+        <p>
+            Bienvenue dans TinyFarm ! Le but est de construire et gérer
+            votre propre exploitation agricole virtuelle.
+        </p>
+        <p>
+            Votre progression dépend de trois indicateurs visibles dans le
+            jeu : la production de votre ferme, votre capacité de gestion et
+            vos écus. Plus vous entretenez correctement vos animaux et plus
+            vous optimisez vos échanges, plus vous grimpez dans le
+            classement global des joueurs.
+        </p>
 
-      <h2>Gérer sa ferme</h2>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sapien
-        lectus, tincidunt lacinia pellentesque eu, rhoncus eu nibh. Aliquam
-        tempus a urna ac ultrices. Mauris porttitor pharetra lacus ut viverra.
-        Integer vel metus quis lacus viverra lobortis. Nullam vehicula felis sit
-        amet dolor faucibus bibendum. Ut feugiat est ut ex vestibulum, eget
-        cursus nisi sodales. Praesent consectetur tellus eu magna facilisis, at
-        cursus turpis pharetra. Aenean laoreet, ante non blandit mattis, tortor
-        nulla placerat eros, id rutrum tellus ex in turpis. Fusce ut ex vitae
-        magna tristique posuere id eu dolor. Praesent lacus turpis, malesuada a
-        quam vel, ornare tempus ipsum. Vivamus in est quis urna malesuada
-        pulvinar ac in arcu. Aenean vitae accumsan sem, vitae congue elit.
-        Nullam sed nisi lobortis justo scelerisque suscipit. Cras dignissim
-        risus a vestibulum accumsan. Duis euismod, tortor in finibus vestibulum,
-        ex ligula pellentesque lectus, vel auctor ipsum nunc vitae lorem. Nulla
-        interdum arcu lorem, id fringilla magna malesuada porttitor.
-      </p>
+        <h2>Gérer sa ferme</h2>
+        <p>
+            Chaque jour de jeu, vous devez vous occuper de vos élevages
+            (poulailler, clapier et pré). Sur chaque animal, les états de
+            base (nourri, abreuvé, propre, en bonne santé) influencent
+            directement la production et la stabilité de la ferme.
+        </p>
+        <p>
+            Négliger l'alimentation ou l'entretien entraîne une baisse de
+            performance, puis des risques de maladie. Dans la logique
+            TinyFarm, un animal laissé malade trop longtemps finit par
+            disparaître. La régularité des actions quotidiennes est donc la
+            clé pour conserver un élevage rentable.
+        </p>
+        <p>
+            Le jeu intègre également une notion de temps (heure courante et
+            fin de journée). Pensez à terminer vos actions importantes avant
+            la fin du cycle afin de ne pas perdre une journée de production.
+        </p>
 
-      <h2>Gagner de l'argent</h2>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sapien
-        lectus, tincidunt lacinia pellentesque eu, rhoncus eu nibh. Aliquam
-        tempus a urna ac ultrices. Mauris porttitor pharetra lacus ut viverra.
-        Integer vel metus quis lacus viverra lobortis. Nullam vehicula felis sit
-        amet dolor faucibus bibendum. Ut feugiat est ut ex vestibulum, eget
-        cursus nisi sodales. Praesent consectetur tellus eu magna facilisis, at
-        cursus turpis pharetra. Aenean laoreet, ante non blandit mattis, tortor
-        nulla placerat eros, id rutrum tellus ex in turpis. Fusce ut ex vitae
-        magna tristique posuere id eu dolor. Praesent lacus turpis, malesuada a
-        quam vel, ornare tempus ipsum. Vivamus in est quis urna malesuada
-        pulvinar ac in arcu. Aenean vitae accumsan sem, vitae congue elit.
-        Nullam sed nisi lobortis justo scelerisque suscipit. Cras dignissim
-        risus a vestibulum accumsan. Duis euismod, tortor in finibus vestibulum,
-        ex ligula pellentesque lectus, vel auctor ipsum nunc vitae lorem. Nulla
-        interdum arcu lorem, id fringilla magna malesuada porttitor.
-      </p>
+        <h2>Gagner de l'argent</h2>
+        <p>
+            Les écus proviennent principalement de la vente de produits (par
+            exemple les œufs) et de la bonne gestion de vos stocks. Deux
+            canaux d'échange sont proposés : la coopérative et le marché.
+        </p>
+        <p>
+            La coopérative offre un cadre plus stable pour écouler ou
+            récupérer des ressources en fonction du stock disponible. Le
+            marché est plus flexible, mais souvent plus concurrentiel.
+            Alterner intelligemment entre ces deux espaces permet
+            d'améliorer vos marges.
+        </p>
+        <p>
+            Les objectifs de long terme sont simples : maintenir une
+            production régulière, éviter les pertes liées aux animaux mal
+            entretenus et faire croître vos revenus pour monter au
+            classement.
+        </p>
     </div>
-  </body>
+</body>
+
 </html>
