@@ -17,7 +17,9 @@ public class Chicken extends Animal {
     public enum ChickenType {
         C("Chick"),
         H("Hen"),
-        R("Rooster");
+        R("Rooster"),
+        L("Laying hen"),
+        B("Breeding rooster");
 
         String wording;
 

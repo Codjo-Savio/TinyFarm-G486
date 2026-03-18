@@ -1,5 +1,5 @@
 /* Enum types for animal subtypes */
-CREATE TYPE chickenTypeEnum AS ENUM ('poussin', 'poule', 'coq');
+CREATE TYPE chickenTypeEnum AS ENUM ('poussin', 'poule', 'coq', 'pondeuse', 'reproducteur');
 CREATE TYPE rabbitTypeEnum AS ENUM ('lapereau', 'lapin');
 CREATE TYPE genderEnum AS ENUM ('M', 'F');
 
