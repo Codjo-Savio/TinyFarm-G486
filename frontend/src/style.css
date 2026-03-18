@@ -136,14 +136,15 @@ body {
 }
 
 .welcome-text {
-    font-size: 2.5rem;
-    line-height: 1;
+    font-size: 1.8rem;
+    line-height: 1.4;
+    font-weight: 200;
     margin-bottom: 30px;
 }
 
 .welcome-text span {
     font-weight: bold;
-    font-size: 3.5rem;
+    font-size: 3.8rem;
 }
 
 /* --- BOUTONS --- */
