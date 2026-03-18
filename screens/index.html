@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TinyFarm</title>
+    <title>TinyFarm</title>
     <link
       rel="stylesheet"
       href="style.css"
@@ -33,7 +34,21 @@
                 </th>
                 <th>
                   Nom
-                  <button class="rankingButton" id="nomButton" active="false">
+                  <button
+                    class="rankingButton"
+                    id="nomButton"
+                    active="false"
+                    onclick="
+                      sortTable(
+                        'nom',
+                        document
+                          .getElementById('nomButton')
+                          .innerHTML.includes('arrow_upward_alt')
+                          ? 1
+                          : -1,
+                      )
+                    "
+                  >
                     <span class="material-symbols-outlined">unfold_more</span>
                   </button>
                 </th>
@@ -42,7 +57,7 @@
                   <button
                     class="rankingButton"
                     id="productionButton"
-                    active="false"
+                    active="none"
                   >
                     <span class="material-symbols-outlined">unfold_more</span>
                   </button>
@@ -53,13 +68,23 @@
                     class="rankingButton"
                     id="capaciteButton"
                     active="false"
+                    onclick="
+                      sortTable(
+                        'capacite',
+                        document
+                          .getElementById('capaciteButton')
+                          .innerHTML.includes('arrow_upward_alt')
+                          ? 1
+                          : -1,
+                      )
+                    "
                   >
                     <span class="material-symbols-outlined">unfold_more</span>
                   </button>
                 </th>
                 <th>
                   Écus
-                  <button class="rankingButton" id="ecusButton" active="false">
+                  <button class="rankingButton" id="ecusButton" active="none">
                     <span class="material-symbols-outlined">unfold_more</span>
                   </button>
                 </th>
@@ -190,6 +215,11 @@
 
       <div class="div2">
         <h1 class="welcome-text">Bienvenue sur <br /><span>Tiny Farm</span></h1>
+        <img
+          src="/screens/assets/teteVache.svg"
+          alt="TinyFarm Cow"
+          class="cow-img"
+        />
         <img
           src="/screens/assets/teteVache.svg"
           alt="TinyFarm Cow"
