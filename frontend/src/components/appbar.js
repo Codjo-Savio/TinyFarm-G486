@@ -17,7 +17,7 @@ class AppBar extends HTMLElement {
             const res = await fetch(this.API_URL + `/users/id/${userId}`);
             return await res.json();
         }
-        window.href.location = "/";
+        window.location.href = "/";
     }
 
     async render() {
@@ -176,7 +176,7 @@ class AppBar extends HTMLElement {
                         <span class="material-symbols-rounded">pause_circle</span>
                         <span>Hiberner</span>
                     </a>
-                    <a href="#">
+                    <a href="/">
                         <span class="material-symbols-rounded">logout</span>
                         <span>Déconnexion</span>
                     </a>
@@ -186,17 +186,24 @@ class AppBar extends HTMLElement {
         `;
         this.shadowRoot.appendChild(template.content.cloneNode(true));
 
-        // Fetch user data
-        const user = await this.fetchUser();
-        // this.shadowRoot.querySelector("#rank").textContent =
-        //     `${user.rank.current}/${user.rank.max}`;
-        this.shadowRoot.querySelector("#level").textContent = this.shadowRoot
-            .querySelector("#level")
-            .textContent.replace("-", user.level);
-        this.shadowRoot.querySelector("#username").textContent = user.name;
-        this.shadowRoot.querySelector("#money-level").textContent = user.ecus;
-        // Set as ready
-        this.shadowRoot.querySelector(".appbar").classList.add("ready");
+        try {
+            // Fetch user data
+            const user = await this.fetchUser();
+            // this.shadowRoot.querySelector("#rank").textContent =
+            //     `${user.rank.current}/${user.rank.max}`;
+            this.shadowRoot.querySelector("#level").textContent =
+                this.shadowRoot
+                    .querySelector("#level")
+                    .textContent.replace("-", user.level);
+            this.shadowRoot.querySelector("#username").textContent = user.name;
+            this.shadowRoot.querySelector("#money-level").textContent =
+                user.ecus;
+        } catch {
+            window.location.href = "/";
+        } finally {
+            // Set as ready
+            this.shadowRoot.querySelector(".appbar").classList.add("ready");
+        }
     }
 
     setupEventListeners() {
