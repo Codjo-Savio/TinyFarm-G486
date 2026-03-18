@@ -5,8 +5,6 @@ import com.api.tinyfarm.repository.AnimalRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class AnimalService {
 
