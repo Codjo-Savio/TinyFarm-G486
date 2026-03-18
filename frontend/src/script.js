@@ -116,19 +116,11 @@ function sortTable(column, order) {
         const valB = column === "rang" ? b.rang.current : b[column];
         if (valA < valB) {
             // Pour le tri par rang, on veut que les rangs plus petits (meilleurs) soient en haut, donc on inverse l'ordre
-            if (column === "rang") {
-                return order;
-            } else {
-                return -order;
-            }
+            return order;
         }
         if (valA > valB) {
             // Pour le tri par rang, on veut que les rangs plus petits (meilleurs) soient en haut, donc on inverse l'ordre
-            if (column === "rang") {
-                return -order;
-            } else {
-                return order;
-            }
+            return -order;
         }
         return 0;
     });
