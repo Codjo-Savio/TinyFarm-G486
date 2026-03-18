@@ -183,7 +183,7 @@ function auth() {
             localStorage.setItem("user", JSON.stringify(res));
 
             // Rediriger vers la page d'accueil dashboard
-            window.location.href = "/src/dashboard/index.html";
+            window.location.href = "/dashboard";
         })
         .catch(function (res) {
             console.log(res);
