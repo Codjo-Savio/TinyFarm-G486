@@ -58,11 +58,11 @@ function displayUsers(users) {
         if (user.rang.current < 4) {
             rowCells[0].innerHTML =
                 user.rang.current +
-                ' <span class="material-symbols-outlined">crown</span>';
+                ' <span class="material-symbols-rounded">crown</span>';
         } else {
             rowCells[0].innerHTML =
                 user.rang.current +
-                ' <span class="material-symbols-outlined">workspace_premium</span>';
+                ' <span class="material-symbols-rounded">workspace_premium</span>';
         }
 
         // Afficher les autres données de l'utilisateur
@@ -81,22 +81,25 @@ function displayUsers(users) {
  * order correspond à l'ordre de tri : 1 pour croissant, -1 pour décroissant
  */
 function sortTable(column, order) {
-    // Mettre à jour l'icône du bouton de tri actif (column)
-    document.getElementById(column + "Button").innerHTML =
-        order === -1
-            ? '<span class="material-symbols-outlined">arrow_upward_alt</span>'
-            : '<span class="material-symbols-outlined">arrow_downward_alt</span>';
-    document.getElementById(column + "Button").setAttribute("active", "true");
+    // Mettre à jour l'icône du bouton de tri actif sans modifier le libellé du champ
+    const activeButton = document.getElementById(column + "Button");
+    const activeIcon = activeButton?.querySelector(".material-symbols-rounded");
+    if (activeIcon) {
+        activeIcon.textContent =
+            order === -1 ? "arrow_upward_alt" : "arrow_downward_alt";
+    }
+    activeButton?.setAttribute("active", "true");
 
     // Réinitialiser les autres boutons de tri
     const columns = ["rang", "nom", "production", "capacite", "ecus"];
     columns.forEach((col) => {
         if (col !== column) {
-            document.getElementById(col + "Button").innerHTML =
-                '<span class="material-symbols-outlined">unfold_more</span>';
-            document
-                .getElementById(col + "Button")
-                .setAttribute("active", "none");
+            const button = document.getElementById(col + "Button");
+            const icon = button?.querySelector(".material-symbols-rounded");
+            if (icon) {
+                icon.textContent = "unfold_more";
+            }
+            button?.setAttribute("active", "none");
         }
     });
 
@@ -113,19 +116,11 @@ function sortTable(column, order) {
         const valB = column === "rang" ? b.rang.current : b[column];
         if (valA < valB) {
             // Pour le tri par rang, on veut que les rangs plus petits (meilleurs) soient en haut, donc on inverse l'ordre
-            if (column === "rang") {
-                return order;
-            } else {
-                return -order;
-            }
+            return order;
         }
         if (valA > valB) {
             // Pour le tri par rang, on veut que les rangs plus petits (meilleurs) soient en haut, donc on inverse l'ordre
-            if (column === "rang") {
-                return -order;
-            } else {
-                return order;
-            }
+            return -order;
         }
         return 0;
     });
@@ -135,7 +130,7 @@ function sortTable(column, order) {
 
 // Au chargement de la page, récupérer les données des utilisateurs depuis l'API et les afficher dans le tableau de classement
 setLoadingState(true);
-fetch("api/classement")
+fetch("http://localhost:8080/api/classement")
     .then((response) => {
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
