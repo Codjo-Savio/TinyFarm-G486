@@ -1,88 +1,89 @@
 <!doctype html>
 <html lang="fr">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>À propos - TinyFarm</title>
-        <link rel="stylesheet" href="../style.css" />
-        <link rel="stylesheet" href="../../styles/global.css" />
-        <link rel="stylesheet" href="../../styles/theme.css" />
-        <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=arrow_left_alt"
-        />
-    </head>
-    <body>
-        <div class="container">
-            <button
-                class="back-btn"
-                onclick="
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>À propos - TinyFarm</title>
+    <!-- Theme -->
+    <link rel="stylesheet" href="/styles/theme.css">
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <!-- Custom page style -->
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <div class="container">
+        <button class="back-btn" onclick="
                     window.location.href = window.location.search
                         ? window.location.search.replace('?from=', '')
                         : '/'
-                "
-            >
-                <span class="material-symbols-outlined">arrow_left_alt</span>
-                Retour
-            </button>
-            <h1>À propos</h1>
+                ">
+            <span class="material-symbols-rounded">arrow_left_alt</span>
+            Retour
+        </button>
+        <h1>À propos</h1>
 
-            <div class="header-section">
-                <img src="../../assets/teteVache.svg" class="cow-img" />
-                <div>
-                    <p>
-                        <strong>TinyFarm</strong> est un site web développé par
-                        des étudiants de l'Université de Nantes dans le cadre de
-                        l'Unité d'Enseignement Développement Web Client. Il
-                        permet de mettre en pratique les concepts étudiés depuis
-                        le début du cursus de Licence Informatique.
-                    </p>
-                    <p>
-                        Ce projet s'inspire librement des principes du jeu My
-                        e-Farm.
-                    </p>
-                </div>
+        <div class="header-section">
+            <img src="../../assets/teteVache.svg" class="cow-img" />
+            <div>
+                <p>
+                    <strong>TinyFarm</strong> est un site web développé par
+                    des étudiants de l'Université de Nantes dans le cadre de
+                    l'Unité d'Enseignement Développement Web Client. Il
+                    permet de mettre en pratique les concepts étudiés depuis
+                    le début du cursus de Licence Informatique.
+                </p>
+                <p>
+                    Ce projet s'inspire librement des principes du jeu My
+                    e-Farm.
+                </p>
             </div>
-
-            <h2>Technologies</h2>
-            <p>
-                Le projet est structuré en deux parties. Le frontend est une
-                interface web en HTML, CSS et JavaScript, servie par Node.js
-                avec Express. L'application utilise des composants web (barre
-                d'application, actions de bas de page, mise en page) pour
-                uniformiser l'interface entre les écrans de gestion et de
-                commerce.
-            </p>
-            <p>
-                Le backend repose sur Java 21 et Spring Boot (API REST,
-                validation et persistence JPA/Hibernate). La couche de données
-                est préparée pour PostgreSQL, avec un environnement de test
-                supporté par H2. Le modèle manipule notamment les utilisateurs,
-                les animaux, les produits, les stocks, les transactions et les
-                structures de marché (coopérative/marché).
-            </p>
-            <p>
-                L'ensemble suit une organisation de type projet complet :
-                maquettes, base de données, API et interface utilisateur.
-                L'objectif pédagogique est de relier conception, implémentation
-                et qualité de code autour d'un même produit.
-            </p>
-
-            <h2>Contributeurs</h2>
-            <p>
-                TinyFarm est un projet collectif réalisé par le groupe 486 de la
-                Licence Informatique de l'Université de Nantes. Le dépôt
-                rassemble les contributions de plusieurs étudiants sur le
-                frontend, le backend, la base de données, les tests et la
-                documentation.
-            </p>
-            <p>
-                Merci à l'ensemble des contributrices et contributeurs du
-                projet, notamment Savio Amoussouvi, Maël Bonnet, Ethann Allain,
-                Noa Chupin, Tugderic, Sacha Guichard, Julien Paillard, Tyler
-                Boucher, Mewenn Le Buan, Killian Bienvenu, Evan Garrec et les
-                autres membres ayant participé aux développements et aux revues.
-            </p>
         </div>
-    </body>
+
+        <h2>Technologies</h2>
+        <p>
+            Le projet est structuré en deux parties. Le frontend est une
+            interface web en HTML, CSS et JavaScript, servie par Node.js
+            avec Express. L'application utilise des composants web (barre
+            d'application, actions de bas de page, mise en page) pour
+            uniformiser l'interface entre les écrans de gestion et de
+            commerce.
+        </p>
+        <p>
+            Le backend repose sur Java 21 et Spring Boot (API REST,
+            validation et persistence JPA/Hibernate). La couche de données
+            est préparée pour PostgreSQL, avec un environnement de test
+            supporté par H2. Le modèle manipule notamment les utilisateurs,
+            les animaux, les produits, les stocks, les transactions et les
+            structures de marché (coopérative/marché).
+        </p>
+        <p>
+            L'ensemble suit une organisation de type projet complet :
+            maquettes, base de données, API et interface utilisateur.
+            L'objectif pédagogique est de relier conception, implémentation
+            et qualité de code autour d'un même produit.
+        </p>
+
+        <h2>Contributeurs</h2>
+        <p>
+            TinyFarm est un projet collectif réalisé par le groupe 486 de la
+            Licence Informatique de l'Université de Nantes. Le dépôt
+            rassemble les contributions de plusieurs étudiants sur le
+            frontend, le backend, la base de données, les tests et la
+            documentation.
+        </p>
+        <p>
+            Merci à l'ensemble des contributrices et contributeurs du
+            projet, notamment Savio Amoussouvi, Maël Bonnet, Ethann Allain,
+            Noa Chupin, Tugderic, Sacha Guichard, Julien Paillard, Tyler
+            Boucher, Mewenn Le Buan, Killian Bienvenu, Evan Garrec et les
+            autres membres ayant participé aux développements et aux revues.
+        </p>
+    </div>
+</body>
+
 </html>

@@ -58,11 +58,11 @@ function displayUsers(users) {
         if (user.rang.current < 4) {
             rowCells[0].innerHTML =
                 user.rang.current +
-                ' <span class="material-symbols-outlined">crown</span>';
+                ' <span class="material-symbols-rounded">crown</span>';
         } else {
             rowCells[0].innerHTML =
                 user.rang.current +
-                ' <span class="material-symbols-outlined">workspace_premium</span>';
+                ' <span class="material-symbols-rounded">workspace_premium</span>';
         }
 
         // Afficher les autres données de l'utilisateur
@@ -83,9 +83,7 @@ function displayUsers(users) {
 function sortTable(column, order) {
     // Mettre à jour l'icône du bouton de tri actif sans modifier le libellé du champ
     const activeButton = document.getElementById(column + "Button");
-    const activeIcon = activeButton?.querySelector(
-        ".material-symbols-outlined",
-    );
+    const activeIcon = activeButton?.querySelector(".material-symbols-rounded");
     if (activeIcon) {
         activeIcon.textContent =
             order === -1 ? "arrow_upward_alt" : "arrow_downward_alt";
@@ -97,7 +95,7 @@ function sortTable(column, order) {
     columns.forEach((col) => {
         if (col !== column) {
             const button = document.getElementById(col + "Button");
-            const icon = button?.querySelector(".material-symbols-outlined");
+            const icon = button?.querySelector(".material-symbols-rounded");
             if (icon) {
                 icon.textContent = "unfold_more";
             }
@@ -140,7 +138,7 @@ function sortTable(column, order) {
 
 // Au chargement de la page, récupérer les données des utilisateurs depuis l'API et les afficher dans le tableau de classement
 setLoadingState(true);
-fetch("api/classement")
+fetch("http://localhost:8080/api/classement")
     .then((response) => {
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);

@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&display=swap");
-
 body {
     background-color: #fff4e0;
     font-family: "Amaranth", sans-serif;
@@ -203,7 +201,7 @@ button {
     font-size: large;
 }
 
-.material-symbols-outlined {
+.material-symbols-rounded {
     font-variation-settings:
         "FILL" 0,
         "wght" 400,
@@ -211,7 +209,7 @@ button {
         "opsz" 24;
 }
 
-.material-symbols-outlined {
+.material-symbols-rounded {
     padding: 0;
     margin-left: 0px;
     vertical-align: middle;
@@ -228,20 +226,20 @@ button {
     min-width: 1px;
 }
 
-.rankingButton .material-symbols-outlined {
+.rankingButton .material-symbols-rounded {
     font-size: 18px;
     color: #55361bd8;
     font-weight: bold;
 }
 
-.rankingButton:hover .material-symbols-outlined {
+.rankingButton:hover .material-symbols-rounded {
     color: #55361b;
 }
 
-.rankingButton[active="true"] .material-symbols-outlined {
+.rankingButton[active="true"] .material-symbols-rounded {
     color: #55361b;
 }
 
-.rankingButton[active="none"] .material-symbols-outlined {
+.rankingButton[active="none"] .material-symbols-rounded {
     color: #55361b75;
 }
