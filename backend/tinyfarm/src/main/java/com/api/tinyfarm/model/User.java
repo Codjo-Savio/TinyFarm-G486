@@ -42,13 +42,17 @@ public class User {
     @Column(name = "ecus")
     private Integer ecus;
 
+    @Column(name = "hibernation")
+    private Boolean hibernation;
+
     @Column(name = "level")
     private Integer level;
 
     // default values for ecus and level
     @PrePersist
-    public void prePersist(){
+    public void prePersist() {
         this.ecus = 1500;
+        this.hibernation = false;
         this.level = 1;
     }
 }

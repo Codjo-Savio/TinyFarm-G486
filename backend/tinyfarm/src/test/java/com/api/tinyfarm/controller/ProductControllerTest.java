@@ -26,11 +26,12 @@ public class ProductControllerTest {
                     "id" : 1,
                      "description" : "foin",
                      "collection" : "false",
-                     "price" : "20"
+                     "price" : "20",
+                     "coefficient" : "1"
                 }
         """;
         mockMvc.perform(
-                post("/products")
+                post("/api/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
         );
@@ -44,29 +45,32 @@ public class ProductControllerTest {
                     "id" : 2,
                      "description" : "paille",
                      "collection" : "false",
-                     "price" : "20"
+                     "price" : "20",
+                     "coefficient" : "1"
                 }
         """;
-        mockMvc.perform(post("/products"))
+        mockMvc.perform(post("/api/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andExpect(status().isOk());
     }
 
     // tests of the GET
     @Test
     void shouldReturnAllProducts() throws  Exception{
-        mockMvc.perform(get("/products"))
+        mockMvc.perform(get("/api/products"))
                 .andExpect(status().isOk());
     }
 
     @Test
     void shouldReturnProductById() throws  Exception{
-        mockMvc.perform(get("/products/1"))
+        mockMvc.perform(get("/api/products/id/1"))
                 .andExpect(status().isOk());
     }
 
     @Test
     void productShouldNotBeFoundById() throws  Exception{
-         mockMvc.perform(get("/products/3"))
+         mockMvc.perform(get("/api/products/id/3"))
                 .andExpect(status().isNotFound());
     }
 
@@ -78,15 +82,16 @@ public class ProductControllerTest {
                     "id" : 4,
                      "description" : "blé",
                      "collection" : "false",
-                     "price" : "20"
+                     "price" : "20",
+                     "coefficient" : "1"
                 }
         """;
         mockMvc.perform(
-                post("/products")
+                post("/api/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
         );
-        mockMvc.perform(delete("/products/4"))
+        mockMvc.perform(delete("/api/products/id/4"))
                 .andExpect(status().isNoContent());
     }
 }

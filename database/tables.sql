@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS "user"
     name VARCHAR(20),
     gender genderEnum,
     ecus INTEGER,
+    hibernation BOOLEAN DEFAULT FALSE,
     level INTEGER DEFAULT 1
 );
 
@@ -73,7 +74,7 @@ CREATE TABLE IF NOT EXISTS chicken
         ON UPDATE CASCADE,
     chickenType chickenTypeEnum,
     name VARCHAR(50),
-    fasting INTEGER DEFAULT FALSE
+    fasting BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS rabbit
