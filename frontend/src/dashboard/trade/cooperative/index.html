@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Coopérative</title>
+        <!-- Components -->
+        <script src="/components/appbar.js"></script>
+        <script src="/components/bottom-actions.js"></script>
+        <script src="/components/layout.js"></script>
+        <!-- Theme -->
+        <link rel="stylesheet" href="/styles/theme.css" />
+        <!-- Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+            rel="stylesheet"
+        />
+        <!-- Custom page style and script -->
+        <link rel="stylesheet" href="style.css" />
+        <script src="script.js" defer></script>
+    </head>
+
+    <body>
+        <app-layout>
+            <app-bar></app-bar>
+            <main class="container">
+                <div class="sub-header">
+                    <a
+                        onclick="
+                            window.location.href = window.location.search
+                                ? window.location.search.replace('?from=', '')
+                                : '/dashboard'
+                        "
+                        class="btn-back"
+                        ><span class="material-symbols-rounded">
+                            keyboard_backspace
+                        </span>
+                        Retour</a
+                    >
+                    <div class="market-stats">
+                        <span
+                            ><span class="material-symbols-rounded"
+                                >shopping_cart</span
+                            >
+                            Achats restants : 10</span
+                        >
+                        <span
+                            ><span class="material-symbols-rounded">store</span>
+                            En stock : 17</span
+                        >
+                    </div>
+                </div>
+
+                <h1 class="page-title">Coopérative</h1>
+
+                <div class="game-grid">
+                    <aside class="left-panel">
+                        <div class="cart-card">
+                            <div class="cart-total-box">
+                                <div class="cart-icon-title">
+                                    <span class="material-symbols-rounded">
+                                        shopping_cart
+                                    </span>
+                                    Total
+                                </div>
+                                <div class="cart-actions">
+                                    <span
+                                        class="total-price"
+                                        id="totalPrice"
+                                    ></span>
+                                    <button class="btn-pay">Payer</button>
+                                </div>
+                            </div>
+
+                            <div class="cart-list"></div>
+                        </div>
+                    </aside>
+
+                    <section class="right-panel" id="shop-container"></section>
+                </div>
+            </main>
+            <bottom-actions></bottom-actions>
+        </app-layout>
+    </body>
+</html>
