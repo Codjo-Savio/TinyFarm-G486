@@ -1,0 +1,47 @@
+main {
+    flex-grow: 1;
+    width: 100%;
+    overflow: hidden;
+}
+
+main > svg {
+    height: auto;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+}
+
+@media (max-width: 1236px) {
+    main > svg {
+        left: -50px;
+        height: 100%;
+        width: auto;
+    }
+}
+
+main > svg > path {
+    cursor: pointer;
+    fill: var(--color-secondary);
+    transition: fill-opacity 0.3s ease;
+    animation: svg-path-shine 2.4s ease-in-out infinite;
+}
+
+main > svg > path:nth-of-type(odd) {
+    animation-delay: 0.35s;
+}
+
+main > svg > path:nth-of-type(even) {
+    animation-delay: 0.9s;
+}
+
+@keyframes svg-path-shine {
+    0%,
+    100% {
+        fill-opacity: 0;
+        filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+    }
+    50% {
+        fill-opacity: 0.1;
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.65));
+    }
+}
