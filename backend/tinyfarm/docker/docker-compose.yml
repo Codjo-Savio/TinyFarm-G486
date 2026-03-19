@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres_prod
+    environment:
+      POSTGRES_DB: tinyfarm
+      POSTGRES_USER_FILE: /run/secrets/db_username
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_username
+      - db_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - tinyfarm_network
+
+  backend:
+    build:
+      context: ..
+      dockerfile: Dockerfile.prod
+    container_name: backend_prod
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_USERNAME_FILE: /run/secrets/db_username
+      DB_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_username
+      - db_password
+    depends_on:
+      - postgres
+    networks:
+      - tinyfarm_network
+
+secrets:
+  db_username:
+    file: secrets/db_username.txt
+  db_password:
+    file: secrets/db_password.txt
+volumes:
+  postgres_data:
+
+networks:
+  tinyfarm_network:

@@ -1,2 +1,2 @@
 ### Ignore Docker secrets
-docker/secrets/
+backend/tinyfarm/docker/secrets/

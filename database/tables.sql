@@ -1,5 +1,5 @@
 /* Enum types for animal subtypes */
-CREATE TYPE chickenTypeEnum AS ENUM ('poussin', 'poule', 'coq');
+CREATE TYPE chickenTypeEnum AS ENUM ('poussin', 'poule', 'coq', 'pondeuse', 'reproducteur');
 CREATE TYPE rabbitTypeEnum AS ENUM ('lapereau', 'lapin');
 CREATE TYPE genderEnum AS ENUM ('M', 'F');
 
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS chicken
         ON UPDATE CASCADE,
     chickenType chickenTypeEnum,
     name VARCHAR(50),
-    fasting INTEGER DEFAULT FALSE
+    fasting BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS rabbit

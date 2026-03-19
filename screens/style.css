@@ -63,6 +63,7 @@ body {
   text-align: center;
   border-bottom: 2px solid #d6b67f;
   border-right: 2px solid #d6b67f;
+  min-height: 40px;
 }
 
 .div2 {
@@ -74,10 +75,17 @@ body {
   height: 100%;
 }
 
-.cow-img {
-  width: 250px;
+.img-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 20px;
   margin-top: 20px;
+  width: 250px;
+}
+
+.cow-img {
+  width: 250px;
 }
 
 .welcome-text {
@@ -185,6 +193,6 @@ button {
   color: #55361b;
 }
 
-.rankingButton[active="none"] .material-symbols-outlined {
+.rankingButton[active="false"] .material-symbols-outlined {
   color: #55361b75;
 }

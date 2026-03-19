@@ -5,8 +5,6 @@ import com.api.tinyfarm.repository.AnimalRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class AnimalService {
 
@@ -42,7 +40,7 @@ public class AnimalService {
         existingAnimal.setHealthy(animal.getHealthy());
         existingAnimal.setAge(animal.getAge());
         existingAnimal.setWeight(animal.getWeight());
-        existingAnimal.setAGender(animal.getAGender());
+        existingAnimal.setGender(animal.getGender());
         return animalRepository.save(existingAnimal);
     }
 
