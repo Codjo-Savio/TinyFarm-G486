@@ -1,12 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 
 :root {
-    --color-primary: #55361B;
-    --color-secondary: #F2D49F;
-    --color-surface: #FFF4E0;
-    --color-surface-dark: #FFEFCE;
-    --color-gold: #DB9519;
-    --color-gold-dark: #8E6317;
+    --color-primary: #55361b;
+    --color-secondary: #f2d49f;
+    --color-surface: #fff4e0;
+    --color-surface-dark: #ffefce;
+    --color-gold: #db9519;
+    --color-gold-dark: #8e6317;
 
     --font-size-title: 64px;
     --font-size-subtitle: 32px;
@@ -28,7 +28,7 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: 'Amaranth', sans-serif;
+    font-family: "Amaranth", sans-serif;
     scrollbar-width: thin;
     scrollbar-color: var(--color-secondary) transparent;
 }
@@ -125,12 +125,12 @@ body {
     gap: 40px;
     font-weight: var(--font-weight-subtitle);
     font-size: var(--font-size-body);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 h1.page-title {
-    font-family: 'Amaranth', sans-serif;
-    font-size: 96px;
+    font-family: "Amaranth", sans-serif;
+    font-size: var(--font-size-title);
     font-weight: 700;
     color: var(--color-primary);
     flex-shrink: 0;
@@ -145,7 +145,7 @@ h1.page-title {
     gap: 40px;
     flex: 1;
     min-height: 0;
-    padding-top: 80px;
+    padding-top: 5px;
     padding-bottom: 20px;
     overflow: hidden;
 }
@@ -201,7 +201,7 @@ h1.page-title {
 
 .btn-pay {
     background-color: var(--color-primary);
-    color: #F2D49F;
+    color: #f2d49f;
     border: none;
     padding: 8px 20px;
     border-radius: 10px;
@@ -219,8 +219,16 @@ h1.page-title {
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 10px;
-    -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 30px), transparent 100%);
-    mask-image: linear-gradient(to bottom, black calc(100% - 30px), transparent 100%);
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        black calc(100% - 30px),
+        transparent 100%
+    );
+    mask-image: linear-gradient(
+        to bottom,
+        black calc(100% - 30px),
+        transparent 100%
+    );
 }
 
 .cart-item {
@@ -233,7 +241,6 @@ h1.page-title {
 }
 
 .cart-item span:first-child {
-    font-family: 'Amaranth', sans-serif;
     font-weight: 700;
 }
 
@@ -281,7 +288,7 @@ h1.page-title {
     color: inherit;
 }
 
-.tab>div {
+.tab > div {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -299,9 +306,6 @@ h1.page-title {
     padding-right: 15px;
     padding-bottom: 120px;
     min-width: 0;
-
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 40px, black calc(100% - 40px), transparent 100%);
-    mask-image: linear-gradient(to bottom, transparent 0%, black 40px, black calc(100% - 40px), transparent 100%);
 }
 
 .product-row {
@@ -334,14 +338,14 @@ h1.page-title {
 }
 
 .prod-name {
-    font-family: 'Amaranth', sans-serif;
+    font-family: "Amaranth", sans-serif;
     font-size: 22px;
     font-weight: 400;
     color: var(--color-primary);
 }
 
 .seller {
-    font-family: 'Amaranth', sans-serif;
+    font-family: "Amaranth", sans-serif;
     font-size: 18px;
     font-weight: bold;
     opacity: 0.8;
@@ -362,7 +366,7 @@ h1.page-title {
 
 .btn-add {
     background-color: var(--color-primary);
-    color: #F2D49F;
+    color: #f2d49f;
     border: none;
     padding: 10px 30px;
     border-radius: 10px;
