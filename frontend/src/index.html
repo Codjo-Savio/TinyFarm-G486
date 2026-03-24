@@ -14,6 +14,7 @@
     <!-- Custom page style and script -->
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
+    <script src="/components/custom-button.js"></script>
 </head>
 
 <body>
@@ -203,9 +204,7 @@
             <div class="img-container">
                 <img src="/assets/teteVache.svg" alt="TinyFarm Cow" class="cow-img" />
             </div>
-            <button id="github" , onclick="auth()">
-                Connexion avec Github
-            </button>
+            <custom-button id="github" onclick="auth()" size="large" variant="secondary">Connexion avec Github</custom-button>
         </div>
     </div>
 </body>
