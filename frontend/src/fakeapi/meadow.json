@@ -1,0 +1,53 @@
+{
+    "milk": 10,
+    "cows": [
+        {
+            "name": "Marguerite",
+            "healthy": false,
+            "clean": false,
+            "type": "Calf",
+            "weight": 1.5,
+            "hunger": 0.5
+        },
+        {
+            "name": "Belle",
+            "healthy": true,
+            "clean": true,
+            "type": "Beef",
+            "weight": 1.2,
+            "hunger": 0
+        },
+        {
+            "name": "Clara",
+            "healthy": false,
+            "clean": true,
+            "type": "Dairy",
+            "weight": 1.4,
+            "hunger": 0
+        },
+        {
+            "name": "Daisy",
+            "healthy": true,
+            "clean": false,
+            "type": "Dairy",
+            "weight": 1.6,
+            "hunger": 1
+        },
+        {
+            "name": "Rosie",
+            "healthy": true,
+            "clean": true,
+            "type": "Beef",
+            "weight": 1.3,
+            "hunger": 1
+        },
+        {
+            "name": "Bessie",
+            "healthy": true,
+            "clean": true,
+            "type": "Dairy",
+            "weight": 1.7,
+            "hunger": 0.5
+        }
+    ]
+}
