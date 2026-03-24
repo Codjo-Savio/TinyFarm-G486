@@ -13,7 +13,7 @@ class CustomButton extends HTMLElement {
                 font-family: "Material Symbols Rounded";
                 font-weight: normal;
                 font-style: normal;
-                font-size: 20px;
+                font-size: 22px;
                 line-height: 1;
                 letter-spacing: normal;
                 text-transform: none;
@@ -52,7 +52,7 @@ class CustomButton extends HTMLElement {
             }
 
             button:has(.material-symbols-rounded) {
-                padding-left: 10px
+                padding-left: 12px
             }
 
             button.primary {
