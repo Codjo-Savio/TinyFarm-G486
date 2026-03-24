@@ -36,7 +36,7 @@ public class MarketRepositoryTest {
 
         // ASSERT
 
-        assertNotNull(saved.getId());
+        assertNotNull(saved.getMarketId());
     }
 
     @Test
