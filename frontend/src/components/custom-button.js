@@ -1,6 +1,6 @@
 class CustomButton extends HTMLElement {
     static get observedAttributes() {
-        return ["variant", "disabled", "icon"];
+        return ["variant", "disabled", "icon", "size"];
     }
 
     constructor() {
@@ -43,6 +43,12 @@ class CustomButton extends HTMLElement {
                 align-items: center;
                 justify-content: center;
                 gap: 8px;
+            }
+
+            button.large {
+                height: 55px;
+                padding: 0 32px;
+                border-radius: 12px;
             }
 
             button:has(.material-symbols-rounded) {
@@ -102,9 +108,13 @@ class CustomButton extends HTMLElement {
         return this.getAttribute("icon") || null;
     }
 
+    get size() {
+        return this.getAttribute("size") || "normal";
+    }
+
     update() {
-        this.button.className = this.variant;
         this.button.disabled = this.disabled;
+        this.button.className = `${this.variant} ${this.size}`;
 
         const currentIcon = this.button.querySelector(
             ".material-symbols-rounded",
