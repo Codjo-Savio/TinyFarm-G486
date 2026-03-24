@@ -2,9 +2,8 @@ package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Market;
 import com.api.tinyfarm.repository.MarketRepository;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+import org.springframework.stereotype.Service;
 
 @Service
 public class MarketService {
@@ -16,18 +15,27 @@ public class MarketService {
     }
 
     public Market findById(Long uid) {
-        return marketRepository.findById(uid)
-                .orElseThrow(() -> new RuntimeException("Marché introuvable : " + uid));
+        return marketRepository
+            .findById(uid)
+            .orElseThrow(() ->
+                new RuntimeException("Marché introuvable : " + uid)
+            );
     }
 
     public Market findByProduct(Long productID) {
-        return marketRepository.findByProduct(productID)
-                .orElseThrow(() -> new RuntimeException("Marché introuvable : " + productID));
+        return marketRepository
+            .findByProduct(productID)
+            .orElseThrow(() ->
+                new RuntimeException("Marché introuvable : " + productID)
+            );
     }
 
     public Market findByPrice(float price) {
-        return marketRepository.findByPrice(price)
-                .orElseThrow(() -> new RuntimeException("Marché introuvable : " + price));
+        return marketRepository
+            .findByPrice(price)
+            .orElseThrow(() ->
+                new RuntimeException("Marché introuvable : " + price)
+            );
     }
 
     public Market create(Market market) {
@@ -36,13 +44,17 @@ public class MarketService {
 
     public Market update(Long id, Market modifiedMarket) {
         Market existing = findById(id);
-        existing.setMarketUid(modifiedMarket.getMarketUid());
+        existing.setUserId(modifiedMarket.getUserId());
         existing.setProductId(modifiedMarket.getProductId());
         existing.setPrice(modifiedMarket.getPrice());
         return marketRepository.save(existing);
     }
 
     public void deleteByID(Long uid) {
-        MarketRepository.deleteById(uid);
+        marketRepository.deleteById(uid);
+    }
+
+    public void deleteAll() {
+        marketRepository.deleteAll();
     }
 }

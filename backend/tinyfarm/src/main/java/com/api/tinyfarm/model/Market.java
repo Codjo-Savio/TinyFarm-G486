@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class Market {
 
     @EmbeddedId
-    private MarketID id;
+    private MarketID marketId;
 
     @MapsId("uid")
     @JoinColumn(name = "uid")

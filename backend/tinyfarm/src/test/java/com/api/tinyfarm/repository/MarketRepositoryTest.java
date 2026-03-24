@@ -3,6 +3,7 @@ package com.api.tinyfarm.repository;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.api.tinyfarm.model.Market;
+import com.api.tinyfarm.model.MarketID;
 import com.api.tinyfarm.model.Product;
 import java.util.List;
 import java.util.Optional;
@@ -39,14 +40,16 @@ public class MarketRepositoryTest {
     }
 
     @Test
-    void shouldFindByID() {
+    void shouldFindByUser() {
         // ARRANGE
         Market market = new Market();
         marketRepository.save(market);
 
         // ACT
 
-        Optional<Market> found = marketRepository.findByUserId(market.getId());
+        Optional<Market> found = marketRepository.findByUserId(
+            market.getUserId()
+        );
 
         // ASSERT
 
