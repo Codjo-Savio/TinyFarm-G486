@@ -87,9 +87,12 @@ public class CooperativeService {
         User user = userRepository.findById(uid).orElse(null);
         if (user == null) return;
 
+        Cooperative coop = cooperativeRepository.findByUserIdAndProductId(uid, pid).orElse(null);
+        if (coop == null) return;
+
         user.setEcus(
             user.getEcus() + 
-            cooperativeRepository.getByUserIdAndProductId(uid, pid).price
+            coop.getPrice()
         );
         cooperativeRepository.deleteByUserIdAndProductId(uid, pid);
     }
