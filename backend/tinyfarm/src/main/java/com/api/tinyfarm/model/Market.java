@@ -23,6 +23,6 @@ public class Market {
     @JoinColumn(name = "productID")
     private Long productId;
 
-    @Column(name = "price")
+    @Column(name = "price") // A voir si besoin de garder comme on a déjà le prix dans Product
     private Float price;
 }
