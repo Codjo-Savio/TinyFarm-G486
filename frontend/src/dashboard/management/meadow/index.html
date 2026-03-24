@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Dashboard</title>
+        <title>Pré</title>
         <!-- Components -->
         <script src="/components/appbar.js"></script>
         <script src="/components/bottom-actions.js"></script>
@@ -42,21 +42,49 @@
                     <div class="market-stats">
                         <span
                             ><span class="material-symbols-rounded">pets</span>
-                            10</span
-                        >
+                            <span id="cow-count"></span>
+                        </span>
                         <span
                             ><span class="material-symbols-rounded"
                                 >water_full</span
                             >
-                            17</span
-                        >
+                            <span id="milk-count"></span
+                        ></span>
                         <button class="action-button">
                             <span class="material-symbols-rounded">sell</span>
                             Vendre
                         </button>
-                        <button class="actions-button" onclick="actions">
-                            ...
-                        </button>
+                        <div class="actions-wrapper">
+                            <button class="menu-actions" onclick="actions()">
+                                ...
+                            </button>
+                            <div class="actions-menu" id="actions-menu">
+                                <button
+                                    onclick="feedAll()"
+                                    class="action-button"
+                                >
+                                    Nourrir
+                                </button>
+                                <button
+                                    onclick="waterAll()"
+                                    class="action-button"
+                                >
+                                    Abreuver
+                                </button>
+                                <button
+                                    onclick="healAll()"
+                                    class="action-button"
+                                >
+                                    Soigner
+                                </button>
+                                <button
+                                    onclick="cleanAll()"
+                                    class="action-button"
+                                >
+                                    Nettoyer
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
