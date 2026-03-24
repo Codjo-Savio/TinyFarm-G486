@@ -31,7 +31,12 @@ async function initialiserBoutique() {
                         <span class="prod-name">${key}</span>
                     </div>
                     <div class="prod-action">
-                        <span class="price">$${values.price}</span>
+                        <button class="edit-price-btn" id="edit-${key.replace(/'/g, "\\'")}" onclick="modifierPrix('${key.replace(/'/g, "\\'")}')">
+                            <span class="material-symbols-rounded">
+                                edit
+                            </span>
+                        </button>
+                        <span class="price" id="price-${key.replace(/'/g, "\\'")}">$${values.price}</span>
                         <button class="btn-add" onclick="ajouterAuPanier('${key.replace(/'/g, "\\'")}')">Ajouter</button>
                     </div>
                 </div>
@@ -125,4 +130,56 @@ function retirerDuPanier(nomProduit) {
     }
     console.log(panier);
     displayPanier();
+}
+
+function modifierPrix(nomProduit) {
+    // Il faut enlever le boutons d'édition du prix le span du prix et le remplacer par un champ de saisie
+    const priceSpan = document.getElementById(
+        `price-${nomProduit.replace(/'/g, "\\'")}`,
+    );
+    const currentPrice = priceSpan.textContent.replace("$", "");
+    const inputHTML = `
+        <input type="number" id="new-price-${nomProduit.replace(/'/g, "\\'")}" value="${currentPrice}" min="0" step="0.01">
+    `;
+    priceSpan.innerHTML = inputHTML;
+    document.getElementById(
+        "edit-" + nomProduit.replace(/'/g, "\\'"),
+    ).innerHTML = `<span class="material-symbols-rounded">
+                                check
+                            </span>`; // Changer l'icône du bouton pour indiquer la confirmation
+    document
+        .getElementById("edit-" + nomProduit.replace(/'/g, "\\'"))
+        .setAttribute(
+            "onclick",
+            `confirmerPrix('${nomProduit.replace(/'/g, "\\'")}')`,
+        ); // Changer la fonction onclick pour confirmer le nouveau prix
+}
+
+function confirmerPrix(nomProduit) {
+    const input = document.getElementById(
+        `new-price-${nomProduit.replace(/'/g, "\\'")}`,
+    );
+    const nouveauPrix = input.value;
+    if (nouveauPrix !== null) {
+        for (const category of Object.values(inventaire)) {
+            if (category[nomProduit]) {
+                category[nomProduit].price = parseFloat(nouveauPrix);
+                document.getElementById(
+                    `price-${nomProduit.replace(/'/g, "\\'")}`,
+                ).textContent = `$${nouveauPrix}`;
+                break; // Sortir de la boucle une fois le produit trouvé
+            }
+        }
+    }
+    document.getElementById(
+        "edit-" + nomProduit.replace(/'/g, "\\'"),
+    ).innerHTML = `<span class="material-symbols-rounded">
+                                edit
+                            </span>`; // Changer l'icône du bouton pour indiquer la confirmation
+    document
+        .getElementById("edit-" + nomProduit.replace(/'/g, "\\'"))
+        .setAttribute(
+            "onclick",
+            `modifierPrix('${nomProduit.replace(/'/g, "\\'")}')`,
+        ); // Changer la fonction onclick pour confirmer le nouveau prix
 }

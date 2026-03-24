@@ -119,6 +119,21 @@ body {
     gap: 10px;
 }
 
+.edit-price-btn {
+    background-color: var(--color-secondary);
+    border: none;
+    padding: 10px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: var(--font-weight-subtitle);
+    font-size: var(--font-size-body);
+    color: var(--color-primary);
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    gap: 10px;
+}
+
 .market-stats {
     display: flex;
     align-items: center;
@@ -227,16 +242,6 @@ h2.category-title {
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 10px;
-    -webkit-mask-image: linear-gradient(
-        to bottom,
-        black calc(100% - 30px),
-        transparent 100%
-    );
-    mask-image: linear-gradient(
-        to bottom,
-        black calc(100% - 30px),
-        transparent 100%
-    );
 }
 
 .cart-item {
@@ -538,4 +543,14 @@ svg {
         flex-direction: column;
         gap: 15px;
     }
+}
+
+input[type="number"] {
+    width: 80px;
+    padding: 5px 10px;
+    border: 1px solid var(--color-secondary);
+    border-radius: 8px;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-body);
+    background-color: var(--color-surface);
 }
