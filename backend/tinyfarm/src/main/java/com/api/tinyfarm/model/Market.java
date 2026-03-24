@@ -12,11 +12,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Market {
 
-    @Column(name = "uid")
+    @EmbeddedId
+    private MarketID id;
+
+    @MapsId("uid")
+    @JoinColumn(name = "uid")
     private Long userId;
 
-    @Column(name = "productID")
-    private Long productID;
+    @MapsId("productID")
+    @JoinColumn(name = "productID")
+    private Long productId;
 
     @Column(name = "price")
     private Float price;
