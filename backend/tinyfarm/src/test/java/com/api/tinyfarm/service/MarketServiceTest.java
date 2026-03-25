@@ -93,15 +93,18 @@ public class MarketServiceTest {
     }
 
     @Test
-    void shouldDeleteProduct(Long userId, Long productId) {
+    void shouldDeleteProduct() {
         // On instancie un market.
-        Market market = new Market();
 
-        market.setUserId(userId);
-        market.setProductId(productId);
+        User user = new User();
+        Market market = new Market();
+        Product product = new Product();
+
+        market.setUserId(user.getId());
+        market.setProductId(product.getId());
 
         // On supprime le produit dans le market.
-        marketService.deleteProductById(userId, productId);
+        marketService.deleteProductById(user.getId(), product.getId());
 
         // Assert ( On vérifie que le produit est bien supprimé. )
         // c.a.d que le productId du market est null.
