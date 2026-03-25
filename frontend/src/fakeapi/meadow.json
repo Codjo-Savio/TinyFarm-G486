@@ -6,54 +6,60 @@
             "healthy": false,
             "clean": false,
             "type": "Calf",
-            "weight": 1.5,
+            "weight": 170.0,
             "hunger": 0,
-            "thirst": 1
+            "thirst": 1,
+            "age": 1
         },
         {
             "name": "Belle",
             "healthy": true,
             "clean": true,
             "type": "Beef",
-            "weight": 1.2,
+            "weight": 536.0,
             "hunger": 0,
-            "thirst": 0
+            "thirst": 0,
+            "age": 2
         },
         {
             "name": "Clara",
             "healthy": false,
             "clean": true,
             "type": "Dairy",
-            "weight": 1.4,
+            "weight": 625.0,
             "hunger": 0,
-            "thirst": 1
+            "thirst": 1,
+            "age": 3
         },
         {
             "name": "Daisy",
             "healthy": true,
             "clean": false,
             "type": "Dairy",
-            "weight": 1.6,
+            "weight": 625.0,
             "hunger": 1,
-            "thirst": 0
+            "thirst": 0,
+            "age": 4
         },
         {
             "name": "Rosie",
             "healthy": true,
             "clean": true,
             "type": "Beef",
-            "weight": 1.3,
+            "weight": 750.0,
             "hunger": 1,
-            "thirst": 1
+            "thirst": 1,
+            "age": 4
         },
         {
             "name": "Bessie",
             "healthy": true,
             "clean": true,
             "type": "Dairy",
-            "weight": 1.7,
+            "weight": 645.0,
             "hunger": 0,
-            "thirst": 0
+            "thirst": 0,
+            "age": 5
         }
     ]
 }

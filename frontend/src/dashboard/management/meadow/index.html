@@ -40,6 +40,16 @@
                         Retour</a
                     >
                     <div class="market-stats">
+                        <div class="animal-state">
+                            <span class="material-symbols-rounded">
+                                heart_broken
+                            </span>
+                            <p>Malade : <span id="sick-count"></span></p>
+                        </div>
+                        <div class="animal-state">
+                            <span class="material-symbols-rounded"> mop </span>
+                            <p>Sale : <span id="dirty-count"></span></p>
+                        </div>
                         <span
                             ><span class="material-symbols-rounded">pets</span>
                             <span id="cow-count"></span>
@@ -48,38 +58,45 @@
                             ><span class="material-symbols-rounded"
                                 >water_full</span
                             >
-                            <span id="milk-count"></span
-                        ></span>
+                            <span id="milk-count"></span>
+                        </span>
                         <button class="action-button">
                             <span class="material-symbols-rounded">sell</span>
                             Vendre
                         </button>
                         <div class="actions-wrapper">
-                            <button class="menu-actions" onclick="actions()">
+                            <button
+                                class="menu-actions"
+                                onclick="toggleActionsMenu()"
+                            >
                                 ...
                             </button>
                             <div class="actions-menu" id="actions-menu">
                                 <button
                                     onclick="feedAll()"
                                     class="action-button"
+                                    id="feed-btn"
                                 >
                                     Nourrir
                                 </button>
                                 <button
                                     onclick="waterAll()"
                                     class="action-button"
+                                    id="water-btn"
                                 >
                                     Abreuver
                                 </button>
                                 <button
                                     onclick="healAll()"
                                     class="action-button"
+                                    id="heal-btn"
                                 >
                                     Soigner
                                 </button>
                                 <button
                                     onclick="cleanAll()"
                                     class="action-button"
+                                    id="clean-btn"
                                 >
                                     Nettoyer
                                 </button>

@@ -148,10 +148,10 @@ body {
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     display: grid;
-    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
     gap: 8px;
     font-weight: normal;
-    min-width: 264px;
+    min-width: 320px;
     max-height: 0;
     padding: 0 18px;
     overflow: hidden;
@@ -180,10 +180,20 @@ body {
     font-weight: var(--font-weight-subtitle);
     line-height: normal;
     box-shadow: none;
+    gap: 6px;
+    white-space: nowrap;
 }
 
 .actions-menu .action-button .material-symbols-rounded {
-    display: none;
+    display: inline-flex;
+    align-items: center;
+    font-size: 18px;
+}
+
+.material-symbols-rounded.coin-icon {
+    /* For écus that need to be smaller than the default size */
+    font-size: var(--font-size-mini);
+    padding: 0;
 }
 
 .market-stats {
@@ -257,7 +267,6 @@ h2.category-title {
 
     .game-grid {
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        height: auto;
         gap: 30px;
         padding-top: 20px;
     }
@@ -299,7 +308,8 @@ h2.category-title {
         right: 0;
         left: auto;
         width: auto;
-        grid-template-columns: repeat(2, minmax(120px, 1fr));
+        min-width: 260px;
+        grid-template-columns: 1fr;
     }
 
     .actions-menu .action-button {
@@ -308,11 +318,23 @@ h2.category-title {
     }
 }
 
-.grid-item {
-    width: 100%;
+.grid-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     background-color: var(--color-surface-dark);
     padding: 20px;
     border-radius: 20px;
+}
+
+.grid-item {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
 }
 
 .animal-title {
@@ -327,7 +349,7 @@ h2.category-title {
     gap: 10px;
 }
 
-.animal-title div {
+.animal-state {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -359,6 +381,12 @@ h2.category-title {
     gap: 10px !important;
 }
 
+.animal-age-text {
+    display: flex;
+    align-items: center;
+    gap: 10px !important;
+}
+
 .food-state {
     width: 50%;
 }
@@ -378,9 +406,27 @@ h2.category-title {
 }
 
 .animal-actions {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: center;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.animal-actions .action-button {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 6px;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.animal-actions .action-button .material-symbols-rounded {
+    font-size: 16px;
 }
 
 .animal-actions button[active="true"] {
