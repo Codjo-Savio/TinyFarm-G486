@@ -23,6 +23,7 @@ public class CowControllerTest {
         cowService.deleteAll();
         String json = """
                 {
+                    "id" : 1,
                     "cowType" : "D",
                     "name" : "Marguerite",
                     "milking" : false
@@ -38,6 +39,7 @@ public class CowControllerTest {
     void shouldCreateCow() throws Exception {
         String json = """
                 {
+                    "id" : 1,
                     "cowType" : "B",
                     "name" : "Bovino",
                     "milking" : false

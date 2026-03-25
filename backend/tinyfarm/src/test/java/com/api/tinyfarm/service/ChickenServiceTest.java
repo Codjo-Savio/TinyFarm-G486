@@ -35,7 +35,7 @@ public class ChickenServiceTest {
 
     @Test
     void shouldCreateChicken() {
-        User user = new User(2L, "Brad", User.Gender.M, 2000, false, 1);
+        User user = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000, false, 1);
 
         Animal animal = new Animal();
         animal.setUserId(2L);
@@ -59,7 +59,7 @@ public class ChickenServiceTest {
 
     @Test
     void shouldReturnAllChickens() {
-        User user = new User(2L, "Brad", User.Gender.M, 2000, false, 1);
+        User user = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000, false, 1);
 
         Animal animal = new Animal();
         animal.setUserId(2L);
@@ -85,6 +85,7 @@ public class ChickenServiceTest {
     void shouldFeedChickenAndGainWeight() {
         User user = new User();
         user.setName("Farmer");
+        user.setEmail("usertest@gmail.com");
         user.setEcus(100);
         user = userRepository.save(user);
 
@@ -109,6 +110,7 @@ public class ChickenServiceTest {
     void shouldStarveChickenAndLoseWeight() {
         User user = new User();
         user.setName("Farmer");
+        user.setEmail("usertest@gmail.com");
         user.setEcus(100);
         user = userRepository.save(user);
 
@@ -133,6 +135,7 @@ public class ChickenServiceTest {
     void shouldWaterCleanAndHealChicken() {
         User user = new User();
         user.setName("Farmer");
+        user.setEmail("usertest@gmail.com");
         user.setEcus(100);
         user = userRepository.save(user);
 
@@ -160,6 +163,7 @@ public class ChickenServiceTest {
     void shouldLayEggsAndSellThem() {
         User user = new User();
         user.setName("Farmer");
+        user.setEmail("usertest@gmail.com");
         user.setEcus(100);
         user = userRepository.save(user);
 
@@ -197,7 +201,7 @@ public class ChickenServiceTest {
 
     @Test
     void shouldDeleteChicken() {
-        User user = new User(2L, "Brad", User.Gender.M, 2000, false, 1);
+        User user = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000, false, 1);
 
         Animal animal = new Animal();
         animal.setUserId(2L);

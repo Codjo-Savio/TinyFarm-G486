@@ -3,8 +3,10 @@ package com.api.tinyfarm.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "cow")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -18,7 +20,7 @@ public class Cow extends Animal {
         B("Beef"),
         C("Calf");
 
-        private String wording;
+        private final String wording;
 
         CowType(String wording) {
             this.wording = wording;
@@ -29,12 +31,10 @@ public class Cow extends Animal {
         }
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "aid")
     private Long id;
 
-    @Column(name = "name")
+    @Column(name = "name", length = 20)
     private String name;
 
     @Enumerated(EnumType.STRING)
