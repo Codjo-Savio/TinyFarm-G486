@@ -216,7 +216,7 @@ h2.category-title {
 
 .game-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
     gap: 40px;
     flex: 1;
     min-height: 0;
@@ -256,8 +256,7 @@ h2.category-title {
     }
 
     .game-grid {
-        display: flex;
-        flex-direction: column;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         height: auto;
         gap: 30px;
         padding-top: 20px;
