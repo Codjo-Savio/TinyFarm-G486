@@ -2,6 +2,7 @@ package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Market;
 import com.api.tinyfarm.repository.MarketRepository;
+import com.api.tinyfarm.repository.ProductRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -22,9 +23,9 @@ public class MarketService {
             );
     }
 
-    public Market findByProduct(Long productID) {
+    public Market findByProductId(Long productID) {
         return marketRepository
-            .findByProduct(productID)
+            .findByProductId(productID)
             .orElseThrow(() ->
                 new RuntimeException("Marché introuvable : " + productID)
             );
@@ -48,6 +49,19 @@ public class MarketService {
         existing.setProductId(modifiedMarket.getProductId());
         existing.setPrice(modifiedMarket.getPrice());
         return marketRepository.save(existing);
+    }
+
+    public void deleteProductById(Long userId, Long productId) {
+        try {
+            marketRepository.deleteByMarketIdUserIdAndMarketIdProductId(
+                userId,
+                productId
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(
+                "Impossible de retirer le produit du marché : " + e.getMessage()
+            );
+        }
     }
 
     public void deleteByID(Long uid) {

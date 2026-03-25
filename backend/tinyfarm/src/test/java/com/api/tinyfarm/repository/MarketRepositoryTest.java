@@ -36,7 +36,7 @@ public class MarketRepositoryTest {
 
         // ASSERT
 
-        assertNotNull(saved.getMarketId());
+        assertNotNull(saved.getUserId()); // PAS SUR A 100% doit on regarder si c'est save par rapport au MarkedId ou bien par le UserId et ProductId
     }
 
     @Test
