@@ -53,10 +53,7 @@ public class MarketService {
 
     public void deleteProductById(Long userId, Long productId) {
         try {
-            marketRepository.deleteByMarketIdUserIdAndMarketIdProductId(
-                userId,
-                productId
-            );
+            marketRepository.deleteByUserIdAndProductId(userId, productId);
         } catch (Exception e) {
             throw new RuntimeException(
                 "Impossible de retirer le produit du marché : " + e.getMessage()
