@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(TestSecurityConfig.class)
 public class ProductServiceTest {
     @Autowired
     ProductService productService;

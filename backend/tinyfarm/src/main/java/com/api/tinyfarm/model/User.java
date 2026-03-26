@@ -2,6 +2,7 @@ package com.api.tinyfarm.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -21,7 +23,7 @@ public class User {
         M("Masculine"),
         F("Feminine");
 
-        private String wording;
+        private final String wording;
 
         Gender(String wording) {
             this.wording = wording;
@@ -34,6 +36,9 @@ public class User {
 
     @Column(name = "name", length = 20)
     private String name;
+
+    @Column(name = "email", length = 100)
+    private String email;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender", length = 20)

@@ -29,7 +29,8 @@ public class ChickenControllerTest {
                         "id" : 1,
                          "chickenType" : "H",
                          "name" : "Hermine",
-                         "fastingDays" : 0
+                         "fastingDays" : 0,
+                         "sickDays" : 0
                     }
             """;
         mockMvc.perform(
@@ -47,7 +48,8 @@ public class ChickenControllerTest {
                         "id" : 2,
                          "chickenType" : "H",
                          "name" : "Clochette",
-                         "fastingDays" : 0
+                         "fastingDays" : 0,
+                          "sickDays" : 0
                     }
             """;
         mockMvc
@@ -87,7 +89,8 @@ public class ChickenControllerTest {
                         "id" : 4,
                          "chickenType" : "H",
                          "name" : "Clémentine",
-                         "fastingDays" : 0
+                         "fastingDays" : 0,
+                          "sickDays" : 0
                     }
             """;
         mockMvc

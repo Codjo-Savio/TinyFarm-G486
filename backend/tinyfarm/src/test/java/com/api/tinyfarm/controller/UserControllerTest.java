@@ -26,6 +26,7 @@ public class UserControllerTest {
                 {
                      "id" : 1,
                      "name" : "Eldoraldo",
+                     "email" : "usertest@gmail.com",
                      "gender" : "F",
                      "ecus" : "10",
                      "level" : "1"
@@ -45,6 +46,7 @@ public class UserControllerTest {
                 {
                     "id" : 2,
                      "name" : "Bigfarm",
+                     "email" : "usertest@gmail.com",
                      "gender" : "M",
                      "ecus" : "10",
                      "level" : "1"
@@ -84,6 +86,7 @@ public class UserControllerTest {
                 {
                     "id" : 3,
                      "name" : "Colorado",
+                     "email" : "usertest@gmail.com",
                      "gender" : "F",
                      "ecus" : "100",
                      "level" : "1"
