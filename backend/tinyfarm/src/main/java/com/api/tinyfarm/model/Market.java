@@ -15,7 +15,7 @@ public class Market {
     @EmbeddedId
     private MarketID marketId;
 
-    @MapsId("uid")
+    @MapsId("userId")
     @JoinColumn(name = "uid")
     private Long userId;
 
