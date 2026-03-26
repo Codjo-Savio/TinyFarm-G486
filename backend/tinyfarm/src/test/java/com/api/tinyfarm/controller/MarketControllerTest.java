@@ -39,9 +39,9 @@ public class MarketControllerTest {
         // Créer une annonce de test
         testMarket = new Market();
         testMarket.setMarketId(new MarketID(1L, 62L));
-        testMarket.setUserId(1L);
+        testMarket.setUserId(1L); // L pour Long
         testMarket.setProductId(62L);
-        testMarket.setPrice(13.0F);
+        testMarket.setPrice(13.0F); // F pour Float
 
         mockMvc
             .perform(
