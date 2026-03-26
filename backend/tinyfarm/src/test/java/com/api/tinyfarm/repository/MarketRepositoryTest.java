@@ -65,7 +65,7 @@ public class MarketRepositoryTest {
 
         // ACT
 
-        Optional<Market> found = marketRepository.findByProduct(
+        Optional<Market> found = marketRepository.findByProductId(
             market.getProductId()
         );
 
