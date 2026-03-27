@@ -17,10 +17,12 @@ public class Market {
 
     @MapsId("userId")
     @JoinColumn(name = "uid")
+    @Column(name = "uid", insertable = false, updatable = false) // Déjà géré par MarketID
     private Long userId;
 
     @MapsId("productID")
     @JoinColumn(name = "productID")
+    @Column(name = "productID", insertable = false, updatable = false) // idem
     private Long productId;
 
     @Column(name = "price") // On garde l'attribut price pour facilité le code.
