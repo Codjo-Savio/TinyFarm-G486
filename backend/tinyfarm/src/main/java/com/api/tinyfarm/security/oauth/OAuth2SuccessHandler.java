@@ -1,6 +1,7 @@
 package com.api.tinyfarm.security.oauth;
 
 import com.api.tinyfarm.model.User;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,14 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         Jwt token = jwtEncoder.encode(JwtEncoderParameters.from(claims));
         String jwtValue = token.getTokenValue();
-        response.sendRedirect("http://localhost:3000/login/success?token=" + jwtValue);
+
+        Cookie cookie = new Cookie("jwt", jwtValue);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(3600);
+        response.addCookie(cookie);
+        response.sendRedirect("http://localhost:3000/login");
 
     }
 }
