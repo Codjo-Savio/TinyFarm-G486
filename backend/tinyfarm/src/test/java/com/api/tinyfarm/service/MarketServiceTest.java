@@ -1,6 +1,5 @@
 package com.api.tinyfarm.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -36,8 +35,6 @@ public class MarketServiceTest {
 
     @Test
     void shouldCreateMarket() {
-        // On instancie les variables nécéssaires pour market :
-        // Et on les attribut au market.
         Market market = new Market();
 
         User user = new User();
@@ -51,8 +48,6 @@ public class MarketServiceTest {
 
         Market created = marketService.create(market);
 
-        // Assert : On vérifie que le market à bien été crée.
-
         assertNotNull(marketService.findById(user.getId()));
     }
 
@@ -65,13 +60,9 @@ public class MarketServiceTest {
         product.setDescription("blé");
         product.setPrice(25.0f);
 
-        // On ajoute le nouveau produit dans le modified market
-
         modifiedMarket.setProductId(product.getId());
         modifiedMarket.setPrice(product.getPrice());
         marketService.update(modifiedMarket.getUserId(), modifiedMarket);
-
-        // On fait la même chose pour le deuxieme
 
         Product anotherProduct = new Product();
         product.setDescription("foin");
@@ -81,20 +72,15 @@ public class MarketServiceTest {
         modifiedMarket.setPrice(anotherProduct.getPrice());
         marketService.update(modifiedMarket.getUserId(), modifiedMarket);
 
-        // On transfère les nouvelles informations dans le nouveau market.
-
         modifiedMarket.setUserId(market.getUserId());
         marketService.update(market.getUserId(), modifiedMarket);
 
-        // ASSERT
-        // On vérifie que les deux nouveaux produits sont dans le market.
         assertNotNull(marketService.findByProductId(product.getId()));
         assertNotNull(marketService.findByProductId(anotherProduct.getId()));
     }
 
     @Test
     void shouldDeleteProduct() {
-        // On instancie un market.
 
         User user = new User();
         Market market = new Market();
@@ -103,11 +89,7 @@ public class MarketServiceTest {
         market.setUserId(user.getId());
         market.setProductId(product.getId());
 
-        // On supprime le produit dans le market.
         marketService.deleteProductById(user.getId(), product.getId());
-
-        // Assert ( On vérifie que le produit est bien supprimé. )
-        // c.a.d que le productId du market est null.
 
         assertNull(market.getProductId());
     }

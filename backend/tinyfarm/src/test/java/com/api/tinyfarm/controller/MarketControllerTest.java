@@ -1,5 +1,6 @@
 package com.api.tinyfarm.controller;
 
+import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -15,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
@@ -46,6 +46,7 @@ public class MarketControllerTest {
         mockMvc
             .perform(
                 post("/api/market")
+                        .with(authenticated())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(testMarket))
             )
@@ -63,6 +64,7 @@ public class MarketControllerTest {
         mockMvc
             .perform(
                 post("/api/market")
+                        .with(authenticated())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(newMarket))
             )
