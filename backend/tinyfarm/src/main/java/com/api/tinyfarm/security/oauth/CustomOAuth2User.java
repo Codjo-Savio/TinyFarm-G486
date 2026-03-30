@@ -2,6 +2,7 @@ package com.api.tinyfarm.security.oauth;
 
 import com.api.tinyfarm.model.User;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
@@ -24,7 +25,7 @@ public class CustomOAuth2User implements OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(); // pas de rôles pour l'instant
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override

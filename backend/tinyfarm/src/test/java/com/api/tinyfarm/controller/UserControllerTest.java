@@ -15,7 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public class UserControllerTest {
+public class UserControllerTest extends AuthenticatedControllerTestSupport {
     @Autowired
     MockMvc mockMvc;
 
@@ -34,6 +34,7 @@ public class UserControllerTest {
         """;
         mockMvc.perform(
                         post("/api/users")
+                                .with(authenticated())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(json)
         );
@@ -54,6 +55,7 @@ public class UserControllerTest {
         """;
         mockMvc.perform(
                         post("/api/users")
+                                .with(authenticated())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(json)
                 )
@@ -63,19 +65,19 @@ public class UserControllerTest {
     // tests of the GET
     @Test
     void shouldReturnUsers() throws Exception{
-        mockMvc.perform(get("/api/users"))
+        mockMvc.perform(get("/api/users").with(authenticated()))
                 .andExpect(status().isOk());
     }
 
     @Test
     void shouldReturnUserById() throws  Exception{
-        mockMvc.perform(get("/api/users/id/1"))
+        mockMvc.perform(get("/api/users/id/1").with(authenticated()))
                 .andExpect(status().isOk());
     }
 
     @Test
     void userShouldNotBeFoundById() throws  Exception{
-        mockMvc.perform(get("/api/users/id/0"))
+        mockMvc.perform(get("/api/users/id/0").with(authenticated()))
                 .andExpect(status().isNotFound());
     }
 
@@ -94,10 +96,11 @@ public class UserControllerTest {
         """;
         mockMvc.perform(
                 post("/api/users")
+                        .with(authenticated())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
         );
-        mockMvc.perform(delete("/api/users/id/3"))
+        mockMvc.perform(delete("/api/users/id/3").with(authenticated()))
                 .andExpect(status().isNoContent());
     }
 }

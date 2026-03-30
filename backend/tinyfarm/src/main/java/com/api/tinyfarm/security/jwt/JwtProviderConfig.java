@@ -13,7 +13,6 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
-@Profile("!test")
 public class JwtProviderConfig {
     @Value("${jwt.secret}")
     private String  secret;

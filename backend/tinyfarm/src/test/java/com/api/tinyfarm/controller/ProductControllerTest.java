@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public class ProductControllerTest {
+public class ProductControllerTest extends AuthenticatedControllerTestSupport {
     @Autowired
     MockMvc mockMvc;
 
@@ -32,6 +32,7 @@ public class ProductControllerTest {
         """;
         mockMvc.perform(
                 post("/api/products")
+                        .with(authenticated())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
         );
@@ -50,6 +51,7 @@ public class ProductControllerTest {
                 }
         """;
         mockMvc.perform(post("/api/products")
+                        .with(authenticated())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isOk());
@@ -58,19 +60,19 @@ public class ProductControllerTest {
     // tests of the GET
     @Test
     void shouldReturnAllProducts() throws  Exception{
-        mockMvc.perform(get("/api/products"))
+        mockMvc.perform(get("/api/products").with(authenticated()))
                 .andExpect(status().isOk());
     }
 
     @Test
     void shouldReturnProductById() throws  Exception{
-        mockMvc.perform(get("/api/products/id/1"))
+        mockMvc.perform(get("/api/products/id/1").with(authenticated()))
                 .andExpect(status().isOk());
     }
 
     @Test
     void productShouldNotBeFoundById() throws  Exception{
-         mockMvc.perform(get("/api/products/id/3"))
+         mockMvc.perform(get("/api/products/id/3").with(authenticated()))
                 .andExpect(status().isNotFound());
     }
 
@@ -88,10 +90,11 @@ public class ProductControllerTest {
         """;
         mockMvc.perform(
                 post("/api/products")
+                        .with(authenticated())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
         );
-        mockMvc.perform(delete("/api/products/id/4"))
+        mockMvc.perform(delete("/api/products/id/4").with(authenticated()))
                 .andExpect(status().isNoContent());
     }
 }
