@@ -1,12 +1,9 @@
 package com.api.tinyfarm.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.api.tinyfarm.model.Market;
-import com.api.tinyfarm.model.Product;
-import com.api.tinyfarm.model.User;
-import com.api.tinyfarm.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,79 +15,65 @@ import org.springframework.test.context.ActiveProfiles;
 public class MarketServiceTest {
 
     @Autowired
-    MarketService marketService;
-
-    @Autowired
-    ProductService productService;
-
-    @Autowired
-    UserRepository userRepository;
+    private MarketService marketService;
 
     @BeforeEach
     void setup() {
         marketService.deleteAll();
-        productService.deleteAllProducts();
-        userRepository.deleteAll();
     }
 
     @Test
     void shouldCreateMarket() {
         Market market = new Market();
-
-        User user = new User();
-        market.setUserId(user.getId());
-
-        Product product = new Product();
-        product.setDescription("blé");
-        product.setPrice(25.0f);
-
-        market.setProductId(product.getId());
+        market.setUserId(1L);
+        market.setProductId(10L);
+        market.setPrice(25.0f);
 
         Market created = marketService.create(market);
 
-        assertNotNull(marketService.findById(user.getId()));
+        assertNotNull(created.getMarketId());
+        assertEquals(1L, created.getUserId());
+        assertEquals(10L, created.getProductId());
     }
 
     @Test
-    void shouldReturnAllProducts() {
+    void shouldReturnMarketByProductId() {
         Market market = new Market();
-        Market modifiedMarket = new Market();
+        market.setUserId(1L);
+        market.setProductId(10L);
+        market.setPrice(25.0f);
 
-        Product product = new Product();
-        product.setDescription("blé");
-        product.setPrice(25.0f);
+        marketService.create(market);
 
-        modifiedMarket.setProductId(product.getId());
-        modifiedMarket.setPrice(product.getPrice());
-        marketService.update(modifiedMarket.getUserId(), modifiedMarket);
+        Market found = marketService.findByProductId(10L);
 
-        Product anotherProduct = new Product();
-        product.setDescription("foin");
-        product.setPrice(25.0f);
-
-        modifiedMarket.setProductId(anotherProduct.getId());
-        modifiedMarket.setPrice(anotherProduct.getPrice());
-        marketService.update(modifiedMarket.getUserId(), modifiedMarket);
-
-        modifiedMarket.setUserId(market.getUserId());
-        marketService.update(market.getUserId(), modifiedMarket);
-
-        assertNotNull(marketService.findByProductId(product.getId()));
-        assertNotNull(marketService.findByProductId(anotherProduct.getId()));
+        assertNotNull(found);
+        assertEquals(1L, found.getUserId());
     }
 
     @Test
-    void shouldDeleteProduct() {
-
-        User user = new User();
+    void shouldDeleteMarketByUserIdAndProductId() {
         Market market = new Market();
-        Product product = new Product();
+        market.setUserId(1L);
+        market.setProductId(10L);
+        market.setPrice(25.0f);
+        marketService.create(market);
 
-        market.setUserId(user.getId());
-        market.setProductId(product.getId());
+        marketService.deleteProductById(1L, 10L);
 
-        marketService.deleteProductById(user.getId(), product.getId());
+        assertEquals(0, marketService.findAll().size());
+    }
 
-        assertNull(market.getProductId());
+    @Test
+    void shouldDeleteMarketByUserId() {
+        Market market = new Market();
+        market.setUserId(1L);
+        market.setProductId(10L);
+        market.setPrice(25.0f);
+        marketService.create(market);
+
+        marketService.deleteByID(1L);
+
+        assertEquals(0, marketService.findAll().size());
     }
 }

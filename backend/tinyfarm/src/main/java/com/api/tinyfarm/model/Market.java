@@ -13,18 +13,18 @@ import lombok.NoArgsConstructor;
 public class Market {
 
     @EmbeddedId
+    @AttributeOverrides({
+        @AttributeOverride(name = "userId", column = @Column(name = "uid")),
+        @AttributeOverride(name = "productID", column = @Column(name = "productID"))
+    })
     private MarketID marketId;
 
-    @MapsId("userId")
-    @JoinColumn(name = "uid")
-    @Column(name = "uid", insertable = false, updatable = false) // Déjà géré par MarketID
+    @Column(name = "uid", insertable = false, updatable = false)
     private Long userId;
 
-    @MapsId("productID")
-    @JoinColumn(name = "productID")
-    @Column(name = "productID", insertable = false, updatable = false) // idem
+    @Column(name = "productID", insertable = false, updatable = false)
     private Long productId;
 
-    @Column(name = "price") // On garde l'attribut price pour facilité le code.
+    @Column(name = "price")
     private Float price;
 }

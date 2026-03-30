@@ -19,13 +19,13 @@ public class MarketController {
     @GetMapping("/id/{id}")
     public ResponseEntity<Market> getById(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(marketService.findById(id));
+            return ResponseEntity.ok(marketService.findByUserId(id));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @GetMapping("/productId/{productId}")
+    @GetMapping("/product/{productId}")
     public ResponseEntity<Market> getByProductId(@PathVariable Long productId) {
         try {
             return ResponseEntity.ok(marketService.findByProductId(productId));
@@ -43,7 +43,7 @@ public class MarketController {
         }
     }
 
-    @PostMapping
+    @PostMapping("")
     public ResponseEntity<Market> create(@RequestBody Market market) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -93,15 +93,4 @@ public class MarketController {
         }
     }
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteAll() {
-        try {
-            marketService.deleteAll();
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(
-                    HttpStatus.INTERNAL_SERVER_ERROR
-            ).build();
-        }
-    }
 }

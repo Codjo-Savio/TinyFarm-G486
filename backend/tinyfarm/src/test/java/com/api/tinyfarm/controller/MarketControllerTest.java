@@ -1,11 +1,12 @@
 package com.api.tinyfarm.controller;
 
-import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.api.tinyfarm.model.Market;
-import com.api.tinyfarm.model.MarketID;
 import com.api.tinyfarm.service.MarketService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,10 +17,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public class MarketControllerTest {
+public class MarketControllerTest extends AuthenticatedControllerTestSupport {
 
     @Autowired
     private MockMvc mockMvc;
@@ -30,91 +32,79 @@ public class MarketControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Market testMarket;
-
     @BeforeEach
     void setup() throws Exception {
         marketService.deleteAll();
-
-        // Créer une annonce de test
-        testMarket = new Market();
-        testMarket.setMarketId(new MarketID(1L, 62L));
-        testMarket.setUserId(1L); // L pour Long
-        testMarket.setProductId(62L);
-        testMarket.setPrice(13.0F); // F pour Float
-
-        mockMvc
-            .perform(
-                post("/api/market")
-                        .with(authenticated())
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(testMarket))
-            )
-            .andExpect(status().isCreated());
+        Market market = new Market();
+        market.setUserId(1L);
+        market.setProductId(10L);
+        market.setPrice(13.0f);
+        marketService.create(market);
     }
 
     @Test
     void shouldCreateMarket() throws Exception {
-        Market newMarket = new Market();
-        newMarket.setMarketId(new MarketID(2L, 53L));
-        newMarket.setUserId(2L);
-        newMarket.setProductId(53L);
-        newMarket.setPrice(32.0F);
+        Market market = new Market();
+        market.setUserId(2L);
+        market.setProductId(20L);
+        market.setPrice(25.0f);
 
         mockMvc
             .perform(
                 post("/api/market")
-                        .with(authenticated())
+                    .with(authenticated())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(newMarket))
+                    .content(objectMapper.writeValueAsString(market))
             )
             .andExpect(status().isCreated());
     }
 
     @Test
     void shouldReturnMarketByUserId() throws Exception {
-        mockMvc.perform(get("/api/market/id/1")).andExpect(status().isOk());
+        mockMvc
+            .perform(get("/api/market/id/1").with(authenticated()))
+            .andExpect(status().isOk());
     }
 
     @Test
     void shouldReturnMarketByProductId() throws Exception {
         mockMvc
-            .perform(get("/api/market/productId/62"))
+            .perform(get("/api/market/product/10").with(authenticated()))
             .andExpect(status().isOk());
     }
 
     @Test
     void shouldReturnMarketByPrice() throws Exception {
         mockMvc
-            .perform(get("/api/market/price/13.0"))
+            .perform(get("/api/market/price/13.0").with(authenticated()))
             .andExpect(status().isOk());
     }
 
     @Test
     void marketShouldNotBeFoundByUserId() throws Exception {
         mockMvc
-            .perform(get("/api/market/id/999"))
+            .perform(get("/api/market/id/999").with(authenticated()))
             .andExpect(status().isNotFound());
     }
 
     @Test
     void marketShouldNotBeFoundByProductId() throws Exception {
         mockMvc
-            .perform(get("/api/market/productId/999"))
+            .perform(get("/api/market/product/999").with(authenticated()))
             .andExpect(status().isNotFound());
     }
 
     @Test
     void shouldUpdateMarket() throws Exception {
         Market updatedMarket = new Market();
-        updatedMarket.setMarketId(new MarketID(1L, 62L));
         updatedMarket.setUserId(1L);
-        updatedMarket.setProductId(62L);
+        updatedMarket.setProductId(10L);
         updatedMarket.setPrice(25.0F);
 
         mockMvc
             .perform(
                 put("/api/market/id/1")
+                    .with(authenticated())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(updatedMarket))
             )
@@ -124,21 +114,14 @@ public class MarketControllerTest {
     @Test
     void shouldDeleteMarketByUserIdAndProductId() throws Exception {
         mockMvc
-            .perform(delete("/api/market/1/62"))
+            .perform(delete("/api/market/1/10").with(authenticated()))
             .andExpect(status().isNoContent());
     }
 
     @Test
     void shouldDeleteMarketByUserId() throws Exception {
         mockMvc
-            .perform(delete("/api/market/id/1"))
-            .andExpect(status().isNoContent());
-    }
-
-    @Test
-    void shouldDeleteAllMarkets() throws Exception {
-        mockMvc
-            .perform(delete("/api/market"))
+            .perform(delete("/api/market/id/1").with(authenticated()))
             .andExpect(status().isNoContent());
     }
 }

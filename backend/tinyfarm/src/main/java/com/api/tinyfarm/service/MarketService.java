@@ -1,10 +1,11 @@
 package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Market;
+import com.api.tinyfarm.model.MarketID;
 import com.api.tinyfarm.repository.MarketRepository;
-import com.api.tinyfarm.repository.ProductRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MarketService {
@@ -15,9 +16,9 @@ public class MarketService {
         this.marketRepository = marketRepository;
     }
 
-    public Market findById(Long uid) {
+    public Market findByUserId(Long uid) {
         return marketRepository
-            .findById(uid)
+            .findByUserId(uid)
             .orElseThrow(() ->
                 new RuntimeException("Marché introuvable : " + uid)
             );
@@ -40,17 +41,24 @@ public class MarketService {
     }
 
     public Market create(Market market) {
+        syncMarketId(market);
         return marketRepository.save(market);
     }
 
+    public List<Market> findAll() {
+        return marketRepository.findAll();
+    }
+
     public Market update(Long id, Market modifiedMarket) {
-        Market existing = findById(id);
+        Market existing = findByUserId(id);
         existing.setUserId(modifiedMarket.getUserId());
         existing.setProductId(modifiedMarket.getProductId());
         existing.setPrice(modifiedMarket.getPrice());
+        syncMarketId(existing);
         return marketRepository.save(existing);
     }
 
+    @Transactional
     public void deleteProductById(Long userId, Long productId) {
         try {
             marketRepository.deleteByUserIdAndProductId(userId, productId);
@@ -61,11 +69,19 @@ public class MarketService {
         }
     }
 
+    @Transactional
     public void deleteByID(Long uid) {
-        marketRepository.deleteById(uid);
+        marketRepository.deleteByUserId(uid);
     }
 
     public void deleteAll() {
         marketRepository.deleteAll();
+    }
+
+    private void syncMarketId(Market market) {
+        if (market.getUserId() == null || market.getProductId() == null) {
+            return;
+        }
+        market.setMarketId(new MarketID(market.getUserId(), market.getProductId()));
     }
 }
