@@ -36,7 +36,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 .issuer("tinyfarm")
                 .subject(user.getId().toString())
                 .issuedAt(now)
-                .expiresAt(now.plusSeconds(3600 * 24))
+                .expiresAt(now.plusSeconds(3600))
                 .claim("username", user.getName())
                 .build();
 
@@ -52,7 +52,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         cookie.setPath("/");
         cookie.setMaxAge(3600);
         response.addCookie(cookie);
-        response.sendRedirect("http://localhost:3000/login");
+        response.sendRedirect("http://localhost:3000/dashboard");
 
     }
 }
