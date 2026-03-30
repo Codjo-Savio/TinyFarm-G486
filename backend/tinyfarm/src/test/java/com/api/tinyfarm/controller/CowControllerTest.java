@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public class CowControllerTest {
+public class CowControllerTest extends AuthenticatedControllerTestSupport {
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -23,6 +23,7 @@ public class CowControllerTest {
         cowService.deleteAll();
         String json = """
                 {
+                    "id" : 1,
                     "cowType" : "D",
                     "name" : "Marguerite",
                     "milking" : false
@@ -30,6 +31,7 @@ public class CowControllerTest {
                 """;
         mockMvc.perform(
                 post("/api/cows")
+                        .with(authenticated())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
         ).andExpect(status().isOk());
@@ -38,6 +40,7 @@ public class CowControllerTest {
     void shouldCreateCow() throws Exception {
         String json = """
                 {
+                    "id" : 1,
                     "cowType" : "B",
                     "name" : "Bovino",
                     "milking" : false
@@ -45,6 +48,7 @@ public class CowControllerTest {
                 """;
         mockMvc.perform(
                         post("/api/cows")
+                                .with(authenticated())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(json)
                 )
@@ -52,23 +56,23 @@ public class CowControllerTest {
     }
     @Test
     void shouldReturnAllCows() throws Exception {
-        mockMvc.perform(get("/api/cows"))
+        mockMvc.perform(get("/api/cows").with(authenticated()))
                 .andExpect(status().isOk());
     }
     @Test
     void shouldReturnCowByName() throws Exception {
-        mockMvc.perform(get("/api/cows/name/Marguerite"))
+        mockMvc.perform(get("/api/cows/name/Marguerite").with(authenticated()))
                 .andExpect(status().isOk());
     }
     @Test
     void cowShouldNotBeFoundByName() throws Exception {
-        mockMvc.perform(get("/api/cows/name/unknown"))
+        mockMvc.perform(get("/api/cows/name/unknown").with(authenticated()))
                 .andExpect(status().isNotFound());
     }
     @Test
     void shouldDeleteCowById() throws Exception {
         Long id = cowService.getByName("Marguerite").getId();
-        mockMvc.perform(delete("/api/cows/id/" + id))
+        mockMvc.perform(delete("/api/cows/id/" + id).with(authenticated()))
                 .andExpect(status().isNoContent());
     }
 }
