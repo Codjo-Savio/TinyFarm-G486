@@ -14,23 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/auth")
 public class AuthenticationController {
-    @PostMapping("/login")
-    public ResponseEntity<User> authenticateUser(@AuthenticationPrincipal Object principal){
-        return resolveAuthenticatedUser(principal);
-    }
 
-    @GetMapping("me")
-    public ResponseEntity<User> getUser(@AuthenticationPrincipal Object principal){
-        return resolveAuthenticatedUser(principal);
-    }
-
-    private ResponseEntity<User> resolveAuthenticatedUser(Object principal) {
-        if (principal instanceof User user) {
-            return ResponseEntity.ok(user);
-        }
-        if (principal instanceof CustomOAuth2User oAuth2User) {
-            return ResponseEntity.ok(oAuth2User.getUser());
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    @GetMapping("/me")
+    public ResponseEntity<User> getUser(@AuthenticationPrincipal User user){
+        return ResponseEntity.ok(user);
     }
 }

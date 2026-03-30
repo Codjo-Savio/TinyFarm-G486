@@ -11,6 +11,12 @@
 4) to run the app in prod context (with postgres)
 5) do `cd docker` and 
     `docker compose up --build`
+6) to check test failure causes
+    `mvn test -pl . -Dtest=JwtRequestFilterTest -e 2>&1 | grep "Caused by"`
+7) to test the authentication : http://localhost:8080/oauth2/authorization/github
+8) then press F12 - go to Applications - cookies - copy the token - ten go to Postman
+and test http://localhost:8080/api/auth/me (or any protected route) with
+Authorization - Bearer - and paste the token that was copied
 
 # END POINT
 ### Animal ("/api/animals")
