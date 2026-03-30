@@ -5,12 +5,13 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +19,6 @@ import java.io.IOException;
 import java.time.Instant;
 
 @Component
-@Profile("!test")
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final JwtEncoder jwtEncoder;
@@ -40,7 +40,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 .claim("username", user.getName())
                 .build();
 
-        Jwt token = jwtEncoder.encode(JwtEncoderParameters.from(claims));
+        Jwt token = jwtEncoder.encode(JwtEncoderParameters.from(
+                JwsHeader.with(MacAlgorithm.HS256).build(),
+                claims
+        ));
         String jwtValue = token.getTokenValue();
 
         Cookie cookie = new Cookie("jwt", jwtValue);

@@ -1,52 +1,61 @@
 package com.api.tinyfarm.authentication;
 
 import com.api.tinyfarm.model.User;
-import com.api.tinyfarm.security.jwt.JwtProviderConfig;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-
+import com.api.tinyfarm.security.jwt.JwtRequestFilter;
+import com.api.tinyfarm.service.UserService;
+import jakarta.servlet.ServletException;
+import java.io.IOException;
 import java.time.Instant;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockFilterChain;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-public class JwtRequestFilterTest {
-    @Autowired
-    private MockMvc mockMvc;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-    @Autowired
-    private JwtEncoder jwtEncoder;
+class JwtRequestFilterTest {
 
-    @Autowired
-    private JwtProviderConfig jwtProviderConfig;
+    private final JwtDecoder jwtDecoder = mock(JwtDecoder.class);
+    private final UserService userService = mock(UserService.class);
+    private final JwtRequestFilter jwtRequestFilter = new JwtRequestFilter(jwtDecoder, userService);
 
-    private String generateToken(Long userId){
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .subject(userId.toString())
-                .issuedAt(Instant.now())
-                .expiresAt(Instant.now().plusSeconds(3600))
-                .build();
-        return  jwtProviderConfig.jwtEncoder().encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
-    void shouldAuthorizeRequestWithValidToken() throws Exception{
+    void shouldAuthorizeRequestWithValidToken() throws ServletException, IOException {
         User user = new User(1L, "test", "usertest@gmail.com", User.Gender.M, 1500, false, 1);
-        String token = generateToken(user.getId());
-        mockMvc.perform(
-                get("/api/me")
-                        .header("Authorization", "Bearer" + token)
-        ).andExpect(status().isOk());
+        Jwt jwt = new Jwt(
+                "valid-token",
+                Instant.now(),
+                Instant.now().plusSeconds(3600),
+                java.util.Map.of("alg", "HS256"),
+                java.util.Map.of("sub", "1")
+        );
 
+        when(jwtDecoder.decode("valid-token")).thenReturn(jwt);
+        when(userService.findById(1L)).thenReturn(user);
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader("Authorization", "Bearer valid-token");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockFilterChain filterChain = new MockFilterChain();
+
+        jwtRequestFilter.doFilter(request, response, filterChain);
+
+        assertNotNull(SecurityContextHolder.getContext().getAuthentication());
+        assertEquals(user, SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        verify(jwtDecoder).decode("valid-token");
+        verify(userService).findById(1L);
     }
-
-
 }

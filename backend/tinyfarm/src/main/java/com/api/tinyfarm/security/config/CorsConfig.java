@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 @Configuration
-@Profile("!test")
 public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource(){

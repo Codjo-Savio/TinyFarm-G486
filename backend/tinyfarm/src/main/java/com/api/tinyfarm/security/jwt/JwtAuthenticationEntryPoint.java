@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-@Profile("!test")
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
