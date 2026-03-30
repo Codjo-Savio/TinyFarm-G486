@@ -11,6 +11,8 @@
 4) to run the app in prod context (with postgres)
 5) do `cd docker` and 
     `docker compose up --build`
+6) to check test failure causes
+    `mvn test -pl . -Dtest=JwtRequestFilterTest -e 2>&1 | grep "Caused by"`
 
 # END POINT
 ### Animal ("/api/animals")

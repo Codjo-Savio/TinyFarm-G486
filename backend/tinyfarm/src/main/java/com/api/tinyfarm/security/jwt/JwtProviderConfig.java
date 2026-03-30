@@ -20,6 +20,7 @@ public class JwtProviderConfig {
     @Bean
     public JwtEncoder jwtEncoder(){
         SecretKeySpec key = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
+        System.out.println(secret);
         return new NimbusJwtEncoder(new ImmutableSecret<>(key));
     }
 
