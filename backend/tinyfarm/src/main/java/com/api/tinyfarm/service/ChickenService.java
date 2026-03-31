@@ -161,49 +161,13 @@ public class ChickenService {
 
         for (Chicken chicken : userChickens) {
             // 1. Santé
-            if (chicken.getHealthy() != null && !chicken.getHealthy()) {
-                chicken.setSickDays(
-                    (chicken.getSickDays() == null
-                            ? 0
-                            : chicken.getSickDays()) +
-                        1
-                );
-                if (chicken.getSickDays() >= 4) {
-                    chickenRepository.delete(chicken);
-                    continue; // Mort de maladie
-                }
-            } else {
-                chicken.setSickDays(0);
+            if (handleHealth(chicken) != 0){
+                continue;
             }
 
             // 2. Faim, Soif et Poids
-            if (chicken.getFedToday() != null && !chicken.getFedToday()) {
-                chicken.setFastingDays(
-                    (chicken.getFastingDays() == null
-                            ? 0
-                            : chicken.getFastingDays()) +
-                        1
-                );
-
-                float weightLoss = 0f;
-                if (chicken.getFastingDays() == 1) weightLoss = 0.2f;
-                else if (chicken.getFastingDays() == 2) weightLoss = 0.5f;
-                else if (chicken.getFastingDays() == 3) weightLoss = 1.0f;
-                else if (chicken.getFastingDays() >= 4) {
-                    chickenRepository.delete(chicken);
-                    continue; // Mort de faim
-                }
-                chicken.setWeight(chicken.getWeight() - weightLoss);
-            } else {
-                chicken.setFastingDays(0);
-                float weightGain = 0.5f; // Grains
-                if (
-                    chicken.getWateredToday() != null &&
-                    chicken.getWateredToday()
-                ) {
-                    weightGain += 0.15f; // Eau (seulement si nourri selon la règle "toute seule elle ne fait pas grossir")
-                }
-                chicken.setWeight(chicken.getWeight() + weightGain);
+            if (handleFood(chicken) != 0){
+                continue;
             }
 
             // Poids max
@@ -222,55 +186,23 @@ public class ChickenService {
                 (chicken.getAge() == null ? 0 : chicken.getAge()) + 1
             );
 
-            // Retour en élevage si perte de poids
-            if (
-                (chicken.getChickenType() == Chicken.ChickenType.H ||
-                    chicken.getChickenType() == Chicken.ChickenType.R) &&
-                chicken.getWeight() < 2.5f
-            ) {
-                chicken.setChickenType(Chicken.ChickenType.C);
-            }
-
-            // Passage adulte
-            if (
-                chicken.getChickenType() == Chicken.ChickenType.C &&
-                chicken.getAge() == 4
-            ) {
-                if (Math.random() > 0.5) {
+            // 4. Changement de type de poulet
+            handleType(chicken);
+            
+            // 5. Saleté
+            if (!chicken.getClean()){
+                if (chicken.getChickenType() == Chicken.ChickenType.L) {
                     chicken.setChickenType(Chicken.ChickenType.H);
-                } else {
+                } else if (chicken.getChickenType() == Chicken.ChickenType.B) {
                     chicken.setChickenType(Chicken.ChickenType.R);
                 }
             }
 
-            // Passage reproducteur
-            if (
-                chicken.getChickenType() == Chicken.ChickenType.H &&
-                chicken.getAge() >= 5 &&
-                chicken.getWeight() >= 2.5f
-            ) {
-                chicken.setChickenType(Chicken.ChickenType.L);
-            }
-            if (
-                chicken.getChickenType() == Chicken.ChickenType.R &&
-                chicken.getAge() >= 5 &&
-                chicken.getWeight() >= 2.5f
-            ) {
-                chicken.setChickenType(Chicken.ChickenType.B);
-            }
-            
-
             // Comptage pour la ponte (doit être adulte, propre, sain, et nourri)
-            if (
-                chicken.getClean() &&
-                chicken.getHealthy() &&
-                chicken.getFedToday()
-            ) {
-                if (chicken.getChickenType() == Chicken.ChickenType.R) {
-                    activeRoosters++;
-                } else if (chicken.getChickenType() == Chicken.ChickenType.H) {
-                    activeHens++;
-                }
+            if (chicken.getChickenType() == Chicken.ChickenType.B) {
+                activeRoosters++;
+            } else if (chicken.getChickenType() == Chicken.ChickenType.L) {
+                activeHens++;
             }
 
             // Réinitialisation journalière
@@ -283,6 +215,124 @@ public class ChickenService {
 
         // 4. Ponte et Vente automatique des œufs (vendus le jour même)
         handleEggs(userId, activeRoosters, activeHens);
+    }
+
+    // renvoi un code 1 si le poulet meurt
+    private int handleHealth(Chicken chicken){
+
+        int out = 0;
+
+        if (chicken.getHealthy() != null && !chicken.getHealthy()) {
+            chicken.setSickDays(
+                (chicken.getSickDays() == null
+                        ? 0
+                        : chicken.getSickDays()) + 1
+                );
+
+            // si il est malade il ne peu pas se reproduire
+            if (chicken.getChickenType() == Chicken.ChickenType.L) {
+                chicken.setChickenType(Chicken.ChickenType.H);
+            } else if (chicken.getChickenType() == Chicken.ChickenType.B) {
+                chicken.setChickenType(Chicken.ChickenType.R);
+            }
+
+            if (chicken.getSickDays() >= 4) {
+                chickenRepository.delete(chicken);
+                return 1; // le poulet meurt
+            }
+        } else {
+            chicken.setSickDays(0);
+        }
+
+        return out;
+    }
+
+    private int handleFood(Chicken chicken){
+
+        int our = 0;
+
+        if (chicken.getFedToday() != null && !chicken.getFedToday()) {
+            chicken.setFastingDays(
+                (chicken.getFastingDays() == null
+                        ? 0
+                        : chicken.getFastingDays()) + 1
+                );
+
+            // si il a faim il ne peu pas se reproduire
+            if (chicken.getChickenType() == Chicken.ChickenType.L) {
+                chicken.setChickenType(Chicken.ChickenType.H);
+            } else if (chicken.getChickenType() == Chicken.ChickenType.B) {
+                chicken.setChickenType(Chicken.ChickenType.R);
+            }
+
+            float weightLoss = 0f;
+            if (chicken.getFastingDays() == 1) weightLoss = 0.2f;
+            else if (chicken.getFastingDays() == 2) weightLoss = 0.5f;
+            else if (chicken.getFastingDays() == 3) weightLoss = 1.0f;
+            else if (chicken.getFastingDays() >= 4) {
+                chickenRepository.delete(chicken);
+                return 1; // le poulet meurt
+            }
+            chicken.setWeight(chicken.getWeight() - weightLoss);
+        } else {
+            chicken.setFastingDays(0);
+            float weightGain = 0.5f; // Grains
+            if (
+                chicken.getWateredToday() != null &&
+                chicken.getWateredToday()
+            ) {
+                weightGain += 0.15f; // Eau (seulement si nourri selon la règle "toute seule elle ne fait pas grossir")
+            }
+            chicken.setWeight(chicken.getWeight() + weightGain);
+        }
+
+        return out;
+    }
+
+    private void handleType(Chicken chicken){
+
+        // Retour en élevage si perte de poids
+        if (
+            (chicken.getChickenType() == Chicken.ChickenType.L &&
+            chicken.getWeight() < 2.5f
+        ) {
+            chicken.setChickenType(Chicken.ChickenType.H);
+        }
+
+        if (
+            (chicken.getChickenType() == Chicken.ChickenType.B &&
+            chicken.getWeight() < 2.5f
+        ) {
+            chicken.setChickenType(Chicken.ChickenType.R);
+        }
+
+        // Passage adulte
+        if (
+            chicken.getChickenType() == Chicken.ChickenType.C &&
+            chicken.getAge() == 4
+        ) {
+            if (Math.random() > 0.5) {
+                chicken.setChickenType(Chicken.ChickenType.H);
+            } else {
+                   chicken.setChickenType(Chicken.ChickenType.R);
+            }
+        }
+
+        // Passage reproducteur
+        if (
+            chicken.getChickenType() == Chicken.ChickenType.H &&
+            chicken.getAge() >= 5 &&
+            chicken.getWeight() >= 2.5f
+        ) {
+            chicken.setChickenType(Chicken.ChickenType.L);
+        }
+        if (
+            chicken.getChickenType() == Chicken.ChickenType.R &&
+            chicken.getAge() >= 5 &&
+            chicken.getWeight() >= 2.5f
+        ) {
+            chicken.setChickenType(Chicken.ChickenType.B);
+        }
     }
 
     private void handleEggs(Long userId, long activeRoosters, long activeHens) {
