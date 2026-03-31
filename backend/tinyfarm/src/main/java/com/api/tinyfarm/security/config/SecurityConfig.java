@@ -14,6 +14,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter;
+import org.springframework.security.web.header.writers.ClearSiteDataHeaderWriter.Directive;
 
 @Configuration
 @EnableWebSecurity
@@ -37,14 +40,20 @@ public class SecurityConfig {
                         auth -> auth.requestMatchers("/api/auth").permitAll()
                                 .requestMatchers("/api/public/**").permitAll()
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                                .anyRequest().authenticated()
-                )
+                                .anyRequest().authenticated())
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(info -> info.userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
-                        .failureHandler(oAuth2FailureHandler)
-                )
+                        .failureHandler(oAuth2FailureHandler))
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        HeaderWriterLogoutHandler clearSiteData = new HeaderWriterLogoutHandler(
+                new ClearSiteDataHeaderWriter(Directive.COOKIES));
+        http.logout((logout) -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
+                .deleteCookies("jwt")
+                .addLogoutHandler(clearSiteData)
+                .permitAll());
         return http.build();
     }
 }

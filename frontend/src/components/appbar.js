@@ -11,13 +11,53 @@ class AppBar extends HTMLElement {
         this.setupEventListeners();
     }
 
+    getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(";").shift();
+    }
+
     async fetchUser() {
-        const userId = localStorage.getItem("tinyfarm-user-id");
-        if (userId) {
-            const res = await fetch(this.API_URL + `/users/id/${userId}`);
+        try {
+            const jwt = this.getCookie("jwt");
+
+            if (!jwt) throw new Error();
+
+            const user = await (
+                await fetch(`${this.API_URL}/auth/me`, {
+                    headers: new Headers({
+                        Authorization: "Bearer " + jwt,
+                    }),
+                })
+            ).json();
+
+            const res = await fetch(`${this.API_URL}/users/id/${user.id}`, {
+                headers: new Headers({
+                    Authorization: "Bearer " + jwt,
+                }),
+            });
             return await res.json();
+        } catch {
+            window.location.href = "/";
         }
-        window.location.href = "/";
+    }
+
+    async logout() {
+        const jwt = this.getCookie("jwt");
+
+        let res = await fetch(`${this.API_URL.replace("/api", "")}/logout`, {
+            method: "POST",
+            credentials: "include",
+            redirect: "manual",
+            headers: new Headers({
+                Authorization: "Bearer " + jwt,
+            }),
+        });
+        console.log("Logout response:", res);
+        if (res.ok || res.status === 0) {
+            // Status= 0 when spring redirects to /login?logout
+            window.location.href = "/";
+        }
     }
 
     async render() {
@@ -126,6 +166,11 @@ class AppBar extends HTMLElement {
             border-radius: calc(var(--radius) - 6px);
             color: var(--color-primary);
             text-decoration: none;
+            border: none;
+            cursor: pointer;
+            background-color: transparent;
+            font: inherit;
+            font-size: inherit;
         }
 
         .appbar > .infos-right > #account-menu > *:hover {
@@ -177,42 +222,40 @@ class AppBar extends HTMLElement {
                         <span class="material-symbols-rounded">pause_circle</span>
                         <span>Hiberner</span>
                     </a>
-                    <a href="/">
+                    <button id="logout">
                         <span class="material-symbols-rounded">logout</span>
                         <span>Déconnexion</span>
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>
         `;
         this.shadowRoot.appendChild(template.content.cloneNode(true));
 
-        try {
-            // Fetch user data
-            const user = await this.fetchUser();
-            // this.shadowRoot.querySelector("#rank").textContent =
-            //     `${user.rank.current}/${user.rank.max}`;
-            this.shadowRoot.querySelector("#level").textContent =
-                this.shadowRoot
-                    .querySelector("#level")
-                    .textContent.replace("-", user.level);
-            this.shadowRoot.querySelector("#username").textContent = user.name;
-            this.shadowRoot.querySelector("#money-level").textContent =
-                user.ecus;
-        } catch {
-            window.location.href = "/";
-        } finally {
-            // Set as ready
-            this.shadowRoot.querySelector(".appbar").classList.add("ready");
-        }
+        // Fetch user data
+        const user = await this.fetchUser();
+        // this.shadowRoot.querySelector("#rank").textContent =
+        //     `${user.rank.current}/${user.rank.max}`;
+        this.shadowRoot.querySelector("#level").textContent = this.shadowRoot
+            .querySelector("#level")
+            .textContent.replace("-", user.level);
+        this.shadowRoot.querySelector("#username").textContent = user.name;
+        this.shadowRoot.querySelector("#money-level").textContent = user.ecus;
+        // Set as ready
+        this.shadowRoot.querySelector(".appbar").classList.add("ready");
     }
 
     setupEventListeners() {
         const accountBtn = this.shadowRoot.getElementById("account");
         const accountMenu = this.shadowRoot.getElementById("account-menu");
+        const logoutBtn = this.shadowRoot.getElementById("logout");
 
         accountBtn.addEventListener("click", () => {
             accountMenu.classList.toggle("open");
+        });
+
+        logoutBtn.addEventListener("click", () => {
+            this.logout();
         });
 
         // Close menu if outside click
