@@ -2,18 +2,21 @@ async function initialiserBoutique() {
     const container = document.getElementById("shop-container");
 
     try {
-        const response = await fetch("../../../fakeapi/trade/marketplace.json");
+        const response = await fetch("/api/market");
 
         if (!response.ok) {
             throw new Error(`Erreur HTTP : ${response.status}`);
         }
 
-        inventaire = await response.json();
+        markets = await response.json();
 
         container.innerHTML = "";
         let totalStock = 0;
 
-        for (const [nom, details] of Object.entries(inventaire)) {
+        markets.forEach(market => {
+            const stock = 5; // Valeur arbitraire pour le stock
+            const nom = `Produit ${market.productId}`; // À remplacer par vraie récupération du nom si possible
+            const seller = `Utilisateur ${market.userId}`;
             const productHTML = `
                 <div class="product-row">
                     <div class="prod-info">
@@ -21,12 +24,12 @@ async function initialiserBoutique() {
                             <span class="material-symbols-rounded">
                                 store
                             </span>
-                            ${details.stock}
+                            ${stock}
                         </span>
-                        <span class="prod-name">${nom}</span><span class="seller-name">• ${details.seller}</span>
+                        <span class="prod-name">${nom}</span><span class="seller-name">• ${seller}</span>
                     </div>
                     <div class="prod-action">
-                        <span class="price">$${details.price}</span>
+                        <span class="price">$${market.price}</span>
                         <button class="btn-add" onclick="ajouterAuPanier('${nom.replace(/'/g, "\\'")}')">Ajouter</button>
                     </div>
                 </div>
@@ -34,8 +37,8 @@ async function initialiserBoutique() {
 
             container.insertAdjacentHTML("beforeend", productHTML);
 
-            totalStock += details.stock;
-        }
+            totalStock += stock;
+        });
         document.querySelector(".stock-info").innerHTML += totalStock;
     } catch (erreur) {
         console.error("Impossible de charger l'inventaire :", erreur);
@@ -46,7 +49,7 @@ async function initialiserBoutique() {
 document.addEventListener("DOMContentLoaded", initialiserBoutique);
 
 // Partie panier
-let inventaire = {};
+let markets = [];
 const panier = {};
 
 function displayPanier() {
@@ -54,11 +57,10 @@ function displayPanier() {
     let total = 0;
 
     for (const [nom, quantite] of Object.entries(panier)) {
-        // Supposons qu'on ait un tableau des produits avec leurs prix
-        // Cela devrait être remplacé par la vraie logique de récupération des prix
-        const produit = inventaire[nom];
-        if (produit) {
-            total += produit.price * quantite;
+        const productId = nom.split(" ")[1]; // Extraire productId de "Produit X"
+        const market = markets.find(m => m.productId == productId);
+        if (market) {
+            total += market.price * quantite;
         }
     }
 
@@ -98,7 +100,8 @@ function displayPanier() {
 displayPanier();
 
 function ajouterAuPanier(nomProduit) {
-    if (panier[nomProduit] == inventaire[nomProduit].stock) {
+    const stock = 5; // Valeur arbitraire
+    if (panier[nomProduit] == stock) {
         alert("Limite de stock atteinte pour ce produit.");
         return;
     }
