@@ -49,8 +49,8 @@ public class MarketService {
         return marketRepository.findAll();
     }
 
-    public Market update(Long id, Market modifiedMarket) {
-        Market existing = findByUserId(id);
+    public Market update(Long uid, Market modifiedMarket) {
+        Market existing = findByUserId(uid);
         existing.setUserId(modifiedMarket.getUserId());
         existing.setProductId(modifiedMarket.getProductId());
         existing.setPrice(modifiedMarket.getPrice());
@@ -82,6 +82,8 @@ public class MarketService {
         if (market.getUserId() == null || market.getProductId() == null) {
             return;
         }
-        market.setMarketId(new MarketID(market.getUserId(), market.getProductId()));
+        market.setMarketId(
+            new MarketID(market.getUserId(), market.getProductId())
+        );
     }
 }

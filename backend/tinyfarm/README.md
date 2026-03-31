@@ -102,3 +102,20 @@ Authorization - Bearer - and paste the token that was copied
     * mettre a jour un produit par identifiant       Put("/id/{id}")
     
     * retirer un produit par identifiant             Delete("/id/{id}")
+
+
+### Market ("api/market")
+
+
+  * récupérer un market par UserId                   Get("/id/{id}")
+  * récupérer un market par ProductId                Get("/product/{productId}")
+  * récupérer un market par price                    Get("/price/{price}")
+
+  * ajouter un market                                Post("")
+    
+  
+  * mettre a jour un market par UserId               Put("/id/{id}")
+  
+  
+  * retirer un market par UserId et ProductId        Delete("/{userId}/{productId}")
+  * retirer un market par UserId                     Delete("/id/{uid}")

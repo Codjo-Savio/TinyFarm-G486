@@ -17,7 +17,7 @@ public class MarketController {
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<Market> getById(@PathVariable Long id) {
+    public ResponseEntity<Market> getByUserId(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(marketService.findByUserId(id));
         } catch (Exception e) {
@@ -47,21 +47,21 @@ public class MarketController {
     public ResponseEntity<Market> create(@RequestBody Market market) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(
-                    marketService.create(market)
+                marketService.create(market)
             );
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (Exception e) {
             return ResponseEntity.status(
-                    HttpStatus.INTERNAL_SERVER_ERROR
+                HttpStatus.INTERNAL_SERVER_ERROR
             ).build();
         }
     }
 
     @PutMapping("/id/{id}")
     public ResponseEntity<Market> update(
-            @PathVariable Long id,
-            @RequestBody Market market
+        @PathVariable Long id,
+        @RequestBody Market market
     ) {
         try {
             return ResponseEntity.ok(marketService.update(id, market));
@@ -72,8 +72,8 @@ public class MarketController {
 
     @DeleteMapping("/{userId}/{productId}")
     public ResponseEntity<Void> deleteProductById(
-            @PathVariable Long userId,
-            @PathVariable Long productId
+        @PathVariable Long userId,
+        @PathVariable Long productId
     ) {
         try {
             marketService.deleteProductById(userId, productId);
@@ -92,5 +92,4 @@ public class MarketController {
             return ResponseEntity.notFound().build();
         }
     }
-
 }
