@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
 
     @GetMapping("/me")
-    public ResponseEntity<User> getUser(@AuthenticationPrincipal User user){
+    public ResponseEntity<User> getUser(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(user);
     }
 }
