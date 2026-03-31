@@ -18,6 +18,11 @@
 and test http://localhost:8080/api/auth/me (or any protected route) with
 Authorization - Bearer - and paste the token that was copied
 
+
+In src/main/resources you have application.properties.example and application-test.properties.example
+
+Before runing the tests and the mvn app, create two files nammed application.properties and application-test.properties
+in which you will copy and paste the content of the two exemple (respectively) by filling the empty spaces with your own secrets
 # END POINT
 ### Animal ("/api/animals")
     * récupérer tous les animaux                     Get("")
