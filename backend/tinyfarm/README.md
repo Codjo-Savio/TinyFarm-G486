@@ -18,6 +18,11 @@
 and test http://localhost:8080/api/auth/me (or any protected route) with
 Authorization - Bearer - and paste the token that was copied
 
+
+In src/main/resources you have application.properties.example and application-test.properties.example
+
+Before runing the tests and the mvn app, create two files nammed application.properties and application-test.properties
+in which you will copy and paste the content of the two exemple (respectively) by filling the empty spaces with your own secrets
 # END POINT
 ### Animal ("/api/animals")
     * récupérer tous les animaux                     Get("")
@@ -102,3 +107,20 @@ Authorization - Bearer - and paste the token that was copied
     * mettre a jour un produit par identifiant       Put("/id/{id}")
     
     * retirer un produit par identifiant             Delete("/id/{id}")
+
+
+### Market ("api/market")
+
+
+  * récupérer un market par UserId                   Get("/id/{id}")
+  * récupérer un market par ProductId                Get("/product/{productId}")
+  * récupérer un market par price                    Get("/price/{price}")
+
+  * ajouter un market                                Post("")
+    
+  
+  * mettre a jour un market par UserId               Put("/id/{id}")
+  
+  
+  * retirer un market par UserId et ProductId        Delete("/{userId}/{productId}")
+  * retirer un market par UserId                     Delete("/id/{uid}")
