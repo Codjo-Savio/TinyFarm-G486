@@ -1,15 +1,31 @@
+API_URL = "http://localhost:8080/api";
+
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+}
+
 async function initializeMeadow() {
     const container = document.getElementById("game-grid");
 
     try {
-        const response = await fetch("/api/cows");
+        const jwt = getCookie("jwt");
+
+        if (!jwt) throw new Error();
+
+        const response = await fetch(`${API_URL}/cows`, {
+            headers: new Headers({
+                Authorization: "Bearer " + jwt,
+            }),
+        });
         // const response = await fetch("../../../fakeapi//meadow.json");
 
         if (!response.ok) {
             throw new Error(`Erreur HTTP : ${response.status}`);
         }
 
-        meadow = await response.json();
+        const meadow = await response.json();
 
         container.innerHTML = "";
         let healthyCount = 0;
