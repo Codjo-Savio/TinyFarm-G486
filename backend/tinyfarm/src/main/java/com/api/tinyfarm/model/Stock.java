@@ -44,3 +44,4 @@ public class Stock {
             collectible = false;
         }
     }
+}
