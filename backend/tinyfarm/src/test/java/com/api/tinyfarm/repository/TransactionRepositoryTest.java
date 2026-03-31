@@ -29,7 +29,6 @@ public class TransactionRepositoryTest {
     @Test
     void shouldSaveTransaction() {
         Transaction transaction = new Transaction();
-        transaction.setId(1L);
         transaction.setSeller(1L);
         transaction.setBuyer(2L);
         transaction.setProduct(61L);
@@ -49,24 +48,24 @@ public class TransactionRepositoryTest {
     @Test
     void shouldFindByTransactionId() {
         Transaction transaction = new Transaction();
-        transaction.setId(2L);
         transaction.setSeller(4L);
         transaction.setBuyer(9L);
         transaction.setProduct(61L);
         transaction.setQuantity(10);
         transaction.setTotalPrice(150.0F);
 
-        transactionRepository.save(transaction);
-        Optional<Transaction> found = transactionRepository.findById(2L);
+        Transaction saved = transactionRepository.save(transaction);
+        Optional<Transaction> found = transactionRepository.findById(
+            saved.getId()
+        );
 
         assertTrue(found.isPresent());
-        assertEquals(2L, found.get().getId());
+        assertEquals(saved.getId(), found.get().getId());
     }
 
     @Test
-    void shouldFindByBuyerId() {
+    void shouldFindByBuyer() {
         Transaction transaction = new Transaction();
-        transaction.setId(2L);
         transaction.setSeller(4L);
         transaction.setBuyer(9L);
         transaction.setProduct(61L);
@@ -74,16 +73,15 @@ public class TransactionRepositoryTest {
         transaction.setTotalPrice(150.0F);
 
         transactionRepository.save(transaction);
-        Optional<Transaction> found = transactionRepository.findByBuyerId(9L);
+        Optional<Transaction> found = transactionRepository.findByBuyer(9L);
 
         assertTrue(found.isPresent());
         assertEquals(9L, found.get().getBuyer());
     }
 
     @Test
-    void shouldFindBySellerId() {
+    void shouldFindBySeller() {
         Transaction transaction = new Transaction();
-        transaction.setId(2L);
         transaction.setSeller(4L);
         transaction.setBuyer(9L);
         transaction.setProduct(61L);
@@ -91,7 +89,7 @@ public class TransactionRepositoryTest {
         transaction.setTotalPrice(150.0F);
 
         transactionRepository.save(transaction);
-        Optional<Transaction> found = transactionRepository.findBySellerId(4L);
+        Optional<Transaction> found = transactionRepository.findBySeller(4L);
 
         assertTrue(found.isPresent());
         assertEquals(4L, found.get().getSeller());
@@ -100,7 +98,6 @@ public class TransactionRepositoryTest {
     @Test
     void shouldFindByProduct() {
         Transaction transaction = new Transaction();
-        transaction.setId(2L);
         transaction.setSeller(4L);
         transaction.setBuyer(9L);
         transaction.setProduct(61L);
@@ -117,17 +114,18 @@ public class TransactionRepositoryTest {
     @Test
     void shouldDeleteById() {
         Transaction transaction = new Transaction();
-        transaction.setId(2L);
         transaction.setSeller(4L);
         transaction.setBuyer(9L);
         transaction.setProduct(61L);
         transaction.setQuantity(10);
         transaction.setTotalPrice(150.0F);
 
-        transactionRepository.save(transaction);
-        transactionRepository.deleteById(2L);
+        Transaction saved = transactionRepository.save(transaction);
+        transactionRepository.deleteById(saved.getId());
 
-        Optional<Transaction> found = transactionRepository.findById(2L);
+        Optional<Transaction> found = transactionRepository.findById(
+            saved.getId()
+        );
 
         assertTrue(found.isEmpty());
     }
@@ -135,27 +133,24 @@ public class TransactionRepositoryTest {
     @Test
     void shouldFindAllTransaction() {
         Transaction firstT = new Transaction();
-        firstT.setId(2L);
         firstT.setSeller(4L);
         firstT.setBuyer(9L);
         firstT.setProduct(61L);
         firstT.setQuantity(10);
         firstT.setTotalPrice(150.0F);
 
-        transactionRepository.save(firstT);
-
         Transaction secondT = new Transaction();
-        secondT.setId(6L);
         secondT.setSeller(10L);
         secondT.setBuyer(22L);
         secondT.setProduct(12L);
         secondT.setQuantity(20);
         secondT.setTotalPrice(250.0F);
 
+        transactionRepository.save(firstT);
         transactionRepository.save(secondT);
 
-        List<Transaction> found = transactionRepository.findAll();
+        List<Transaction> founds = transactionRepository.findAll();
 
-        assertEquals(2, found.size());
+        assertEquals(2, founds.size());
     }
 }

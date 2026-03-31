@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "`transaction`")
+@Table(name = "transaction")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,25 +17,25 @@ public class Transaction {
     @Id
     @Column(name = "tid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
-    @JoinColumn(name = "seller")
-    Long seller;
+    @Column(name = "seller")
+    private Long seller;
 
-    @JoinColumn(name = "buyer")
-    Long buyer;
+    @Column(name = "buyer")
+    private Long buyer;
 
-    @JoinColumn(name = "product")
-    Long product;
+    @Column(name = "product")
+    private Long product;
 
     @Column(name = "quantity")
-    Integer quantity;
+    private Integer quantity;
 
     @Column(name = "totalPrice")
-    float totalPrice;
+    private float totalPrice;
 
     @Column(name = "transactionDate")
-    LocalDateTime transactionDate;
+    private LocalDateTime transactionDate;
 
     @PrePersist
     public void prePersist() {
