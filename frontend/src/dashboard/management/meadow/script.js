@@ -2,8 +2,8 @@ async function initializeMeadow() {
     const container = document.getElementById("game-grid");
 
     try {
-        // const response = await fetch("/api/cows");
-        const response = await fetch("../../../fakeapi//meadow.json");
+        const response = await fetch("/api/cows");
+        // const response = await fetch("../../../fakeapi//meadow.json");
 
         if (!response.ok) {
             throw new Error(`Erreur HTTP : ${response.status}`);
