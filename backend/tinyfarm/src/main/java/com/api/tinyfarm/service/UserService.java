@@ -22,12 +22,33 @@ public class UserService {
         userRepository.deleteAll();
     }
 
+    public User findOrCreateOAuthUser(String email, String name, User.Gender gender) {
+        return userRepository.findByEmail(email)
+                .map(existing -> {
+                    existing.setName(name);
+                    existing.setGender(gender);
+                    return userRepository.save(existing);
+                })
+                .orElseGet(() -> userRepository.save(
+                        User.builder()
+                                .email(email)
+                                .name(name)
+                                .gender(gender)
+                                .build()
+                ));
+    }
+
     public User findById(Long id) {
         return userRepository
             .findById(id)
             .orElseThrow(() ->
-                new RuntimeException("Utilisateur introuvale : " + id)
+                new RuntimeException("Utilisateur introuvable : " + id)
             );
+    }
+
+    public User getByEmail(String email){
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé : " + email));
     }
 
     public User create(User user) {
@@ -65,7 +86,7 @@ public class UserService {
 
     public boolean canBuy(Long id, Integer purchaseNumberForToday) {
         User user = findById(id);
-        int maxPurchase = user.getLevel() * 12; // niveau 1 = 12 achats  par jour
+        int maxPurchase = user.getLevel() * 12; // niveau 1 = 12 achats par jour
         return purchaseNumberForToday < maxPurchase;
     }
 }
