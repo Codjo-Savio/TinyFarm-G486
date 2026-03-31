@@ -23,11 +23,10 @@ import java.time.Instant;
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final JwtEncoder jwtEncoder;
 
-
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
-                                       HttpServletResponse response,
-                                       Authentication authentication) throws IOException {
+            HttpServletResponse response,
+            Authentication authentication) throws IOException {
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         User user = oAuth2User.getUser();
         Instant now = Instant.now();
@@ -42,12 +41,11 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         Jwt token = jwtEncoder.encode(JwtEncoderParameters.from(
                 JwsHeader.with(MacAlgorithm.HS256).build(),
-                claims
-        ));
+                claims));
         String jwtValue = token.getTokenValue();
 
         Cookie cookie = new Cookie("jwt", jwtValue);
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false);
         cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(3600);
