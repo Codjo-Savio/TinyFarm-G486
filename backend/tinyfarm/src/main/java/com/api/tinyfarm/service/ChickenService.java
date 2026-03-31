@@ -249,7 +249,7 @@ public class ChickenService {
 
     private int handleFood(Chicken chicken){
 
-        int our = 0;
+        int out = 0;
 
         if (chicken.getFedToday() != null && !chicken.getFedToday()) {
             chicken.setFastingDays(
@@ -293,14 +293,14 @@ public class ChickenService {
 
         // Retour en élevage si perte de poids
         if (
-            (chicken.getChickenType() == Chicken.ChickenType.L &&
+            chicken.getChickenType() == Chicken.ChickenType.L &&
             chicken.getWeight() < 2.5f
         ) {
             chicken.setChickenType(Chicken.ChickenType.H);
         }
 
         if (
-            (chicken.getChickenType() == Chicken.ChickenType.B &&
+            chicken.getChickenType() == Chicken.ChickenType.B &&
             chicken.getWeight() < 2.5f
         ) {
             chicken.setChickenType(Chicken.ChickenType.R);
