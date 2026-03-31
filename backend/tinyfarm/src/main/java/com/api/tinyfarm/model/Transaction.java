@@ -1,8 +1,8 @@
 package com.api.tinyfarm.model;
 
-import javax.annotation.processing.Generated;
-
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Transaction {
-
 
     @Id
     @Column(name = "tid")
@@ -35,6 +34,8 @@ public class Transaction {
     @Column(name = "totalPrice")
     float totalPrice;
 
+    @Column(name = "transactionDate")
+    LocalDateTime transactionDate;
 
     @PrePersist
     public void prePersist() {
