@@ -234,17 +234,31 @@ public class ChickenService {
             // Passage adulte
             if (
                 chicken.getChickenType() == Chicken.ChickenType.C &&
-                chicken.getAge() >= 5 &&
-                chicken.getWeight() >= 2.5f
+                chicken.getAge() == 4
             ) {
                 if (Math.random() > 0.5) {
                     chicken.setChickenType(Chicken.ChickenType.H);
-                    chicken.setGender(Animal.AnimalGender.F);
                 } else {
                     chicken.setChickenType(Chicken.ChickenType.R);
-                    chicken.setGender(Animal.AnimalGender.M);
                 }
             }
+
+            // Passage reproducteur
+            if (
+                chicken.getChickenType() == Chicken.ChickenType.H &&
+                chicken.getAge() >= 5 &&
+                chicken.getWeight() >= 2.5f
+            ) {
+                chicken.setChickenType(Chicken.ChickenType.L);
+            }
+            if (
+                chicken.getChickenType() == Chicken.ChickenType.R &&
+                chicken.getAge() >= 5 &&
+                chicken.getWeight() >= 2.5f
+            ) {
+                chicken.setChickenType(Chicken.ChickenType.B);
+            }
+            
 
             // Comptage pour la ponte (doit être adulte, propre, sain, et nourri)
             if (
