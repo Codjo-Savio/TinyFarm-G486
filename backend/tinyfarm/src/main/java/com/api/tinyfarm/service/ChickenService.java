@@ -314,7 +314,7 @@ public class ChickenService {
             if (Math.random() > 0.5) {
                 chicken.setChickenType(Chicken.ChickenType.H);
             } else {
-                   chicken.setChickenType(Chicken.ChickenType.R);
+               chicken.setChickenType(Chicken.ChickenType.R);
             }
         }
 
