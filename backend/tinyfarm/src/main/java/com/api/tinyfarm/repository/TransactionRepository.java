@@ -7,11 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TransactionRepository extends JpaRepository<Transaction, Long>{
+public interface TransactionRepository
+    extends JpaRepository<Transaction, Long>
+{
     Optional<Transaction> findById(Long id);
     Optional<Transaction> findByBuyerId(Long buyer);
     Optional<Transaction> findBySellerId(Long seller);
-    Optional<List<Transaction>> findByProduct(Long product);
+    Optional<Transaction> findByProduct(Long product);
     void deleteAll();
     void deleteById(Long id);
 }
