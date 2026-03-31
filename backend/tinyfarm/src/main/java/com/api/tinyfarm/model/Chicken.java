@@ -21,7 +21,7 @@ public class Chicken extends Animal {
         L("Laying hen"),
         B("Breeding rooster");
 
-        String wording;
+        private final String wording;
 
         ChickenType(String wording) {
             this.wording = wording;

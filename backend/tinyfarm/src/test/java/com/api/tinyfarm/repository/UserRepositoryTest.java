@@ -29,6 +29,7 @@ public class UserRepositoryTest {
         // ARRANGE
         User user = new User();
         user.setName("Marcel");
+        user.setEmail("usertest@gmail.com");
         user.setGender(User.Gender.M);
         user.setEcus(1500);
         user.setLevel(1);
@@ -63,10 +64,12 @@ public class UserRepositoryTest {
         // ARRANGE
         User u1 = new User();
         u1.setName("Marcel");
+        u1.setEmail("usertest@gmail.com");
         u1.setGender(User.Gender.M);
 
         User u2 = new User();
         u2.setName("Huguette");
+        u2.setEmail("usertest2@gmail.com");
         u2.setGender(User.Gender.F);
 
         userRepository.save(u1);

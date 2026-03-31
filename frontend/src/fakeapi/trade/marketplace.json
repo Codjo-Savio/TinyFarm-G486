@@ -1,0 +1,52 @@
+{
+  "Seau d'eau": {
+    "stock": 10,
+    "price": 100,
+    "seller": "Micheline"
+  },
+  "Pelle en fer": {
+    "stock": 5,
+    "price": 250,
+    "seller": "Micheline"
+  },
+  "Sac de terreau (50L)": {
+    "stock": 25,
+    "price": 45,
+    "seller": "Micheline"
+  },
+  "Graines de tournesol (x50)": {
+    "stock": 100,
+    "price": 20,
+    "seller": "Micheline"
+  },
+  "Bottes en caoutchouc": {
+    "stock": 8,
+    "price": 150,
+    "seller": "Micheline"
+  },
+  "Fourche de curage": {
+    "stock": 4,
+    "price": 180,
+    "seller": "Micheline"
+  },
+  "Ballot de paille": {
+    "stock": 40,
+    "price": 15,
+    "seller": "Micheline"
+  },
+  "Pierre à lécher (sel)": {
+    "stock": 12,
+    "price": 35,
+    "seller": "Micheline"
+  },
+  "Lanterne à huile": {
+    "stock": 6,
+    "price": 75,
+    "seller": "Micheline"
+  },
+  "Clôture électrique (rouleau 50m)": {
+    "stock": 15,
+    "price": 450,
+    "seller": "Micheline"
+  }
+}

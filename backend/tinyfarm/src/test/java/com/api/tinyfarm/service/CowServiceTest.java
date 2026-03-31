@@ -1,15 +1,11 @@
 package com.api.tinyfarm.service;
 
-import com.api.tinyfarm.config.TestSecurityConfig;
-import com.api.tinyfarm.model.Animal;
 import com.api.tinyfarm.model.Cow;
-import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(TestSecurityConfig.class)
 public class CowServiceTest {
 
     @Autowired

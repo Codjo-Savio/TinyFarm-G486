@@ -1,0 +1,42 @@
+{
+  "Seau d'eau": {
+    "stock": 10,
+    "price": 100
+  },
+  "Pelle en fer": {
+    "stock": 5,
+    "price": 250
+  },
+  "Sac de terreau (50L)": {
+    "stock": 25,
+    "price": 45
+  },
+  "Graines de tournesol (x50)": {
+    "stock": 100,
+    "price": 20
+  },
+  "Bottes en caoutchouc": {
+    "stock": 8,
+    "price": 150
+  },
+  "Fourche de curage": {
+    "stock": 4,
+    "price": 180
+  },
+  "Ballot de paille": {
+    "stock": 40,
+    "price": 15
+  },
+  "Pierre à lécher (sel)": {
+    "stock": 12,
+    "price": 35
+  },
+  "Lanterne à huile": {
+    "stock": 6,
+    "price": 75
+  },
+  "Clôture électrique (rouleau 50m)": {
+    "stock": 15,
+    "price": 450
+  }
+}
