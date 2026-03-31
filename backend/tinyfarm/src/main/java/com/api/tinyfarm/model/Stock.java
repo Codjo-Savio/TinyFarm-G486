@@ -44,32 +44,3 @@ public class Stock {
             collectible = false;
         }
     }
-
-    @Embeddable
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class StockId implements Serializable {
-
-        @Column(name = "uid")
-        private Long uid;
-
-        @Column(name = "productID")
-        private Long productID;
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null || getClass() != o.getClass())
-                return false;
-            StockId stockId = (StockId) o;
-            return Objects.equals(uid, stockId.uid) && Objects.equals(productID, stockId.productID);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(uid, productID);
-        }
-    }
-}
