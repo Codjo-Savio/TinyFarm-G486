@@ -162,7 +162,7 @@ class BottomActions extends HTMLElement {
 				<span class="material-symbols-rounded">
 					schedule
 				</span>
-				<span><b class="current">- AoE</b> • Fin du jour : <b class="remaining">${this.getAttribute("day-end") || "13 min"}</b></span>
+				<span><b class="current">- AoE</b> • Fin du jour : <b class="remaining">-</b></span>
 			</div>
 		</div>
 		`;
@@ -182,13 +182,19 @@ class BottomActions extends HTMLElement {
 
             // Fetch time data
             const time = await this.fetchTime();
-            const displayTime = new Date(time.aoeTs).toLocaleTimeString();
             this.shadowRoot.querySelector("#time .current").textContent =
                 this.shadowRoot
                     .querySelector("#time .current")
                     .textContent.replace(
                         "-",
-                        displayTime.substring(0, displayTime.length - 3),
+                        `${time.aoe.min}:${time.aoe.sec}`,
+                    );
+            this.shadowRoot.querySelector("#time .remaining").textContent =
+                this.shadowRoot
+                    .querySelector("#time .remaining")
+                    .textContent.replace(
+                        "-",
+                        `${23 - time.aoe.min}h${60 - time.aoe.sec}min`,
                     );
         } finally {
             // Set as ready

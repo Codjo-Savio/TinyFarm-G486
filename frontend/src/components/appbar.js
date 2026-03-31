@@ -37,6 +37,7 @@ class AppBar extends HTMLElement {
             direction: ltr;
             -webkit-font-feature-settings: "liga";
             -webkit-font-smoothing: antialiased;
+            font-variation-settings: var(--font-var-icon);
         }
 
         .appbar {

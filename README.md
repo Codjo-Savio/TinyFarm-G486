@@ -4,17 +4,33 @@ This is the repository of the group 486 for the TinyFarm game project
 
 ## Launch the server
 
----
+### Start the backend
 
 ```
-python3 -m http.server 8080 --directory screens/
+cd backend/tinyfarm
+
+# With tests
+mvn clean clean-install
+# Without tests
+mvn clean compile
+
+mvn spring-boot:run
+```
+
+### Start the frontend
+
+```
+cd frontend
+npm i
+npm run start
 ```
 
 ## Frameworks
 
-Here is the frameworks used in the project
-[Spring Boot](https://spring.io/projects/spring-boot)
-[Maven](https://maven.apache.org/)
+Here is the frameworks used in the project :
+
+- [Spring Boot](https://spring.io/projects/spring-boot)
+- [Maven](https://maven.apache.org/)
 
 ## Design
 
