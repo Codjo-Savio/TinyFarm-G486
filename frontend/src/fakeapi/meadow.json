@@ -1,65 +1,72 @@
-{
-    "milk": 10,
-    "cows": [
-        {
-            "name": "Marguerite",
-            "healthy": false,
-            "clean": false,
-            "type": "Calf",
-            "weight": 170.0,
-            "hunger": 0,
-            "thirst": 1,
-            "age": 1
-        },
-        {
-            "name": "Belle",
-            "healthy": true,
-            "clean": true,
-            "type": "Beef",
-            "weight": 536.0,
-            "hunger": 0,
-            "thirst": 0,
-            "age": 2
-        },
-        {
-            "name": "Clara",
-            "healthy": false,
-            "clean": true,
-            "type": "Dairy",
-            "weight": 625.0,
-            "hunger": 0,
-            "thirst": 1,
-            "age": 3
-        },
-        {
-            "name": "Daisy",
-            "healthy": true,
-            "clean": false,
-            "type": "Dairy",
-            "weight": 625.0,
-            "hunger": 1,
-            "thirst": 0,
-            "age": 4
-        },
-        {
-            "name": "Rosie",
-            "healthy": true,
-            "clean": true,
-            "type": "Beef",
-            "weight": 750.0,
-            "hunger": 1,
-            "thirst": 1,
-            "age": 4
-        },
-        {
-            "name": "Bessie",
-            "healthy": true,
-            "clean": true,
-            "type": "Dairy",
-            "weight": 645.0,
-            "hunger": 0,
-            "thirst": 0,
-            "age": 5
-        }
-    ]
-}
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "clean": true,
+    "healthy": true,
+    "age": 1,
+    "weight": 50,
+    "fedToday": false,
+    "wateredToday": false,
+    "gender": "F",
+    "name": "Eglantine",
+    "cowType": "Dairy",
+    "milking": false
+  },
+    {
+        "id": 2,
+        "userId": 1,
+        "clean": true,
+        "healthy": true,
+        "age": 2,
+        "weight": 60,
+        "fedToday": false,
+        "wateredToday": false,
+        "gender": "F",
+        "name": "Marguerite",
+        "cowType": "Dairy",
+        "milking": false
+    },
+    {
+        "id": 3,
+        "userId": 1,
+        "clean": true,
+        "healthy": true,
+        "age": 3,
+        "weight": 70,
+        "fedToday": false,
+        "wateredToday": false,
+        "gender": "F",
+        "name": "Violette",
+        "cowType": "Calf",
+        "milking": false
+    },
+    {
+        "id": 4,
+        "userId": 1,
+        "clean": true,
+        "healthy": true,
+        "age": 4,
+        "weight": 80,
+        "fedToday": false,
+        "wateredToday": false,
+        "gender": "M",
+        "name": "Boris",
+        "cowType": "Beef",
+        "milking": false
+    },
+    {
+        "id": 5,
+        "userId": 1,
+        "clean": true,
+        "healthy": true,
+        "age": 5,
+        "weight": 90,
+        "fedToday": false,
+        "wateredToday": false,
+        "gender": "M",
+        "name": "Gustave",
+        "cowType": "Beef",
+        "milking": false
+    }
+]
