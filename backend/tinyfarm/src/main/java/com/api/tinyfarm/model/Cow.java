@@ -31,6 +31,7 @@ public class Cow extends Animal {
         }
     }
 
+    @MapsId
     @Column(name = "aid")
     private Long id;
 
@@ -45,7 +46,9 @@ public class Cow extends Animal {
     private Boolean milking;
 
     @PrePersist
+    @Override
     public void prePersist() {
+        super.prePersist();
         this.milking = false;
     }
 }
