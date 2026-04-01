@@ -3,6 +3,7 @@ package com.api.tinyfarm.security.jwt;
 import com.api.tinyfarm.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -29,14 +30,30 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtDecoder jwtDecoder;
     private final UserService userService;
 
+    private String extractToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
-            String header = request.getHeader("Authorization");
-            if (header != null && header.startsWith("Bearer ") &&
+
+            String token = extractToken(request);
+            if (token != null &&
                     SecurityContextHolder.getContext().getAuthentication() == null) {
-                String token = header.substring(7);
                 Jwt decoded = jwtDecoder.decode(token);
                 Long userId = Long.valueOf(decoded.getSubject());
                 var userDetails = userService.findById(userId);

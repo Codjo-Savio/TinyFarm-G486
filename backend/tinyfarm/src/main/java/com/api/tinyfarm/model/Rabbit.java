@@ -19,10 +19,20 @@ public class Rabbit extends Animal {
         lapin,
     }
 
+    @MapsId
+    @Column(name = "aid")
+    private Long id;
+
     @Column(name = "name", length = 50)
     private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "rabbitType")
     private RabbitTypeEnum rabbitType;
+
+    @PrePersist
+    @Override
+    public void prePersist(){
+        super.prePersist();
+    }
 }

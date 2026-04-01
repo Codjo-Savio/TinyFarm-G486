@@ -57,4 +57,26 @@ public class Animal {
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")
     private AnimalGender gender;
+
+    @PrePersist
+    public void prePersist(){
+        if (clean == null) {
+            clean = true;
+        }
+        if (healthy == null) {
+            healthy = true;
+        }
+        if (age == null) {
+            age = 0;
+        }
+        if (weight == null) {
+            weight = 1f;
+        }
+        if (fedToday == null) {
+            fedToday = true;
+        }
+        if (wateredToday == null) {
+            wateredToday = true;
+        }
+    }
 }
