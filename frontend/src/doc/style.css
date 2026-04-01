@@ -22,22 +22,7 @@ body {
 }
 
 .back-btn {
-    background-color: var(--color-secondary);
-    padding: 10px 20px;
-    border-radius: 10px;
-    text-decoration: none;
-    color: var(--color-primary);
-    font-weight: bold;
-    display: inline-flex;
-    gap: 10px;
     margin-bottom: 20px;
-    border: none;
-    cursor: pointer;
-}
-
-.back-btn:hover {
-    background-color: var(--color-primary);
-    color: var(--color-surface);
 }
 
 h1 {

@@ -1,6 +1,7 @@
 /* Enum types for animal subtypes */
 CREATE TYPE chickenTypeEnum AS ENUM ('poussin', 'poule', 'coq', 'pondeuse', 'reproducteur');
 CREATE TYPE rabbitTypeEnum AS ENUM ('lapereau', 'lapin');
+CREATE TYPE cowTypeEnum AS ENUM ('Boeuf', 'vache', 'veau');
 CREATE TYPE genderEnum AS ENUM ('M', 'F');
 
 
@@ -8,6 +9,7 @@ CREATE TABLE IF NOT EXISTS "user"
 (
     uid INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR(20),
+    email VARCHAR(100),
     gender genderEnum,
     ecus INTEGER,
     hibernation BOOLEAN DEFAULT FALSE,
@@ -91,7 +93,9 @@ CREATE TABLE IF NOT EXISTS cow
     aid INTEGER PRIMARY KEY REFERENCES animal(aid)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    name VARCHAR(50)
+    name VARCHAR(50),
+    cowType cowTypeEnum,
+    milking BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS event

@@ -36,6 +36,7 @@ public class RabbitServiceTest {
     void shouldFeedRabbitAndSurvive() {
         com.api.tinyfarm.model.User user = new com.api.tinyfarm.model.User();
         user.setName("Farmer");
+        user.setEmail("usertest@gmail.com");
         user.setEcus(100);
         user = userRepository.save(user);
 
@@ -62,6 +63,7 @@ public class RabbitServiceTest {
     void shouldStarveRabbitAndDie() {
         com.api.tinyfarm.model.User user = new com.api.tinyfarm.model.User();
         user.setName("Farmer");
+        user.setEmail("usertest@gmail.com");
         user.setEcus(100);
         user = userRepository.save(user);
 
@@ -86,6 +88,7 @@ public class RabbitServiceTest {
     void shouldWaterCleanAndHealRabbit() {
         com.api.tinyfarm.model.User user = new com.api.tinyfarm.model.User();
         user.setName("Farmer");
+        user.setEmail("usertest@gmail.com");
         user.setEcus(100);
         user = userRepository.save(user);
 
@@ -115,6 +118,7 @@ public class RabbitServiceTest {
     void shouldReproduceRabbits() {
         com.api.tinyfarm.model.User user = new com.api.tinyfarm.model.User();
         user.setName("Farmer");
+        user.setEmail("usertest@gmail.com");
         user.setEcus(100);
         user = userRepository.save(user);
 

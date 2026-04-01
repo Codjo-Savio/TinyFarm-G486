@@ -1,6 +1,5 @@
 package com.api.tinyfarm.controller;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public class ChickenControllerTest {
+public class ChickenControllerTest extends AuthenticatedControllerTestSupport {
 
     @Autowired
     MockMvc mockMvc;
@@ -29,11 +28,13 @@ public class ChickenControllerTest {
                         "id" : 1,
                          "chickenType" : "H",
                          "name" : "Hermine",
-                         "fastingDays" : 0
+                         "fastingDays" : 0,
+                         "sickDays" : 0
                     }
             """;
         mockMvc.perform(
             post("/api/chickens")
+                .with(authenticated())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(json)
         );
@@ -47,12 +48,14 @@ public class ChickenControllerTest {
                         "id" : 2,
                          "chickenType" : "H",
                          "name" : "Clochette",
-                         "fastingDays" : 0
+                         "fastingDays" : 0,
+                          "sickDays" : 0
                     }
             """;
         mockMvc
             .perform(
                 post("/api/chickens")
+                    .with(authenticated())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(json)
             )
@@ -62,36 +65,28 @@ public class ChickenControllerTest {
     // tests of the GET
     @Test
     void shouldReturnAllChickens() throws Exception {
-        mockMvc.perform(get("/api/chickens")).andExpect(status().isOk());
+        mockMvc.perform(get("/api/chickens").with(authenticated())).andExpect(status().isOk());
     }
 
     @Test
     void shouldReturnChickenByName() throws Exception {
         mockMvc
-            .perform(get("/api/chickens/name/Hermine"))
+            .perform(get("/api/chickens/name/Hermine").with(authenticated()))
             .andExpect(status().isOk());
     }
 
     @Test
     void chickenShouldNotBeFoundByName() throws Exception {
         mockMvc
-            .perform(get("/api/chickens/name/unknown"))
+            .perform(get("/api/chickens/name/unknown").with(authenticated()))
             .andExpect(status().isNotFound());
     }
 
     // test of the DELETE
     @Test
     void shouldDeleteChickenByName() throws Exception {
-        String json = """
-                    {
-                        "id" : 4,
-                         "chickenType" : "H",
-                         "name" : "Clémentine",
-                         "fastingDays" : 0
-                    }
-            """;
         mockMvc
-            .perform(delete("/api/chickens/name/Clémentine"))
+            .perform(delete("/api/chickens/name/Clémentine").with(authenticated()))
             .andExpect(status().isNoContent());
     }
 }

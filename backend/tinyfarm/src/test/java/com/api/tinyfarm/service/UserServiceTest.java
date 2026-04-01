@@ -1,18 +1,15 @@
 package com.api.tinyfarm.service;
 
-import com.api.tinyfarm.config.TestSecurityConfig;
 import com.api.tinyfarm.model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(TestSecurityConfig.class)
 public class UserServiceTest {
     @Autowired
     UserService userService;
@@ -26,6 +23,7 @@ public class UserServiceTest {
     void shouldCreateUser() {
         User user = new User();
         user.setName("Eldoraldo");
+        user.setEmail("usertest@gmail.com");
         user.setGender(User.Gender.M);
 
         User created = userService.create(user);
@@ -39,12 +37,14 @@ public class UserServiceTest {
     void shouldReturnAllUsers() {
         User user = new User();
         user.setName("Eldoraldo");
+        user.setEmail("usertest@gmail.com");
         user.setGender(User.Gender.M);
 
         User created = userService.create(user);
 
         User anotherUser = new User();
         anotherUser.setName("Colorado");
+        user.setEmail("usertest@gmail.com");
         anotherUser.setGender(User.Gender.F);
 
         User anotherUserCreated = userService.create(anotherUser);
@@ -56,6 +56,7 @@ public class UserServiceTest {
     void shouldDeleteUser(){
         User user = new User();
         user.setName("Colorado");
+        user.setEmail("usertest@gmail.com");
         user.setGender(User.Gender.F);
 
         User created = userService.create(user);

@@ -15,14 +15,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-public class RabbitControllerTest {
+public class RabbitControllerTest extends AuthenticatedControllerTestSupport {
 
     @Autowired
     MockMvc mockMvc;
 
     @BeforeEach
     void setup() throws Exception {
-        mockMvc.perform(delete("/api/rabbits/all"));
+        mockMvc.perform(delete("/api/rabbits/all").with(authenticated()));
 
         String json = """
                 {
@@ -38,6 +38,7 @@ public class RabbitControllerTest {
         """;
         mockMvc.perform(
                 post("/api/rabbits")
+                        .with(authenticated())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
         );
@@ -59,6 +60,7 @@ public class RabbitControllerTest {
         """;
         mockMvc.perform(
                         post("/api/rabbits")
+                                .with(authenticated())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(json)
                 )
@@ -67,19 +69,19 @@ public class RabbitControllerTest {
 
     @Test
     void shouldReturnAllRabbits() throws Exception {
-        mockMvc.perform(get("/api/rabbits"))
+        mockMvc.perform(get("/api/rabbits").with(authenticated()))
                 .andExpect(status().isOk());
     }
 
     @Test
     void shouldReturnRabbitByName() throws Exception {
-        mockMvc.perform(get("/api/rabbits/filter/name/Jeannot"))
+        mockMvc.perform(get("/api/rabbits/filter/name/Jeannot").with(authenticated()))
                 .andExpect(status().isOk());
     }
 
     @Test
     void shouldDeleteAllRabbits() throws Exception {
-        mockMvc.perform(delete("/api/rabbits/all"))
+        mockMvc.perform(delete("/api/rabbits/all").with(authenticated()))
                 .andExpect(status().isNoContent());
     }
 }
