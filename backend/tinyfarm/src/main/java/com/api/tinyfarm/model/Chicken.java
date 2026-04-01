@@ -32,6 +32,7 @@ public class Chicken extends Animal {
         }
     }
 
+    @MapsId
     @Column(name = "aid")
     Long id;
 
@@ -49,7 +50,9 @@ public class Chicken extends Animal {
     private Integer sickDays;
 
     @PrePersist
+    @Override
     public void prePersist() {
+        super.prePersist();
         this.fastingDays = 0;
         this.sickDays = 0;
     }

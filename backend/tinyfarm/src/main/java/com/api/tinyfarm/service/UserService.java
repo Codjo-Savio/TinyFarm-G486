@@ -46,9 +46,12 @@ public class UserService {
             );
     }
 
-    public User getByEmail(String email){
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé : " + email));
+    public User findByName(String name) {
+        return userRepository
+                .findByName(name)
+                .orElseThrow(() ->
+                        new RuntimeException("Utilisateur introuvable : " + name)
+                );
     }
 
     public User create(User user) {

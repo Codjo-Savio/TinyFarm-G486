@@ -74,9 +74,11 @@ CREATE TABLE IF NOT EXISTS chicken
     aid INTEGER PRIMARY KEY REFERENCES animal(aid)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
-    chickenType chickenTypeEnum,
     name VARCHAR(50),
-    fasting BOOLEAN DEFAULT FALSE
+    chickenType chickenTypeEnum,
+    fasting BOOLEAN DEFAULT FALSE,
+    fasting_days INTEGER,
+    sick_days INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS rabbit
