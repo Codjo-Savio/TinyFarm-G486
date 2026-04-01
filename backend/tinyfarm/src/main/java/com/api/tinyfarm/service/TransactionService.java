@@ -65,7 +65,7 @@ public class TransactionService {
         return transactionRepository.save(existingT);
     }
 
-    public void deleteByID(Long id) {
+    public void deleteById(Long id) {
         transactionRepository.deleteById(id);
     }
 
