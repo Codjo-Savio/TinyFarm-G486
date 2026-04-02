@@ -1,6 +1,7 @@
 package com.api.tinyfarm.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,7 @@ public class Animal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "a_id")
+    @Column(name = "a_id", nullable = false)
     private Long id;
 
     @Column(name = "u_id")
@@ -57,4 +58,26 @@ public class Animal {
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")
     private AnimalGender gender;
+
+    @PrePersist
+    public void prePersist(){
+        if (clean == null) {
+            clean = true;
+        }
+        if (healthy == null) {
+            healthy = true;
+        }
+        if (age == null) {
+            age = 0;
+        }
+        if (weight == null) {
+            weight = 1f;
+        }
+        if (fedToday == null) {
+            fedToday = true;
+        }
+        if (wateredToday == null) {
+            wateredToday = true;
+        }
+    }
 }

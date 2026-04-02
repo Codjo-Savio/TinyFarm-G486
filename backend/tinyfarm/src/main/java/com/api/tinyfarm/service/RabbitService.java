@@ -5,6 +5,8 @@ import com.api.tinyfarm.model.Rabbit;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.RabbitRepository;
 import java.util.List;
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -149,20 +151,20 @@ public class RabbitService {
         List<Rabbit> userRabbits = rabbitRepository.findByUserId(userId);
 
         long adultCount = userRabbits
-            .stream()
-            .filter(r -> r.getRabbitType() == Rabbit.RabbitTypeEnum.lapin)
-            .count();
+                .stream()
+                .filter(r -> r.getRabbitType() == Rabbit.RabbitTypeEnum.lapin)
+                .count();
         long babyCount = userRabbits
-            .stream()
-            .filter(r -> r.getRabbitType() == Rabbit.RabbitTypeEnum.lapereau)
-            .count();
+                .stream()
+                .filter(r -> r.getRabbitType() == Rabbit.RabbitTypeEnum.lapereau)
+                .count();
 
         for (Rabbit rabbit : userRabbits) {
             if (!rabbit.getClean() || !rabbit.getHealthy()) {
                 if (Math.random() > 0.5) {
                     rabbitRepository.delete(rabbit);
                     if (
-                        rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapin
+                            rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapin
                     ) adultCount--;
                     else babyCount--;
                     continue;
@@ -172,27 +174,27 @@ public class RabbitService {
             if (!rabbit.getFedToday()) {
                 rabbitRepository.delete(rabbit);
                 if (
-                    rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapin
+                        rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapin
                 ) adultCount--;
                 else babyCount--;
                 continue;
             }
 
             if (rabbit.getFedToday() && !rabbit.getWateredToday()) {
-                // survit mais ne grandit pas
+                // survit, mais ne grandit pas
             } else if (rabbit.getFedToday() && rabbit.getWateredToday()) {
                 rabbit.setAge(rabbit.getAge() + 1);
 
                 if (
-                    rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapereau &&
-                    rabbit.getAge() >= 30
+                        rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapereau &&
+                                rabbit.getAge() >= 30
                 ) {
                     if (adultCount < 50) {
                         rabbit.setRabbitType(Rabbit.RabbitTypeEnum.lapin);
                         rabbit.setGender(
-                            Math.random() > 0.5
-                                ? Animal.AnimalGender.M
-                                : Animal.AnimalGender.F
+                                Math.random() > 0.5
+                                        ? Animal.AnimalGender.M
+                                        : Animal.AnimalGender.F
                         );
                         adultCount++;
                         babyCount--;
@@ -244,6 +246,7 @@ public class RabbitService {
                 baby.setHealthy(true);
                 baby.setFedToday(false);
                 baby.setWateredToday(false);
+                baby.setName("Baby-" + UUID.randomUUID().toString().substring(0, 5));
                 rabbitRepository.save(baby);
                 currentBabies++;
             }
