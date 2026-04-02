@@ -39,22 +39,12 @@ class BottomActions extends HTMLElement {
 			font-variation-settings:var(--font-var-icon);
         }
 
-		.bottom-actions {
-			padding: 24px;
-			display: flex;
-			position: fixed;
-			bottom: 0;
-			left: 0;
-			width: 100%;
-			gap: 24px;
-			justify-content: space-between;
-			align-items: flex-end;
-			box-sizing: border-box;
-		}
-
 		.links {
 			display: flex;
 			gap: 24px;
+            position: fixed;
+            left: 24px;
+            bottom: 24px;
 		}
 
 		.links > a {
@@ -99,6 +89,9 @@ class BottomActions extends HTMLElement {
 			padding: 6px 16px 6px 6px;
 			line-height: 1;
 			color: var(--color-primary);
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
 		}
 
 		.large {
