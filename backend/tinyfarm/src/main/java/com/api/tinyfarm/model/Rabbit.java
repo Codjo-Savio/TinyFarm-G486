@@ -1,6 +1,7 @@
 package com.api.tinyfarm.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,6 +24,7 @@ public class Rabbit extends Animal {
     @Column(name = "aid")
     private Long id;
 
+    @NotNull
     @Column(name = "name", length = 50)
     private String name;
 
@@ -34,5 +36,8 @@ public class Rabbit extends Animal {
     @Override
     public void prePersist(){
         super.prePersist();
+        if (this.rabbitType == null) {
+            this.rabbitType = RabbitTypeEnum.lapereau;
+        }
     }
 }

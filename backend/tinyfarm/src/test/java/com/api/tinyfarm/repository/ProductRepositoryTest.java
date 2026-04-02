@@ -79,6 +79,7 @@ public class ProductRepositoryTest {
     void shouldUpdateProductPrice() {
         // ARRANGE
         Product product = new Product();
+        product.setDescription("Foin");
         product.setPrice(5.0f);
         productRepository.save(product);
 
@@ -94,6 +95,7 @@ public class ProductRepositoryTest {
     void shouldDeleteProduct() {
         // ARRANGE
         Product product = new Product();
+        product.setDescription("Foin");
         productRepository.save(product);
 
         // ACT

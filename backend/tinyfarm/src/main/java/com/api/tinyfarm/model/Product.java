@@ -3,6 +3,7 @@ package com.api.tinyfarm.model;
 import javax.annotation.processing.Generated;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @NotNull
     @Column(name = "description")
     String description;
 
@@ -34,7 +36,11 @@ public class Product {
 
     @PrePersist
     public void prePersist() {
-        this.coefficient = 1;
-        this.collectible = false;
+        if (this.coefficient == null) {
+            this.coefficient = 1;
+        }
+        if (this.collectible == null) {
+            this.collectible = false;
+        }
     }
 }

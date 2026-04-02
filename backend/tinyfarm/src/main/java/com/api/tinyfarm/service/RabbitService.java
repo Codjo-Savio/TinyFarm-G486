@@ -5,6 +5,8 @@ import com.api.tinyfarm.model.Rabbit;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.RabbitRepository;
 import java.util.List;
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -244,6 +246,7 @@ public class RabbitService {
                 baby.setHealthy(true);
                 baby.setFedToday(false);
                 baby.setWateredToday(false);
+                baby.setName("Baby-" + UUID.randomUUID().toString().substring(0, 5));
                 rabbitRepository.save(baby);
                 currentBabies++;
             }

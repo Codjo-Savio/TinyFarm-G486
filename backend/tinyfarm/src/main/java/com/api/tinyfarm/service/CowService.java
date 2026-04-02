@@ -37,19 +37,10 @@ public class CowService {
     public Cow create(Cow cow) {
         cow.setId(null);
 
-        if (cow.getUserId() == null) {
-            if (SecurityContextHolder.getContext().getAuthentication() != null) {
-                String username = SecurityContextHolder.getContext()
-                        .getAuthentication()
-                        .getName();
-                try {
-                    User currentUser = userService.findByName(username);
-                    cow.setUserId(currentUser.getId());
-                } catch (RuntimeException ignored) {
-                    // Controller tests authenticate without creating a matching user row.
-                }
-            }
-        }
+        User currentUser = (User) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+        cow.setUserId(currentUser.getId());
         return cowRepository.save(cow);
     }
 
