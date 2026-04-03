@@ -1,6 +1,7 @@
 package com.api.tinyfarm.security.oauth;
 
 import com.api.tinyfarm.model.User;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -11,6 +12,7 @@ import java.util.Map;
 
 public class CustomOAuth2User implements OAuth2User {
     private final Map<String, Object> attributes;
+    @Getter
     private final User user;
 
     public CustomOAuth2User(Map<String, Object> attributes, User user) {
@@ -33,7 +35,4 @@ public class CustomOAuth2User implements OAuth2User {
         return user.getName();
     }
 
-    public User getUser() {
-        return this.user;
-    }
 }

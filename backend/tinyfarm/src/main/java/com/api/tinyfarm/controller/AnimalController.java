@@ -47,16 +47,6 @@ public class AnimalController {
 
     }
 
-    @PutMapping("/id/{id}")
-    public ResponseEntity<Animal> update(@PathVariable Long id, @RequestBody Animal animal) {
-        try{
-            return ResponseEntity.ok(animalService.update(id, animal));
-        }catch(Exception e){
-            return ResponseEntity.notFound().build();
-        }
-
-    }
-
     @DeleteMapping("/id/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {

@@ -260,7 +260,11 @@ class AppBar extends HTMLElement {
 
         // Close menu if outside click
         document.addEventListener("click", (e) => {
-            if (!this.contains(e.target)) {
+            const path = e.composedPath();
+            const clickedAccount = path.includes(accountBtn);
+            const clickedMenu = path.includes(accountMenu);
+
+            if (!clickedAccount && !clickedMenu) {
                 accountMenu.classList.remove("open");
             }
         });

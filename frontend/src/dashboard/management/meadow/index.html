@@ -1,33 +1,115 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Pré</title>
+        <!-- Components -->
+        <script src="/components/appbar.js"></script>
+        <script src="/components/bottom-actions.js"></script>
+        <script src="/components/layout.js"></script>
+        <!-- Theme -->
+        <link rel="stylesheet" href="/styles/theme.css" />
+        <!-- Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+            rel="stylesheet"
+        />
+        <!-- Custom page style and script -->
+        <link rel="stylesheet" href="style.css" />
+        <script src="script.js"></script>
+    </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <!-- Components -->
-    <script src="/components/appbar.js"></script>
-    <script src="/components/bottom-actions.js"></script>
-    <script src="/components/layout.js"></script>
-    <!-- Theme -->
-    <link rel="stylesheet" href="/styles/theme.css">
-    <!-- Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-    <!-- Custom page style and script -->
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
-</head>
+    <body>
+        <app-layout>
+            <app-bar></app-bar>
+            <main class="container">
+                <div class="sub-header">
+                    <a
+                        onclick="
+                            window.location.href = window.location.search
+                                ? window.location.search.replace('?from=', '')
+                                : '/dashboard'
+                        "
+                        class="btn-back"
+                        ><span class="material-symbols-rounded">
+                            keyboard_backspace
+                        </span>
+                        Retour</a
+                    >
+                    <div class="market-stats">
+                        <div class="animal-state">
+                            <span class="material-symbols-rounded">
+                                heart_broken
+                            </span>
+                            <p>Malade : <span id="sick-count"></span></p>
+                        </div>
+                        <div class="animal-state">
+                            <span class="material-symbols-rounded"> mop </span>
+                            <p>Sale : <span id="dirty-count"></span></p>
+                        </div>
+                        <span
+                            ><span class="material-symbols-rounded">pets</span>
+                            <span id="cow-count"></span>
+                        </span>
+                        <span
+                            ><span class="material-symbols-rounded"
+                                >water_full</span
+                            >
+                            <span id="milk-count"></span>
+                        </span>
+                        <button class="action-button">
+                            <span class="material-symbols-rounded">sell</span>
+                            Vendre
+                        </button>
+                        <div class="actions-wrapper">
+                            <button
+                                class="menu-actions"
+                                onclick="toggleActionsMenu()"
+                            >
+                                ...
+                            </button>
+                            <div class="actions-menu" id="actions-menu">
+                                <button
+                                    onclick="feedAll()"
+                                    class="action-button"
+                                    id="feed-btn"
+                                >
+                                    Nourrir
+                                </button>
+                                <button
+                                    onclick="waterAll()"
+                                    class="action-button"
+                                    id="water-btn"
+                                >
+                                    Abreuver
+                                </button>
+                                <button
+                                    onclick="healAll()"
+                                    class="action-button"
+                                    id="heal-btn"
+                                >
+                                    Soigner
+                                </button>
+                                <button
+                                    onclick="cleanAll()"
+                                    class="action-button"
+                                    id="clean-btn"
+                                >
+                                    Nettoyer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-<body>
-    <app-layout>
-        <app-bar></app-bar>
-        <main>
-            <!-- Write your code here -->
-        </main>
-        <bottom-actions></bottom-actions>
-    </app-layout>
-</body>
+                <h1 class="page-title">Pré</h1>
 
+                <div class="game-grid" id="game-grid"></div>
+            </main>
+            <bottom-actions></bottom-actions>
+        </app-layout>
+    </body>
 </html>

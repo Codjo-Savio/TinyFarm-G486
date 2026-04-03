@@ -30,7 +30,7 @@ in which you will copy and paste the content of the two exemple (respectively) b
     
     * créer un animal Post("")
     
-    * mettre a jour un animal par identifiant        Put("/id/{id}")
+    * mettre à jour un animal par identifiant        Put("/id/{id}")
     
     * retirer un animal par identifiant              Delete("/id/{id}")
 
@@ -46,8 +46,8 @@ in which you will copy and paste the content of the two exemple (respectively) b
     * soigner un poulet par identifiant              Post("/{id}/heal")
     * fin de journée des poulets                     Post("/endOfDay")
     
-    * mettre a jour un poulet par identifiant        Put("/id/{id}")
-    * mettre a jour un poulet par nom                Put("/id/{id}")
+    * mettre à jour un poulet par identifiant        Put("/id/{id}")
+    * mettre à jour un poulet par nom                Put("/id/{id}")
     
     * retirer un poulet par identifiant              Delete("/id/{id}")
     * retirer un poulet par nom                      Delete("/id/{id}")
@@ -59,7 +59,7 @@ in which you will copy and paste the content of the two exemple (respectively) b
     
     * créer une vache Post("")
     
-    * mettre a jour une vache par identifiant        Put("/id/{id}")
+    * mettre à jour une vache par identifiant        Put("/id/{id}")
     
     * retirer une vache par identifiant              Delete("/id/{id}")
     * retirer une vache par nom                      Delete("/name/{name}")
@@ -78,7 +78,7 @@ in which you will copy and paste the content of the two exemple (respectively) b
     *soigner un lapin par identifiant                Post("/{id}/heal")
     *fin de journée des lapins                       Post("endOfDay")
     
-    * mettre a jour un lapin par identifiant         Put("/{id}")
+    * mettre à jour un lapin par identifiant         Put("/{id}")
     
     * retirer un lapin par identifiant               Delete("/{id}")
     * retirer tous les lapins                        Delete("/all")
@@ -89,7 +89,7 @@ in which you will copy and paste the content of the two exemple (respectively) b
     
     * créer un utilisateurs                          Post("")
     
-    * mettre a jour un Utilisateur par identifiant   Put("/id/{id}")
+    * mettre à jour un Utilisateur par identifiant   Put("/id/{id}")
     
     * supprimer un utilisateur par identifiant       Delete("/id/{id}")
     
@@ -104,7 +104,7 @@ in which you will copy and paste the content of the two exemple (respectively) b
     
     * ajouter un produit                             Post("")
     
-    * mettre a jour un produit par identifiant       Put("/id/{id}")
+    * mettre à jour un produit par identifiant       Put("/id/{id}")
     
     * retirer un produit par identifiant             Delete("/id/{id}")
 
@@ -119,8 +119,21 @@ in which you will copy and paste the content of the two exemple (respectively) b
   * ajouter un market                                Post("")
     
   
-  * mettre a jour un market par UserId               Put("/id/{id}")
+  * mettre à jour un market par UserId               Put("/id/{id}")
   
   
   * retirer un market par UserId et ProductId        Delete("/{userId}/{productId}")
   * retirer un market par UserId                     Delete("/id/{uid}")
+  
+  ### Transaction ("api/transaction")
+  
+  * récupérer une transaction par Id                Get("/id/{id})
+  * récupérer une transaction par Buyer             Get("/buyer/{buyer})
+  * récupérer une transaction par Seller            Get("/seller/{seller})
+  * récupérer une transaction par Product           Get("/product/{product})
+  
+  * ajouter une transaction                         Post("")
+  
+  * mettre à jour une transaction                   Put("id/{id}")
+
+  * retirer une transaction par Id                  Delete("id/{id}")
