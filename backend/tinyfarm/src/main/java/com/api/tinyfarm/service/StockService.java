@@ -1,41 +1,27 @@
 package com.api.tinyfarm.service;
 
-import com.api.tinyfarm.model.Product;
 import com.api.tinyfarm.model.Stock;
-import com.api.tinyfarm.model.User;
-import com.api.tinyfarm.repository.ProductRepository;
+import com.api.tinyfarm.model.StockId;
 import com.api.tinyfarm.repository.StockRepository;
-import com.api.tinyfarm.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class StockService {
 
-    private final StockRepository stockRepository;
-    private final UserRepository userRepository;
-    private final ProductRepository productRepository;
-
-    public StockService(
-        StockRepository stockRepository,
-        UserRepository userRepository,
-        ProductRepository productRepository
-    ) {
-        this.stockRepository = stockRepository;
-        this.userRepository = userRepository;
-        this.productRepository = productRepository;
-    }
+    @Autowired
+    private StockRepository stockRepository;
 
     public List<Stock> findAll() {
         return stockRepository.findAll();
     }
 
-    public Stock findById(Long userId, Long productId) {
-        Stock.StockId id = new Stock.StockId(userId, productId);
-        return stockRepository
-            .findById(id)
-            .orElseThrow(() -> new RuntimeException("Stock introuvable : " + userId + "/" + productId));
+    public Stock findById(Long userId, Long productId){
+        StockId id = new StockId(userId, productId);
+        return stockRepository.findById(id).get();
     }
 
     public List<Stock> findByUser(Long userId) {
@@ -60,22 +46,6 @@ public class StockService {
         if (userId == null || productId == null) {
             throw new IllegalArgumentException("Clé composite manquante dans stock");
         }
-
-        Stock.StockId id = new Stock.StockId(userId, productId);
-        if (stockRepository.existsById(id)) {
-            throw new IllegalArgumentException("Stock déjà existant pour cet utilisateur / produit");
-        }
-
-        User user = userRepository.findById(userId).orElseThrow(
-            () -> new RuntimeException("Utilisateur introuvable : " + userId)
-        );
-        Product product = productRepository.findById(productId).orElseThrow(
-            () -> new RuntimeException("Produit introuvable : " + productId)
-        );
-
-        stock.setUser(user);
-        stock.setProduct(product);
-        stock.setId(id);
         return stockRepository.save(stock);
     }
 
@@ -91,7 +61,7 @@ public class StockService {
     }
 
     public void delete(Long userId, Long productId) {
-        Stock.StockId id = new Stock.StockId(userId, productId);
+        StockId id = new StockId(userId, productId);
         stockRepository.deleteById(id);
     }
 

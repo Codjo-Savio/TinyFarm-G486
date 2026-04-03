@@ -3,11 +3,8 @@ package com.api.tinyfarm.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.util.Objects;
 
 @Entity
 @Table(name = "stock")
@@ -21,13 +18,13 @@ public class Stock {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId("uid")
-    @JoinColumn(name = "uid", nullable = false)
-    private User user;
+    @Column(name = "uid", nullable = false)
+    private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId("productID")
-    @JoinColumn(name = "productID", nullable = false)
-    private Product product;
+    @Column(name = "productID", nullable = false)
+    private Long productId;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity = 0;
