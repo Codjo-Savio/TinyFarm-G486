@@ -3,17 +3,16 @@ package com.api.tinyfarm.service;
 import com.api.tinyfarm.model.Transaction;
 import com.api.tinyfarm.repository.TransactionRepository;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TransactionService {
 
-    private final TransactionRepository transactionRepository;
-
-    public TransactionService(TransactionRepository transactionRepository) {
-        this.transactionRepository = transactionRepository;
-    }
-
+    @Autowired
+    private TransactionRepository transactionRepository;
+    
     public Transaction findByBuyer(Long buyer) {
         return transactionRepository
             .findByBuyer(buyer)
