@@ -14,16 +14,16 @@ import lombok.NoArgsConstructor;
 public class Stock {
 
     @EmbeddedId
+    @AttributeOverrides({
+        @AttributeOverride(name = "uid", column = @Column(name = "uid", nullable = false)),
+        @AttributeOverride(name = "productID", column = @Column(name = "productID", nullable = false))
+    })
     private StockId id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @MapsId("uid")
-    @Column(name = "uid", nullable = false)
+    @Column(name = "uid", nullable = false, insertable = false, updatable = false)
     private Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @MapsId("productID")
-    @Column(name = "productID", nullable = false)
+    @Column(name = "productID", nullable = false, insertable = false, updatable = false)
     private Long productId;
 
     @Column(name = "quantity", nullable = false)

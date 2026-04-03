@@ -36,15 +36,19 @@ public class StockService {
             .collect(Collectors.toList());
     }
 
-    public Stock create(Stock stock) {
+    public Stock create(Stock stock) throws Exception{
         if (stock == null || stock.getId() == null) {
             throw new IllegalArgumentException("Stock invalide");
         }
 
-        Long userId = stock.getId().getUid();
-        Long productId = stock.getId().getProductID();
+        Long userId = stock.getUserId();
+        Long productId = stock.getProductId();
         if (userId == null || productId == null) {
             throw new IllegalArgumentException("Clé composite manquante dans stock");
+        }
+
+        if(stockRepository.existsById(stock.getId())){
+            throw new Exception(("Ce stock existe déjà"));
         }
         return stockRepository.save(stock);
     }
