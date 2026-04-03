@@ -7,6 +7,8 @@ import com.api.tinyfarm.repository.RabbitRepository;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -40,6 +42,10 @@ public class RabbitService {
     }
 
     public Rabbit create(Rabbit rabbit) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
+            rabbit.setUserId(currentUser.getId());
+        }
         return rabbitRepository.save(rabbit);
     }
 

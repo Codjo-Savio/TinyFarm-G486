@@ -36,11 +36,11 @@ public class User {
         }
     }
 
-    @NotNull
+    @NotNull(message = "The name is obligatory")
     @Column(name = "name", length = 20)
     private String name;
 
-    @Email
+    @Email(message = "This attribute must be an email")
     @Column(name = "email", length = 100)
     private String email;
 

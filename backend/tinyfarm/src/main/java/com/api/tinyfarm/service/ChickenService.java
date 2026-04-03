@@ -5,6 +5,9 @@ import com.api.tinyfarm.model.Chicken;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.ChickenRepository;
 import java.util.List;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -47,6 +50,10 @@ public class ChickenService {
         }
         if (chicken.getAge() == null) {
             chicken.setAge(0);
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
+            chicken.setUserId(currentUser.getId());
         }
         return chickenRepository.save(chicken);
     }

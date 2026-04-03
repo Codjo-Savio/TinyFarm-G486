@@ -1,7 +1,6 @@
 package com.api.tinyfarm.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -44,7 +43,7 @@ public class Animal {
         M("Male"),
         F("Female");
 
-        String wording;
+        final String wording;
 
         AnimalGender(String wording) {
             this.wording = wording;

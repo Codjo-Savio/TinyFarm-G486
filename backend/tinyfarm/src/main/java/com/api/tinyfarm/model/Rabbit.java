@@ -24,7 +24,7 @@ public class Rabbit extends Animal {
     @Column(name = "aid")
     private Long id;
 
-    @NotNull
+    @NotNull(message = "The name is obligatory")
     @Column(name = "name", length = 50)
     private String name;
 

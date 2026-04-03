@@ -36,7 +36,7 @@ public class Cow extends Animal {
     @Column(name = "aid")
     private Long id;
 
-    @NotNull
+    @NotNull(message = "The name is obligatory")
     @Column(name = "name", length = 20)
     private String name;
 

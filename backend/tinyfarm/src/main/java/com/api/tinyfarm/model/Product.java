@@ -1,7 +1,5 @@
 package com.api.tinyfarm.model;
 
-import javax.annotation.processing.Generated;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -21,7 +19,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @NotNull
+    @NotNull(message = "The description is obligatory")
     @Column(name = "description")
     String description;
 

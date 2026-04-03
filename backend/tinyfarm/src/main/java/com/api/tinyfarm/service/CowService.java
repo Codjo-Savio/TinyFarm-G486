@@ -5,6 +5,7 @@ import com.api.tinyfarm.model.Cow;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.CowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -35,12 +36,10 @@ public class CowService {
     }
 
     public Cow create(Cow cow) {
-        cow.setId(null);
-
-        User currentUser = (User) SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getPrincipal();
-        cow.setUserId(currentUser.getId());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
+            cow.setUserId(currentUser.getId());
+        }
         return cowRepository.save(cow);
     }
 

@@ -41,7 +41,7 @@ public class Chicken extends Animal {
     @Column(name = "chickenType")
     private ChickenType chickenType;
 
-    @NotNull
+    @NotNull(message = "The name is obligatory")
     @Column(name = "name")
     private String name;
 
