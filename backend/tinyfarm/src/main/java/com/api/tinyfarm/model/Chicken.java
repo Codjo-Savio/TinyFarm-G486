@@ -1,6 +1,7 @@
 package com.api.tinyfarm.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -40,6 +41,7 @@ public class Chicken extends Animal {
     @Column(name = "chickenType")
     private ChickenType chickenType;
 
+    @NotNull(message = "The name is obligatory")
     @Column(name = "name")
     private String name;
 
@@ -53,7 +55,14 @@ public class Chicken extends Animal {
     @Override
     public void prePersist() {
         super.prePersist();
-        this.fastingDays = 0;
-        this.sickDays = 0;
+        if (this.fastingDays == null) {
+            this.fastingDays = 0;
+        }
+        if (this.sickDays == null) {
+            this.sickDays = 0;
+        }
+        if (this.chickenType == null) {
+            this.chickenType = ChickenType.C;
+        }
     }
 }

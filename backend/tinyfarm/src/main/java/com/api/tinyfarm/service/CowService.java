@@ -5,6 +5,7 @@ import com.api.tinyfarm.model.Cow;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.CowRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -35,20 +36,9 @@ public class CowService {
     }
 
     public Cow create(Cow cow) {
-        cow.setId(null);
-
-        if (cow.getUserId() == null) {
-            if (SecurityContextHolder.getContext().getAuthentication() != null) {
-                String username = SecurityContextHolder.getContext()
-                        .getAuthentication()
-                        .getName();
-                try {
-                    User currentUser = userService.findByName(username);
-                    cow.setUserId(currentUser.getId());
-                } catch (RuntimeException ignored) {
-                    // Controller tests authenticate without creating a matching user row.
-                }
-            }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
+            cow.setUserId(currentUser.getId());
         }
         return cowRepository.save(cow);
     }

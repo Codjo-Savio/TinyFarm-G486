@@ -1,22 +1,16 @@
 main {
+    position: relative;
     flex-grow: 1;
     width: 100%;
     overflow: hidden;
 }
 
 main > svg {
-    height: auto;
+    inset: 0;
+    height: 100%;
     width: 100%;
     position: absolute;
-    bottom: 0;
-}
-
-@media (max-width: 1236px) {
-    main > svg {
-        left: -50px;
-        height: 100%;
-        width: auto;
-    }
+    display: block;
 }
 
 main > svg > path {
@@ -24,6 +18,13 @@ main > svg > path {
     fill: var(--color-secondary);
     transition: fill-opacity 0.3s ease;
     animation: svg-path-shine 2.4s ease-in-out infinite;
+    stroke-width: 10px;
+    stroke-opacity: 0;
+}
+
+main > svg > path:hover {
+    stroke: var(--color-primary);
+    stroke-opacity: 1;
 }
 
 main > svg > path:nth-of-type(odd) {

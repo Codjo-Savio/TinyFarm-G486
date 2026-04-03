@@ -15,7 +15,7 @@ public class Animal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "a_id")
+    @Column(name = "a_id", nullable = false)
     private Long id;
 
     @Column(name = "u_id")
@@ -43,7 +43,7 @@ public class Animal {
         M("Male"),
         F("Female");
 
-        String wording;
+        final String wording;
 
         AnimalGender(String wording) {
             this.wording = wording;

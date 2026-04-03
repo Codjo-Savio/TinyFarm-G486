@@ -11,10 +11,17 @@ class Layout extends HTMLElement {
     render() {
         const style = document.createElement("style");
         style.textContent = `
+        :host {
+            display: block;
+            height: 100%;
+            min-height: 0;
+        }
+
         .layout {
             display: flex;
             flex-direction: column;
             height: 100%;
+            min-height: 0;
         }
         `;
         this.shadowRoot.appendChild(style);

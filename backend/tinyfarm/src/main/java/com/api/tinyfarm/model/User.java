@@ -1,6 +1,8 @@
 package com.api.tinyfarm.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +18,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "uid")
+    @Column(name = "uid", nullable = false)
     private Long id;
 
     public enum Gender {
@@ -34,9 +36,11 @@ public class User {
         }
     }
 
+    @NotNull(message = "The name is obligatory")
     @Column(name = "name", length = 20)
     private String name;
 
+    @Email(message = "This attribute must be an email")
     @Column(name = "email", length = 100)
     private String email;
 
@@ -56,8 +60,14 @@ public class User {
     // default values for ecus and level
     @PrePersist
     public void prePersist() {
-        this.ecus = 1500;
-        this.hibernation = false;
-        this.level = 1;
+        if (this.ecus == null) {
+            this.ecus = 1500;
+        }
+        if (this.hibernation == null) {
+            this.hibernation = false;
+        }
+        if (this.level == null) {
+            this.level = 1;
+        }
     }
 }

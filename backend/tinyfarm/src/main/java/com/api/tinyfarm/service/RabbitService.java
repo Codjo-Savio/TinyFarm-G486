@@ -5,6 +5,10 @@ import com.api.tinyfarm.model.Rabbit;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.RabbitRepository;
 import java.util.List;
+import java.util.UUID;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,6 +42,10 @@ public class RabbitService {
     }
 
     public Rabbit create(Rabbit rabbit) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
+            rabbit.setUserId(currentUser.getId());
+        }
         return rabbitRepository.save(rabbit);
     }
 
@@ -244,6 +252,7 @@ public class RabbitService {
                 baby.setHealthy(true);
                 baby.setFedToday(false);
                 baby.setWateredToday(false);
+                baby.setName("Baby-" + UUID.randomUUID().toString().substring(0, 5));
                 rabbitRepository.save(baby);
                 currentBabies++;
             }

@@ -45,7 +45,8 @@ public class SecurityConfig {
                 .oauth2Login(oauth -> oauth
                         .userInfoEndpoint(info -> info.userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
-                        .failureHandler(oAuth2FailureHandler))
+                        .failureHandler(oAuth2FailureHandler)
+                )
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         HeaderWriterLogoutHandler clearSiteData = new HeaderWriterLogoutHandler(
                 new ClearSiteDataHeaderWriter(Directive.COOKIES));
