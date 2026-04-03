@@ -1,3 +1,5 @@
+package com.api.tinyfarm.model;
+
 import java.io.Serializable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
