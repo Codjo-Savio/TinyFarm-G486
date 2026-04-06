@@ -1,12 +1,8 @@
 package com.api.tinyfarm.service;
 
-import com.api.tinyfarm.model.Product;
 import com.api.tinyfarm.model.Stock;
 import com.api.tinyfarm.model.StockId;
-import com.api.tinyfarm.model.User;
-import com.api.tinyfarm.repository.ProductRepository;
 import com.api.tinyfarm.repository.StockRepository;
-import com.api.tinyfarm.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -15,17 +11,9 @@ import org.springframework.stereotype.Service;
 public class StockService {
 
     private final StockRepository stockRepository;
-    private final UserRepository userRepository;
-    private final ProductRepository productRepository;
 
-    public StockService(
-        StockRepository stockRepository,
-        UserRepository userRepository,
-        ProductRepository productRepository
-    ) {
+    public StockService(StockRepository stockRepository) {
         this.stockRepository = stockRepository;
-        this.userRepository = userRepository;
-        this.productRepository = productRepository;
     }
 
     public List<Stock> findAll() {
@@ -79,19 +67,6 @@ public class StockService {
             );
         }
 
-        User user = userRepository
-            .findById(userId)
-            .orElseThrow(() ->
-                new RuntimeException("Utilisateur introuvable : " + userId)
-            );
-        Product product = productRepository
-            .findById(productId)
-            .orElseThrow(() ->
-                new RuntimeException("Produit introuvable : " + productId)
-            );
-
-        stock.setUser(user);
-        stock.setProduct(product);
         stock.setId(id);
         return stockRepository.save(stock);
     }

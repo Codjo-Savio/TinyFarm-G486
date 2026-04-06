@@ -15,15 +15,11 @@ public class Stock {
     @EmbeddedId
     private StockId id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @MapsId("uid")
-    @JoinColumn(name = "uid", nullable = false)
-    private User user;
+    @Column(name = "uid", insertable = false, updatable = false)
+    private Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @MapsId("productID")
-    @JoinColumn(name = "productID", nullable = false)
-    private Product product;
+    @Column(name = "productID", insertable = false, updatable = false)
+    private Long productId;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity = 0;

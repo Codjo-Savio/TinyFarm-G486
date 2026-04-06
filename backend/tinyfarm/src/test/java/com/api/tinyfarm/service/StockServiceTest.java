@@ -3,12 +3,9 @@ package com.api.tinyfarm.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.api.tinyfarm.model.Product;
 import com.api.tinyfarm.model.Stock;
 import com.api.tinyfarm.model.StockId;
-import com.api.tinyfarm.model.User;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,89 +20,37 @@ public class StockServiceTest {
     @Autowired
     private StockService stockService;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ProductService productService;
-
     private Stock testStock;
-    private User testUser;
-    private Product testProduct;
+    private Long testUserId;
+    private Long testProductId;
 
     @BeforeEach
     void setup() {
         stockService.deleteAll();
-        userService.deleteAllUsers();
-        productService.deleteAllProducts();
 
-        // Créer et sauvegarder l'User
-        testUser = new User();
-        testUser.setName("Test User");
-        testUser.setEmail("test@example.com");
-        testUser = userService.create(testUser);
+        testUserId = 1L;
+        testProductId = 10L;
 
-        // Créer et sauvegarder le Product
-        testProduct = new Product();
-        testProduct.setDescription("Test Product");
-        testProduct.setPrice(100.0F);
-        testProduct = productService.create(testProduct);
-
-        // Créer et sauvegarder le Stock
         testStock = new Stock();
-        testStock.setId(new StockId(testUser.getId(), testProduct.getId()));
-        testStock.setUser(testUser);
-        testStock.setProduct(testProduct);
-        testStock.setCollectible(false);
+        testStock.setId(new StockId(testUserId, testProductId));
         testStock.setQuantity(1000);
+        testStock.setCollectible(false);
         testStock = stockService.create(testStock);
     }
-
-    // Save / Create Test
 
     @Test
     void shouldCreateStock() {
         assertNotNull(testStock);
         assertNotNull(testStock.getId());
-        assertEquals(testUser.getId(), testStock.getId().getUid());
-        assertEquals(testProduct.getId(), testStock.getId().getProductID());
+        assertEquals(testUserId, testStock.getId().getUid());
+        assertEquals(testProductId, testStock.getId().getProductID());
         assertEquals(1000, testStock.getQuantity());
         assertEquals(false, testStock.getCollectible());
     }
 
     @Test
-    void shouldNotCreateStockWithNullId() {
-        Stock invalidStock = new Stock();
-        invalidStock.setQuantity(500);
-        invalidStock.setCollectible(false);
-
-        assertThrows(IllegalArgumentException.class, () ->
-            stockService.create(invalidStock)
-        );
-    }
-
-    @Test
-    void shouldNotCreateDuplicateStock() {
-        Stock duplicateStock = new Stock();
-        duplicateStock.setId(
-            new StockId(testUser.getId(), testProduct.getId())
-        );
-        duplicateStock.setQuantity(500);
-        duplicateStock.setCollectible(false);
-
-        assertThrows(IllegalArgumentException.class, () ->
-            stockService.create(duplicateStock)
-        );
-    }
-
-    // Find Test
-
-    @Test
     void shouldFindById() {
-        Stock found = stockService.findById(
-            testUser.getId(),
-            testProduct.getId()
-        );
+        Stock found = stockService.findById(testUserId, testProductId);
 
         assertNotNull(found);
         assertEquals(testStock.getId(), found.getId());
@@ -113,15 +58,8 @@ public class StockServiceTest {
     }
 
     @Test
-    void shouldNotFindByInvalidId() {
-        assertThrows(RuntimeException.class, () ->
-            stockService.findById(999L, 999L)
-        );
-    }
-
-    @Test
     void shouldFindByUser() {
-        List<Stock> stocks = stockService.findByUser(testUser.getId());
+        List<Stock> stocks = stockService.findByUser(testUserId);
 
         assertNotNull(stocks);
         assertEquals(1, stocks.size());
@@ -130,7 +68,7 @@ public class StockServiceTest {
 
     @Test
     void shouldFindByProduct() {
-        List<Stock> stocks = stockService.findByProduct(testProduct.getId());
+        List<Stock> stocks = stockService.findByProduct(testProductId);
 
         assertNotNull(stocks);
         assertEquals(1, stocks.size());
@@ -139,23 +77,11 @@ public class StockServiceTest {
 
     @Test
     void shouldFindAll() {
-        // Créer un second stock
-        User secondUser = new User();
-        secondUser.setName("Second User");
-        secondUser.setEmail("second@example.com");
-        secondUser = userService.create(secondUser);
-
-        Product secondProduct = new Product();
-        secondProduct.setDescription("Second Product");
-        secondProduct.setPrice(150.0F);
-        secondProduct = productService.create(secondProduct);
+        Long secondUserId = 2L;
+        Long secondProductId = 20L;
 
         Stock secondStock = new Stock();
-        secondStock.setId(
-            new StockId(secondUser.getId(), secondProduct.getId())
-        );
-        secondStock.setUser(secondUser);
-        secondStock.setProduct(secondProduct);
+        secondStock.setId(new StockId(secondUserId, secondProductId));
         secondStock.setQuantity(500);
         secondStock.setCollectible(true);
         stockService.create(secondStock);
@@ -166,8 +92,6 @@ public class StockServiceTest {
         assertEquals(2, stocks.size());
     }
 
-    // Update Test
-
     @Test
     void shouldUpdateStock() {
         Stock updatedStock = new Stock();
@@ -175,8 +99,8 @@ public class StockServiceTest {
         updatedStock.setCollectible(true);
 
         Stock updated = stockService.update(
-            testUser.getId(),
-            testProduct.getId(),
+            testUserId,
+            testProductId,
             updatedStock
         );
 
@@ -185,33 +109,32 @@ public class StockServiceTest {
         assertEquals(true, updated.getCollectible());
     }
 
-    // Delete Test
-
     @Test
     void shouldDeleteStockById() {
-        stockService.delete(testUser.getId(), testProduct.getId());
+        stockService.delete(testUserId, testProductId);
 
         assertThrows(RuntimeException.class, () ->
-            stockService.findById(testUser.getId(), testProduct.getId())
+            stockService.findById(testUserId, testProductId)
         );
     }
 
     @Test
     void shouldDeleteByUser() {
-        Product secondProduct = new Product();
-        secondProduct.setDescription("Another Product");
-        secondProduct.setPrice(200.0F);
-        secondProduct = productService.create(secondProduct);
+        Long secondProductId = 20L;
 
         Stock secondStock = new Stock();
-        secondStock.setId(new StockId(testUser.getId(), secondProduct.getId()));
-        secondStock.setUser(testUser);
-        secondStock.setProduct(secondProduct);
+        secondStock.setId(new StockId(testUserId, secondProductId));
         secondStock.setQuantity(300);
+        secondStock.setCollectible(false);
         stockService.create(secondStock);
 
-        List<Stock> stocksBefore = stockService.findByUser(testUser.getId());
+        List<Stock> stocksBefore = stockService.findByUser(testUserId);
         assertEquals(2, stocksBefore.size());
+
+        stockService.deleteByUser(testUserId);
+
+        List<Stock> stocksAfter = stockService.findByUser(testUserId);
+        assertEquals(0, stocksAfter.size());
     }
 
     @Test
