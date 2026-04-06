@@ -86,6 +86,7 @@ public class UserRepositoryTest {
     void shouldUpdateUserEcus() {
         // ARRANGE
         User user = new User();
+        user.setName("Marcel");
         user.setEcus(1500);
         userRepository.save(user);
 
@@ -101,6 +102,7 @@ public class UserRepositoryTest {
     void shouldDeleteUser() {
         // ARRANGE
         User user = new User();
+        user.setName("Marcel");
         userRepository.save(user);
 
         // ACT

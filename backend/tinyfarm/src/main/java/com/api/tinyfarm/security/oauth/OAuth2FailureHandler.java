@@ -14,7 +14,7 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request,
                                         HttpServletResponse response,
-                                        org.springframework.security.core.AuthenticationException exception) throws IOException, ServletException {
+                                        org.springframework.security.core.AuthenticationException exception) throws IOException{
         response.sendRedirect("/auth/error");
     }
 }

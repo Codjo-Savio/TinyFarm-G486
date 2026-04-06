@@ -13,6 +13,10 @@ import lombok.NoArgsConstructor;
 public class Stock {
 
     @EmbeddedId
+    @AttributeOverrides({
+        @AttributeOverride(name = "uid", column = @Column(name = "uid", nullable = false)),
+        @AttributeOverride(name = "productID", column = @Column(name = "productID", nullable = false))
+    })
     private StockId id;
 
     @Column(name = "uid", insertable = false, updatable = false)

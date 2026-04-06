@@ -44,8 +44,8 @@ public class ProductServiceTest {
         Product created = productService.add(product);
 
         Product anotherProduct = new Product();
-        product.setDescription("foin");
-        product.setPrice(25.0f);
+        anotherProduct.setDescription("foin");
+        anotherProduct.setPrice(25.0f);
 
         Product anotherProductCreated = productService.add(anotherProduct);
 
