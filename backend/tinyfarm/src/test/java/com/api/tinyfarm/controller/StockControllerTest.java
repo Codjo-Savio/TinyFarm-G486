@@ -38,7 +38,7 @@ public class StockControllerTest extends AuthenticatedControllerTestSupport {
     private Long testProductId = 10L;
 
     @BeforeEach
-    void setup() {
+    void setup() throws Exception {
         stockService.deleteAll();
 
         // Créer et sauvegarder le Stock avec des IDs simples

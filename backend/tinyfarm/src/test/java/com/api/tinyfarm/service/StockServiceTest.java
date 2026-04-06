@@ -25,7 +25,7 @@ public class StockServiceTest {
     private Long testProductId;
 
     @BeforeEach
-    void setup() {
+    void setup() throws Exception {
         stockService.deleteAll();
 
         testUserId = 1L;
@@ -76,7 +76,7 @@ public class StockServiceTest {
     }
 
     @Test
-    void shouldFindAll() {
+    void shouldFindAll() throws Exception {
         Long secondUserId = 2L;
         Long secondProductId = 20L;
 
@@ -119,7 +119,7 @@ public class StockServiceTest {
     }
 
     @Test
-    void shouldDeleteByUser() {
+    void shouldDeleteByUser() throws Exception {
         Long secondProductId = 20L;
 
         Stock secondStock = new Stock();

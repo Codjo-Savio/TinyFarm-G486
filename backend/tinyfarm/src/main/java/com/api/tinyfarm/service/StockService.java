@@ -5,7 +5,6 @@ import com.api.tinyfarm.model.StockId;
 import com.api.tinyfarm.repository.StockRepository;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,27 +48,26 @@ public class StockService {
             .collect(Collectors.toList());
     }
 
-    public Stock create(Stock stock) throws Exception{
+    public Stock create(Stock stock) throws Exception {
         if (stock == null || stock.getId() == null) {
             throw new IllegalArgumentException("Stock invalide");
         }
 
-        Long userId = stock.getUserId();
-        Long productId = stock.getProductId();
+        StockId id = stock.getId();
+        Long userId = id.getUid();
+        Long productId = id.getProductID();
         if (userId == null || productId == null) {
             throw new IllegalArgumentException(
                 "Clé composite manquante dans stock"
             );
         }
 
-        StockId id = new StockId(userId, productId);
         if (stockRepository.existsById(id)) {
             throw new IllegalArgumentException(
                 "Stock déjà existant pour cet utilisateur / produit"
             );
         }
 
-        stock.setId(id);
         return stockRepository.save(stock);
     }
 
