@@ -107,6 +107,10 @@ public class StockService {
         return stockRepository.save(existing);
     }
 
+    public void deleteAll() {
+        stockRepository.deleteAll();
+    }
+
     public void delete(Long userId, Long productId) {
         StockId id = new StockId(userId, productId);
         stockRepository.deleteById(id);
