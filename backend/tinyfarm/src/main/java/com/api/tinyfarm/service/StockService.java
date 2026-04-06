@@ -2,6 +2,7 @@ package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Product;
 import com.api.tinyfarm.model.Stock;
+import com.api.tinyfarm.model.StockId;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.ProductRepository;
 import com.api.tinyfarm.repository.StockRepository;
@@ -32,20 +33,28 @@ public class StockService {
     }
 
     public Stock findById(Long userId, Long productId) {
-        Stock.StockId id = new Stock.StockId(userId, productId);
+        StockId id = new StockId(userId, productId);
         return stockRepository
             .findById(id)
-            .orElseThrow(() -> new RuntimeException("Stock introuvable : " + userId + "/" + productId));
+            .orElseThrow(() ->
+                new RuntimeException(
+                    "Stock introuvable : " + userId + "/" + productId
+                )
+            );
     }
 
     public List<Stock> findByUser(Long userId) {
-        return stockRepository.findAll().stream()
+        return stockRepository
+            .findAll()
+            .stream()
             .filter(stock -> stock.getId().getUid().equals(userId))
             .collect(Collectors.toList());
     }
 
     public List<Stock> findByProduct(Long productId) {
-        return stockRepository.findAll().stream()
+        return stockRepository
+            .findAll()
+            .stream()
             .filter(stock -> stock.getId().getProductID().equals(productId))
             .collect(Collectors.toList());
     }
@@ -58,20 +67,28 @@ public class StockService {
         Long userId = stock.getId().getUid();
         Long productId = stock.getId().getProductID();
         if (userId == null || productId == null) {
-            throw new IllegalArgumentException("Clé composite manquante dans stock");
+            throw new IllegalArgumentException(
+                "Clé composite manquante dans stock"
+            );
         }
 
-        Stock.StockId id = new Stock.StockId(userId, productId);
+        StockId id = new StockId(userId, productId);
         if (stockRepository.existsById(id)) {
-            throw new IllegalArgumentException("Stock déjà existant pour cet utilisateur / produit");
+            throw new IllegalArgumentException(
+                "Stock déjà existant pour cet utilisateur / produit"
+            );
         }
 
-        User user = userRepository.findById(userId).orElseThrow(
-            () -> new RuntimeException("Utilisateur introuvable : " + userId)
-        );
-        Product product = productRepository.findById(productId).orElseThrow(
-            () -> new RuntimeException("Produit introuvable : " + productId)
-        );
+        User user = userRepository
+            .findById(userId)
+            .orElseThrow(() ->
+                new RuntimeException("Utilisateur introuvable : " + userId)
+            );
+        Product product = productRepository
+            .findById(productId)
+            .orElseThrow(() ->
+                new RuntimeException("Produit introuvable : " + productId)
+            );
 
         stock.setUser(user);
         stock.setProduct(product);
@@ -91,7 +108,7 @@ public class StockService {
     }
 
     public void delete(Long userId, Long productId) {
-        Stock.StockId id = new Stock.StockId(userId, productId);
+        StockId id = new StockId(userId, productId);
         stockRepository.deleteById(id);
     }
 
@@ -100,6 +117,8 @@ public class StockService {
     }
 
     public void deleteByProduct(Long productId) {
-        findByProduct(productId).forEach(s -> stockRepository.deleteById(s.getId()));
+        findByProduct(productId).forEach(s ->
+            stockRepository.deleteById(s.getId())
+        );
     }
 }
