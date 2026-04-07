@@ -185,16 +185,19 @@ public class StockServiceTest {
 
         stockService.buy(transaction.getId());
         Stock sfound = stockService.findById(testUserId, testProductId);
-        User uFound = userService.find
+        User uFound = userService.findById(2L);
 
         // Test Quantité de produit
-        assertEquals(testStock.getProductId(), found.getProductId());
+        assertEquals(testStock.getProductId(), sfound.getProductId());
         assertEquals(
             testStock.getQuantity() - transaction.getQuantity(),
-            found.getQuantity()
+            sfound.getQuantity()
         );
         // Test Ecus
-        assertEquals(buyer.getEcus() - transaction.getTotalPrice(), buyer);
+        assertEquals(
+            buyer.getEcus() - transaction.getTotalPrice(),
+            uFound.getEcus()
+        );
     }
 
     @Test
