@@ -63,4 +63,214 @@ public class CowService {
     public void deleteAll() {
         cowRepository.deleteAll();
     }
+
+    // --- Actions Journalières ---
+
+    /**
+     * nourri une vache avec de la paille
+     * si impossible, elle sera nourrie avec de l'herbe
+     */
+    public Cow hayCow(Long cowId, Long userId){
+        Cow cow = findById(cowId);
+        User user = userService.findById(userId);
+
+        if (user.getEcus() >= 5){
+            user.setEcus(user.getEcus() - 5);
+            user.update(userId, user);
+
+            cow.setHayToday(true);
+            cow.setFedToday(true);
+            return cowRepository.save(cow);
+        } else {
+            throw new RuntimeException(
+                "Pas assez d'écus pour nourrir la vahe avec de la paille !"
+            );
+        }
+    }
+
+    /**
+     * nouri la vache avec de l'herbe
+     */
+    public Cow grassCow(Long cowId){
+        Cow cow = findById(cowId);
+
+        cow.setFedToday(true);
+        return cowRepository.save(cow);
+    }
+
+    /**
+     * abreuve une vache
+     */
+    public Cow waterCow(Long cowId, Long userId){
+        Cow cow = findById(cowId);
+        User user = userService.findById(userId);
+
+        if (user.getEcus() >= 2){
+            user.setEcus(user.getEcus() - 2);
+            user.update(userId, user);
+
+            cow.setWateredToday(true);
+            return cowRepository.save(cow);
+        } else {
+            throw new RuntimeException(
+                "Pas assez d'écus pour abreuver la vache !"
+            );
+        }
+    }
+
+    /**
+     * nettoie une vache
+     */
+    public Cow cleanCow(Long cowId, Long userId){
+        Cow cow = findById(cowId);
+        User user = userService.findById(userId);
+
+        if (user.getEcus() >= 3){
+            user.setEcus(user.getEcus() - 3);
+            user.update(userId, user);
+
+            cow.setClean(true);
+            return cowRepository.save(cow);
+        } else {
+            throw new RuntimeException(
+                "Pas assez d'écus pour nettoyer la vache !"
+            );
+        }
+    }
+
+    /**
+     * soigne une vache
+     */
+    public Cow healCow(Long cowId, Long userId){
+        Cow cow = findById(cowId);
+        User user = userService.findById(userId);
+
+        if (user.getEcus() >= 6){
+            user.setEcus(user.getEcus() - 6);
+            user.update(userId, user);
+
+            cow.setHealthy(true);
+            return cowRepository.save(cow);
+        } else {
+            throw new RuntimeException(
+                "Pas assez d'écus pour soigner la vache !"
+            );
+        }
+    }
+
+    /**
+     * gère la quantité de lait produite par les vaches d'un utilisateur
+     */
+    public void milking(Long UserID){
+        List<Cow> userCows = cowRepository.findByUserId(UserID);
+
+        for (Cow cow : userCows){
+
+            //si elle peut produire
+            if (cow.getMilking()){
+                // et qu'elle a été traite (i.e. elle n'a pas de lait)
+                if (cow.getMilk() == 0){
+                    cow.setMilk(8);
+                } else {
+                    cow.setMilk(cow.getMilk() + 4)
+                }
+            }
+
+            if (cow.getMilk() == 16){
+                cow.setMilking(false);
+            }
+        }
+    }
+
+    /**
+     * ajuste le poid de la vache en fonction de ce qu'elle a mangé dans la journée
+     */
+    private void handleWeight(Cow cow){
+
+        if (cow.getWateredToday()){
+            if(cow.getHayToday()){
+                // paille herbe eau
+                cow.setWeight(cow.getWeight() + 9);
+            } else {
+                //herbe eau
+                cow.setWeight(cow.getWeight() + 6);
+            }
+            
+        } else {
+            if(cow.getHayToday()){
+                //paille herbe
+                cow.setWeight(cow.getWeight() + 8);
+            } else {
+                // herbe
+                cow.setWeight(cow.getWeight() + 5);
+            }
+            
+        }
+
+        // eau seule ne fait rien
+    }
+
+    /**
+     * gère la fin de journée
+     */
+    public void processEndOfDay(Long userId) {
+        List<Cow> userCows = cowRepository.findByUserId(userId);
+
+        for (Cow cow : userCows) {
+            // 1. Santé
+            if (!handleHealth(cow)) {
+                cowRepository.delete(cow);
+                continue;
+            }
+
+            // 2. Poids
+            handleWeight(cow);
+
+            // poids max = 750 kg
+            if (cow.getWeight() > 750.0f) {
+                cow.setWeight(750.0f);
+            }
+
+            // reset journaliers
+            cow.setFedToday(false);
+            cow.setHayToday(false);
+            cow.setWateredToday(false);
+            cow.setClean(false); // elle devient sale
+            cow.setMilking(false); // et ne peut donc plus faire de lait
+
+            // 1 chance sur 5 de tomber malade
+            if (Math.random() < 0.2){ 
+                cow.setHealthy(false);
+                cow.setMilking(false);
+            }
+
+            cowRepository.save(cow);
+        }
+    }
+
+    /**
+     * gère la santé d'une vache séléctionnée
+     */
+    private Boolean handleHealth(Cow cow){
+        Boolean out = true;
+
+        if (cow.getHealthy() != null && !cow.getHealthy()){
+            cow.setSickDays(
+                (cow.getSickDays() == null
+                        ? 0
+                        : cow.getSickDays()) + 1
+                );
+            
+            if (cow.getSickDays() >= 4){
+                return false;
+            }
+
+        } else {
+            cow.setSickDays(0);
+            cow.setMilking(true);
+        }
+
+        return out;
+    }
+
 }

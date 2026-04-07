@@ -47,6 +47,12 @@ public class Cow extends Animal {
     @Column(name = "milking")
     private Boolean milking;
 
+    @Column(name = "milk")
+    private int milk;
+
+    @Column(name = "hay_today")
+    private Boolean hayToday = false;
+
     @PrePersist
     @Override
     public void prePersist() {

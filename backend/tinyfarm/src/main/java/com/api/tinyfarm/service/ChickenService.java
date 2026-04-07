@@ -161,12 +161,12 @@ public class ChickenService {
 
         for (Chicken chicken : userChickens) {
             // 1. Santé
-            if (handleHealth(chicken) != 0){
+            if (!handleHealth(chicken)){
                 continue;
             }
 
             // 2. Faim, Soif et Poids
-            if (handleFood(chicken) != 0){
+            if (!handleFood(chicken)){
                 continue;
             }
 
@@ -210,6 +210,18 @@ public class ChickenService {
             chicken.setWateredToday(false);
             chicken.setClean(false); // Le poulailler devient sale tous les jours
 
+            // 1 chance sur 10 de tomber malade
+            if (Math.random() < 0.1){ 
+                chicken.setHealthy(false);
+
+                // si il est malade il ne peu pas se reproduire
+                if (chicken.getChickenType() == Chicken.ChickenType.L) {
+                    chicken.setChickenType(Chicken.ChickenType.H);
+                } else if (chicken.getChickenType() == Chicken.ChickenType.B) {
+                    chicken.setChickenType(Chicken.ChickenType.R);
+                }
+            }
+
             chickenRepository.save(chicken);
         }
 
@@ -217,10 +229,10 @@ public class ChickenService {
         handleEggs(userId, activeRoosters, activeHens);
     }
 
-    // renvoi un code 1 si le poulet meurt
-    private int handleHealth(Chicken chicken){
+    // renvoi faux si le poulet meurt
+    private Boolean handleHealth(Chicken chicken){
 
-        int out = 0;
+        Boolean out = true;
 
         if (chicken.getHealthy() != null && !chicken.getHealthy()) {
             chicken.setSickDays(
@@ -229,27 +241,27 @@ public class ChickenService {
                         : chicken.getSickDays()) + 1
                 );
 
-            // si il est malade il ne peu pas se reproduire
-            if (chicken.getChickenType() == Chicken.ChickenType.L) {
-                chicken.setChickenType(Chicken.ChickenType.H);
-            } else if (chicken.getChickenType() == Chicken.ChickenType.B) {
-                chicken.setChickenType(Chicken.ChickenType.R);
-            }
-
             if (chicken.getSickDays() >= 4) {
                 chickenRepository.delete(chicken);
-                return 1; // le poulet meurt
+                return false; // le poulet meurt
             }
         } else {
             chicken.setSickDays(0);
+
+            if (chicken.getChickenType() == Chicken.ChickenType.H) {
+                chicken.setChickenType(Chicken.ChickenType.L);
+            } else if (chicken.getChickenType() == Chicken.ChickenType.R) {
+                chicken.setChickenType(Chicken.ChickenType.B);
+            }
         }
 
         return out;
     }
 
-    private int handleFood(Chicken chicken){
+    // renvoi faux si le poulet meurt
+    private Boolean handleFood(Chicken chicken){
 
-        int out = 0;
+        Boolean out = true;
 
         if (chicken.getFedToday() != null && !chicken.getFedToday()) {
             chicken.setFastingDays(
@@ -271,7 +283,7 @@ public class ChickenService {
             else if (chicken.getFastingDays() == 3) weightLoss = 1.0f;
             else if (chicken.getFastingDays() >= 4) {
                 chickenRepository.delete(chicken);
-                return 1; // le poulet meurt
+                return false; // le poulet meurt
             }
             chicken.setWeight(chicken.getWeight() - weightLoss);
         } else {

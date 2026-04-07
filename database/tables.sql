@@ -97,7 +97,9 @@ CREATE TABLE IF NOT EXISTS cow
         ON UPDATE CASCADE,
     name VARCHAR(50),
     cowType cowTypeEnum,
-    milking BOOLEAN DEFAULT FALSE
+    milking BOOLEAN DEFAULT FALSE,
+    milk INTEGER DEFAULT 0,
+    hay_today BOOLEAN DEFAULT FALSE; 
 );
 
 CREATE TABLE IF NOT EXISTS event
