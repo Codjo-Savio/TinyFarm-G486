@@ -137,3 +137,18 @@ in which you will copy and paste the content of the two exemple (respectively) b
   * mettre à jour une transaction                   Put("id/{id}")
 
   * retirer une transaction par Id                  Delete("id/{id}")
+
+  ### Stock ("api/stocks")
+  
+  * récupérer tous les stocks                       Get("")
+  * récupérer un stock par UserId et ProductId      Get("/user/{userId}/product/{productId}")
+  * récupérer un stock par UserId                   Get("/user/{userId}")
+  * récupérer tous les stocks                       Get("/product/{productId}")
+
+  * ajouter un stock                                Post("")
+  
+  * mettre à jour un stock                          Put("/user/{userId}/product/{productId}")
+  
+  * retirer un stock par UserId et ProductId        Delete("/user/{userId}/product/{productId}")
+  * retirer un stock par UserId                     Delete("/user/{userId}")
+  * retirer un stock par ProductId                  Delete("/product/{productId}")

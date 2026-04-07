@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Table(name = "stock")
 @Data
@@ -20,10 +19,10 @@ public class Stock {
     })
     private StockId id;
 
-    @Column(name = "uid", nullable = false, insertable = false, updatable = false)
+    @Column(name = "uid", insertable = false, updatable = false)
     private Long userId;
 
-    @Column(name = "productID", nullable = false, insertable = false, updatable = false)
+    @Column(name = "productID", insertable = false, updatable = false)
     private Long productId;
 
     @Column(name = "quantity", nullable = false)
