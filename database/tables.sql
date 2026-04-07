@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS "user"
     name VARCHAR(20),
     email VARCHAR(100),
     gender genderEnum,
-    ecus INTEGER,
+    ecus FLOAT,
     hibernation BOOLEAN DEFAULT FALSE,
     level INTEGER DEFAULT 1
 );

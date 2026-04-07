@@ -45,7 +45,7 @@ public class User {
     private Gender gender;
 
     @Column(name = "ecus")
-    private Integer ecus;
+    private Float ecus;
 
     @Column(name = "hibernation")
     private Boolean hibernation;
@@ -56,7 +56,7 @@ public class User {
     // default values for ecus and level
     @PrePersist
     public void prePersist() {
-        this.ecus = 1500;
+        this.ecus = 1500F;
         this.hibernation = false;
         this.level = 1;
     }
