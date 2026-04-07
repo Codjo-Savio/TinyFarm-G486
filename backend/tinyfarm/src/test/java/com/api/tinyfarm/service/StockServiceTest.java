@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.api.tinyfarm.model.Stock;
 import com.api.tinyfarm.model.StockId;
+import com.api.tinyfarm.model.Transaction;
+import com.api.tinyfarm.model.User;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,8 @@ public class StockServiceTest {
     private Stock testStock;
     private Long testUserId;
     private Long testProductId;
+
+    private UserService userService;
 
     @BeforeEach
     void setup() throws Exception {
@@ -145,4 +149,54 @@ public class StockServiceTest {
 
         assertEquals(0, stockService.findAll().size());
     }
+
+    @Test
+    void shouldModifyStockByBuying() {
+        /* Stock
+        testUserId = 1L;
+        testProductId = 10L;
+
+        testStock = new Stock();
+        testStock.setId(new StockId(testUserId, testProductId));
+        testStock.setQuantity(1000);
+        testStock.setCollectible(false);
+        testStock = stockService.create(testStock);
+        */
+
+        // Création d'une transaction test
+
+        Transaction transaction = new Transaction();
+        transaction.setId(13L);
+        transaction.setBuyer(testUserId);
+        transaction.setSeller(24L);
+        transaction.setProduct(testProductId);
+        transaction.setQuantity(250);
+        transaction.setTotalPrice(500);
+
+        // Création d'un User
+        User buyer = new User();
+        buyer.setId(2L);
+        buyer.setEmail("buyer@lovetobuy.com");
+        buyer.setGender(User.Gender.F);
+        buyer.setHibernation(false);
+        buyer.setLevel(10);
+        buyer.setName("Véronica");
+        buyer.setEcus(1500F);
+
+        stockService.buy(transaction.getId());
+        Stock sfound = stockService.findById(testUserId, testProductId);
+        User uFound = userService.find
+
+        // Test Quantité de produit
+        assertEquals(testStock.getProductId(), found.getProductId());
+        assertEquals(
+            testStock.getQuantity() - transaction.getQuantity(),
+            found.getQuantity()
+        );
+        // Test Ecus
+        assertEquals(buyer.getEcus() - transaction.getTotalPrice(), buyer);
+    }
+
+    @Test
+    void shouldModifyStockBySelling() {}
 }
