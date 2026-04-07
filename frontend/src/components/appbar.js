@@ -23,13 +23,15 @@ class AppBar extends HTMLElement {
 
             if (!jwt) throw new Error();
 
-            const user = await (
-                await fetch(`${this.API_URL}/auth/me`, {
-                    headers: new Headers({
-                        Authorization: "Bearer " + jwt,
-                    }),
-                })
-            ).json();
+            const userRes = await fetch(`${this.API_URL}/auth/me`, {
+                headers: new Headers({
+                    Authorization: "Bearer " + jwt,
+                }),
+            });
+
+            if (userRes.status !== 200) throw new Error();
+
+            const user = await userRes.json();
 
             const res = await fetch(`${this.API_URL}/users/id/${user.id}`, {
                 headers: new Headers({
