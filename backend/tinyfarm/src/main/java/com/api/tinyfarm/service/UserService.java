@@ -102,6 +102,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public void hibernate(Long id){
+        User user = findById(id);
+        user.setHibernation(true);
+        userRepository.save(user);
+    }
+
     public boolean canBuy(Long id, Integer purchaseNumberForToday) {
         User user = findById(id);
         int maxPurchase = user.getLevel() * 12; // niveau 1 = 12 achats par jour
