@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -37,8 +35,7 @@ public class Chicken extends Animal {
     }
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "chicken_type", columnDefinition = "chickentypeenum")
+    @Column(name = "chicken_type")
     private ChickenType chickenType;
 
     @NotNull(message = "The name is obligatory")

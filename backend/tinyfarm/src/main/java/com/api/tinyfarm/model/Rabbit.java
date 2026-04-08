@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -28,8 +26,7 @@ public class Rabbit extends Animal {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "rabbit_type", columnDefinition = "rabbittypeenum")
+    @Column(name = "rabbit_type")
     private RabbitTypeEnum rabbitType;
 
     @PrePersist

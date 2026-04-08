@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "Animal")
@@ -57,8 +55,7 @@ public class Animal {
     }
 
     @Enumerated(EnumType.STRING)
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "gender", columnDefinition = "genderenum")
+    @Column(name = "gender", length = 20)
     private AnimalGender gender;
 
     @PrePersist

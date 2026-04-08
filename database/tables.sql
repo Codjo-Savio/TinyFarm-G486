@@ -1,17 +1,8 @@
-/* Enum types for animal subtypes */
-CREATE TYPE chickenTypeEnum AS ENUM('C', 'H', 'R', 'L', 'B');
-
-CREATE TYPE rabbitTypeEnum AS ENUM('lapereau', 'lapin');
-
-CREATE TYPE cowTypeEnum AS ENUM('D', 'B', 'C');
-
-CREATE TYPE genderEnum AS ENUM('M', 'F');
-
 CREATE TABLE IF NOT EXISTS "user" (
     uid INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR(20),
     email VARCHAR(100),
-    gender genderEnum,
+    gender VARCHAR(20) CHECK (gender IN ('M', 'F')),
     ecus INTEGER,
     hibernation BOOLEAN DEFAULT FALSE,
     level INTEGER DEFAULT 1
@@ -53,13 +44,13 @@ CREATE TABLE IF NOT EXISTS animal (
     weight FLOAT,
     fed_today BOOLEAN DEFAULT FALSE,
     watered_today BOOLEAN DEFAULT FALSE,
-    gender genderEnum
+    gender VARCHAR(20) CHECK (gender IN ('M', 'F'))
 );
 
 CREATE TABLE IF NOT EXISTS chicken (
     aid INTEGER PRIMARY KEY REFERENCES animal (aid) ON DELETE CASCADE ON UPDATE CASCADE,
     name VARCHAR(50),
-    chicken_type chickenTypeEnum,
+    chicken_type VARCHAR(20) CHECK (chicken_type IN ('C', 'H', 'R', 'L', 'B')),
     fasting BOOLEAN DEFAULT FALSE,
     fasting_days INTEGER,
     sick_days INTEGER
@@ -68,13 +59,13 @@ CREATE TABLE IF NOT EXISTS chicken (
 CREATE TABLE IF NOT EXISTS rabbit (
     aid INTEGER PRIMARY KEY REFERENCES animal (aid) ON DELETE CASCADE ON UPDATE CASCADE,
     name VARCHAR(50),
-    rabbit_type rabbitTypeEnum
+    rabbit_type VARCHAR(20) CHECK (rabbit_type IN ('lapereau', 'lapin'))
 );
 
 CREATE TABLE IF NOT EXISTS cow (
     aid INTEGER PRIMARY KEY REFERENCES animal (aid) ON DELETE CASCADE ON UPDATE CASCADE,
     name VARCHAR(50),
-    cow_type cowTypeEnum,
+    cow_type VARCHAR(20) CHECK (cow_type IN ('D', 'B', 'C')),
     milking BOOLEAN DEFAULT FALSE
 );
 
