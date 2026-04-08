@@ -138,4 +138,16 @@ public class CowController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @PostMapping("/endOfDay")
+    public ResponseEntity<Void> processEndOfDay(@RequestParam Long userId) {
+        try {
+            cowService.processEndOfDay(userId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(
+                HttpStatus.INTERNAL_SERVER_ERROR
+            ).build();
+        }
+    }
 }
