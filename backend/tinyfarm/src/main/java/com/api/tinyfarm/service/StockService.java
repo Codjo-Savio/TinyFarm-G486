@@ -117,50 +117,92 @@ public class StockService {
     }
 
     public void sell(Long tid) {
-        // Récupération de la transaction d'achat
+        // Récupération de la transaction de vente
         Optional<Transaction> transaction = transactionRepository.findById(tid);
-        // Récupération du stock de l'utilisateur qui vend
-        List<Stock> stock = findByUser(transaction.get().getSeller());
+        if (!transaction.isPresent()) {
+            throw new RuntimeException("Transaction non trouvée");
+        }
 
-        // Gestion du stock de l'utilisateur qui vend en fonction de la transaction
+        Transaction trans = transaction.get();
+        Long sellerId = trans.getSeller();
+        Long buyerId = trans.getBuyer();
+        Long productId = trans.getProduct();
+        int quantity = trans.getQuantity();
+        float totalPrice = trans.getTotalPrice();
 
-        int quantity = transaction.get().getQuantity();
+        // Récupération du stock du vendeur pour ce produit
+        List<Stock> sellerStocks = findByUser(sellerId);
+        Stock sellerStock = sellerStocks
+            .stream()
+            .filter(s -> s.getId().getProductID().equals(productId))
+            .findFirst()
+            .orElseThrow(() ->
+                new RuntimeException("Stock du vendeur non trouvé")
+            );
 
-        // Gestion des écus de l'utilisateur qui achète en fonction de la transaction
+        // Mise à jour du stock du vendeur (diminution de la quantité vendue)
+        Stock updatedSellerStock = new Stock();
+        updatedSellerStock.setId(sellerStock.getId());
+        updatedSellerStock.setUserId(sellerStock.getUserId());
+        updatedSellerStock.setProductId(sellerStock.getProductId());
+        updatedSellerStock.setQuantity(sellerStock.getQuantity() - quantity);
+        updatedSellerStock.setCollectible(sellerStock.getCollectible());
 
-        float ecuGain = transaction.get().getTotalPrice();
+        // Mise à jour du stock de l'acheteur
+        List<Stock> buyerStocks = findByUser(buyerId);
+        Stock buyerStock = buyerStocks
+            .stream()
+            .filter(s -> s.getId().getProductID().equals(productId))
+            .findFirst()
+            .orElse(null);
 
-        // On retire la quantité d'objet vendu dans le stock en l'updatant avec le nouveau stock.
+        if (buyerStock == null) {
+            // Créer un nouveau stock pour l'acheteur
+            buyerStock = new Stock();
+            buyerStock.setId(new StockId(buyerId, productId));
+            buyerStock.setQuantity(quantity);
+            buyerStock.setCollectible(sellerStock.getCollectible());
+            stockRepository.save(buyerStock);
+        } else {
+            // Augmenter le stock existant
+            Stock updatedBuyerStock = new Stock();
+            updatedBuyerStock.setId(buyerStock.getId());
+            updatedBuyerStock.setUserId(buyerStock.getUserId());
+            updatedBuyerStock.setProductId(buyerStock.getProductId());
+            updatedBuyerStock.setQuantity(buyerStock.getQuantity() + quantity);
+            updatedBuyerStock.setCollectible(buyerStock.getCollectible());
+            update(buyerId, productId, updatedBuyerStock);
+        }
 
-        Stock updatedStock = new Stock();
-        updatedStock.setId(stock.get(0).getId());
-        updatedStock.setUserId(stock.get(0).getUserId());
-        updatedStock.setProductId(stock.get(0).getProductId());
-        updatedStock.setQuantity((stock.get(0).getQuantity()) - quantity); // On retire la quantité de la vente.
-        updatedStock.setCollectible(stock.get(0).getCollectible());
+        // Mise à jour des écus
+        Optional<User> seller = userRepository.findById(sellerId);
+        Optional<User> buyer = userRepository.findById(buyerId);
 
-        Optional<User> seller = userRepository.findById(
-            stock.get(0).getUserId()
-        );
+        if (seller.isPresent() && buyer.isPresent()) {
+            // Mise à jour du vendeur (gain d'écus)
+            User updatedSeller = new User();
+            updatedSeller.setId(seller.get().getId());
+            updatedSeller.setName(seller.get().getName());
+            updatedSeller.setEmail(seller.get().getEmail());
+            updatedSeller.setEcus(seller.get().getEcus() + totalPrice);
+            updatedSeller.setGender(seller.get().getGender());
+            updatedSeller.setHibernation(seller.get().getHibernation());
 
-        // Création du User modifié :
+            // Mise à jour de l'acheteur (perte d'écus)
+            User updatedBuyer = new User();
+            updatedBuyer.setId(buyer.get().getId());
+            updatedBuyer.setName(buyer.get().getName());
+            updatedBuyer.setEmail(buyer.get().getEmail());
+            updatedBuyer.setEcus(buyer.get().getEcus() - totalPrice);
+            updatedBuyer.setGender(buyer.get().getGender());
+            updatedBuyer.setHibernation(buyer.get().getHibernation());
 
-        User updatedUser = new User();
-        updatedUser.setId(seller.get().getId());
-        updatedUser.setName(seller.get().getName());
-        updatedUser.setEmail(seller.get().getEmail());
-        updatedUser.setEcus(seller.get().getEcus() + ecuGain);
-        updatedUser.setGender(seller.get().getGender());
-        updatedUser.setHibernation(seller.get().getHibernation());
+            userService.update(sellerId, updatedSeller);
+            userService.update(buyerId, updatedBuyer);
+        }
 
-        // Update
-
-        userService.update(seller.get().getId(), updatedUser);
-        update(
-            seller.get().getId(),
-            transaction.get().getProduct(),
-            updatedStock
-        );
+        // Mise à jour du stock du vendeur
+        update(sellerId, productId, updatedSellerStock);
     }
 
     public void buy(Long tid) {
