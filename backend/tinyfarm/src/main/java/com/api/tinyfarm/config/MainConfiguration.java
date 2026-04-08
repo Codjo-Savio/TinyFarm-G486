@@ -1,7 +1,6 @@
 package com.api.tinyfarm.config;
 
 import jakarta.annotation.PostConstruct;
-import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -15,33 +14,36 @@ import org.springframework.context.annotation.Profile;
 @Profile("prod")
 public class MainConfiguration {
 
-    @Value("${secrets.username}")
+    @Value("${secrets.username:}")
     private String usernameFilePath;
 
-    @Value("${secrets.password-path}")
+    @Value("${secrets.password-path:}")
     private String passwordFilePath;
 
     private String databaseUsername;
     private String databasePassword;
 
-    // the methods bellow will be executed once, when spring will start
+    // Accept either file paths (Docker secrets style) or direct values.
     @PostConstruct
-    private void checkPaths() throws FileNotFoundException {
-        if (!Files.exists(Path.of(usernameFilePath))) {
-            throw new FileNotFoundException("File not found: " + usernameFilePath);
-        }
-        if (!Files.exists(Path.of(passwordFilePath))) {
-            throw new FileNotFoundException("File not found: " + passwordFilePath);
-        }
+    private void init() {
+        this.databaseUsername = resolveValue(usernameFilePath);
+        this.databasePassword = resolveValue(passwordFilePath);
     }
 
-    public void innit() throws FileNotFoundException {
-        checkPaths();
-        try {
-            this.databaseUsername = Files.readString(Path.of(usernameFilePath)).trim();
-            this.databasePassword = Files.readString(Path.of(passwordFilePath)).trim();
-        } catch (Exception e) {
-            throw new RuntimeException("Error reading secret files", e);
+    private String resolveValue(String valueOrPath) {
+        if (valueOrPath == null || valueOrPath.isBlank()) {
+            return "";
         }
+
+        Path candidatePath = Path.of(valueOrPath);
+        if (Files.exists(candidatePath)) {
+            try {
+                return Files.readString(candidatePath).trim();
+            } catch (Exception e) {
+                throw new RuntimeException("Error reading secret file: " + valueOrPath, e);
+            }
+        }
+
+        return valueOrPath.trim();
     }
 }

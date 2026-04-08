@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "`user`")
@@ -41,7 +43,8 @@ public class User {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "gender", length = 20)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "gender", columnDefinition = "genderenum")
     private Gender gender;
 
     @Column(name = "ecus")
@@ -56,15 +59,15 @@ public class User {
     // default values for ecus and level
     @PrePersist
     public void prePersist() {
-        if(this.ecus == null){
+        if (this.ecus == null) {
             this.ecus = 1500;
         }
 
-        if(this.hibernation == null){
+        if (this.hibernation == null) {
             this.hibernation = false;
         }
 
-        if(this.level == null){
+        if (this.level == null) {
             this.level = 1;
         }
     }

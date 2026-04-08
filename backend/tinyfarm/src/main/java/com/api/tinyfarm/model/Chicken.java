@@ -6,10 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "chicken")
+@PrimaryKeyJoinColumn(name = "aid")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,12 +36,9 @@ public class Chicken extends Animal {
         }
     }
 
-    @MapsId
-    @Column(name = "aid")
-    Long id;
-
     @Enumerated(EnumType.STRING)
-    @Column(name = "chickenType")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "chicken_type", columnDefinition = "chickentypeenum")
     private ChickenType chickenType;
 
     @NotNull(message = "The name is obligatory")

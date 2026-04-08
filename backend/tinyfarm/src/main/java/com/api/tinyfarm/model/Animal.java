@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "Animal")
@@ -15,10 +17,10 @@ public class Animal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "a_id", nullable = false)
+    @Column(name = "aid", nullable = false)
     private Long id;
 
-    @Column(name = "u_id")
+    @Column(name = "uid")
     private Long userId;
 
     @Column(name = "clean")
@@ -55,11 +57,12 @@ public class Animal {
     }
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "gender")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "gender", columnDefinition = "genderenum")
     private AnimalGender gender;
 
     @PrePersist
-    public void prePersist(){
+    public void prePersist() {
         if (clean == null) {
             clean = true;
         }
