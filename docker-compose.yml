@@ -1,0 +1,57 @@
+name: TinyFarm-G486
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: tinyfarm
+      POSTGRES_USER: tinyfarm486
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/tables.sql:/docker-entrypoint-initdb.d/01-tables.sql:ro
+    networks:
+      - internal
+
+  backend:
+    build:
+      context: ./backend/tinyfarm
+      dockerfile: Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tinyfarm
+      SPRING_DATASOURCE_USERNAME: tinyfarm486
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      # SECRETS_USERNAME: ${DB_USER:-tinyfarm_user}
+      # SECRETS_PASSWORD_PATH: ${DB_PASSWORD:-tinyfarm_password}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_REDIRECT_URI: "{baseUrl}/api/auth/login/oauth2/code/github"
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-10000}
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_SCOPE: read:user,user:email
+      TINYFARM_FRONTEND_URL: ${FRONTEND_URL}
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
+    networks:
+      - internal
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      API_URL: ${API_URL}
+    ports:
+      - 3000:3000
+
+volumes:
+  postgres_data:
+
+networks:
+  internal:
