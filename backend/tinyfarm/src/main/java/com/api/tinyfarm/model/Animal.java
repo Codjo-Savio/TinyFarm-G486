@@ -15,10 +15,10 @@ public class Animal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "a_id", nullable = false)
+    @Column(name = "aid", nullable = false)
     private Long id;
 
-    @Column(name = "u_id")
+    @Column(name = "uid")
     private Long userId;
 
     @Column(name = "clean")
@@ -55,11 +55,11 @@ public class Animal {
     }
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "gender")
+    @Column(name = "gender", length = 20)
     private AnimalGender gender;
 
     @PrePersist
-    public void prePersist(){
+    public void prePersist() {
         if (clean == null) {
             clean = true;
         }

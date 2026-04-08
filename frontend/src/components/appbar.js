@@ -1,5 +1,5 @@
 class AppBar extends HTMLElement {
-    API_URL = "http://localhost:8080/api";
+    API_URL = window.apiUrl || "http://localhost:8080/api";
 
     constructor() {
         super();
@@ -47,7 +47,7 @@ class AppBar extends HTMLElement {
     async logout() {
         const jwt = this.getCookie("jwt");
 
-        let res = await fetch(`${this.API_URL.replace("/api", "")}/logout`, {
+        let res = await fetch(`${this.API_URL}/auth/logout`, {
             method: "POST",
             credentials: "include",
             redirect: "manual",

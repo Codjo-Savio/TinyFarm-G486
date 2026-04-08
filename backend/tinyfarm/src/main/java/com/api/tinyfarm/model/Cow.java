@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "cow")
+@PrimaryKeyJoinColumn(name = "aid")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Data
 @NoArgsConstructor
@@ -32,16 +33,12 @@ public class Cow extends Animal {
         }
     }
 
-    @MapsId
-    @Column(name = "aid")
-    private Long id;
-
     @NotNull(message = "The name is obligatory")
     @Column(name = "name", length = 20)
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "cowType")
+    @Column(name = "cow_type")
     private CowType cowType;
 
     @Column(name = "milking")

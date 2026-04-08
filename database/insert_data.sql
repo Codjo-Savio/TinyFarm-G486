@@ -2,14 +2,17 @@
 /*  SCRIPT D'INSERTION DES DONNÉES DE TEST   */
 /*  TinyFarm                                 */
 /*===========================================*/
-
-SET search_path TO TinyFarm;
+SET
+    search_path TO TinyFarm;
 
 -- ============================================
 -- Utilisateurs
 -- ============================================
 -- u_id = 1 est réservé à la coopérative
-INSERT INTO "User" (u_id, nom, sexe, ecus, level) OVERRIDING SYSTEM VALUE VALUES
+INSERT INTO
+    "user" (u_id, nom, sexe, ecus, level)
+OVERRIDING SYSTEM VALUE
+VALUES
     (1, 'Cooperative', 'N/A', 5000, 0),
     (2, 'Alice', 'F', 1200, 5),
     (3, 'Bob', 'M', 800, 3),
@@ -17,12 +20,24 @@ INSERT INTO "User" (u_id, nom, sexe, ecus, level) OVERRIDING SYSTEM VALUE VALUES
     (5, 'Diana', 'F', 350, 2);
 
 -- Resynchroniser la séquence après insertion manuelle
-SELECT setval(pg_get_serial_sequence('"User"', 'u_id'), (SELECT MAX(u_id) FROM "User"));
+SELECT
+    setval(
+        pg_get_serial_sequence('"user"', 'u_id'),
+        (
+            SELECT
+                MAX(u_id)
+            FROM
+                "user"
+        )
+    );
 
 -- ============================================
 -- Produits
 -- ============================================
-INSERT INTO Product (productID, description, collection, price, coef) OVERRIDING SYSTEM VALUE VALUES
+INSERT INTO
+    Product (productID, description, collection, price, coef)
+OVERRIDING SYSTEM VALUE
+VALUES
     (1, 'Lapin', FALSE, 50.0, 3),
     (2, 'Oeuf', TRUE, 5.0, 1),
     (3, 'Lait', TRUE, 10.0, 2),
@@ -31,12 +46,32 @@ INSERT INTO Product (productID, description, collection, price, coef) OVERRIDING
     (6, 'Carotte', TRUE, 2.0, 1),
     (7, 'Blé', TRUE, 3.0, 1);
 
-SELECT setval(pg_get_serial_sequence('Product', 'productid'), (SELECT MAX(productID) FROM Product));
+SELECT
+    setval(
+        pg_get_serial_sequence('Product', 'productid'),
+        (
+            SELECT
+                MAX(productID)
+            FROM
+                Product
+        )
+    );
 
 -- ============================================
 -- Transactions
 -- ============================================
-INSERT INTO Transactions (t_id, seller, buyer, product, quantite, prix_total, date_transaction) OVERRIDING SYSTEM VALUE VALUES
+INSERT INTO
+    Transactions (
+        t_id,
+        seller,
+        buyer,
+        product,
+        quantite,
+        prix_total,
+        date_transaction
+    )
+OVERRIDING SYSTEM VALUE
+VALUES
     (1, 2, 3, 2, 10, 50.0, '2025-02-01 10:00:00'),
     (2, 2, 4, 3, 5, 50.0, '2025-02-02 11:30:00'),
     (3, 3, 5, 2, 8, 40.0, '2025-02-03 09:15:00'),
@@ -48,52 +83,86 @@ INSERT INTO Transactions (t_id, seller, buyer, product, quantite, prix_total, da
     (9, 4, 5, 2, 12, 60.0, '2025-02-14 13:00:00'),
     (10, 5, 3, 4, 4, 60.0, '2025-02-15 17:20:00');
 
-SELECT setval(pg_get_serial_sequence('Transactions', 't_id'), (SELECT MAX(t_id) FROM Transactions));
+SELECT
+    setval(
+        pg_get_serial_sequence('Transactions', 't_id'),
+        (
+            SELECT
+                MAX(t_id)
+            FROM
+                Transactions
+        )
+    );
 
 -- ============================================
 -- Animaux
 -- ============================================
 -- Animaux d'Alice (u_id = 2)
-INSERT INTO Animal (u_id, a_id, clean, healthy, age, weight, a_gender) OVERRIDING SYSTEM VALUE VALUES
-    (2, 1, TRUE, TRUE, 120, 2.5, TRUE),
-    (2, 2, TRUE, TRUE, 90, 2.0, FALSE),
-    (2, 3, FALSE, TRUE, 30, 0.5, FALSE),
-    (2, 4, TRUE, FALSE, 200, 3.0, TRUE);
+INSERT INTO
+    Animal (u_id, a_id, clean, healthy, age, weight, gender)
+OVERRIDING SYSTEM VALUE
+VALUES
+    (2, 1, TRUE, TRUE, 120, 2.5, 'M'),
+    (2, 2, TRUE, TRUE, 90, 2.0, 'F'),
+    (2, 3, FALSE, TRUE, 30, 0.5, 'F'),
+    (2, 4, TRUE, FALSE, 200, 3.0, 'M');
 
 -- Animaux de Bob (u_id = 3)
-INSERT INTO Animal (u_id, a_id, clean, healthy, age, weight, a_gender) OVERRIDING SYSTEM VALUE VALUES
-    (3, 5, TRUE, TRUE, 60, 1.8, FALSE),
-    (3, 6, TRUE, TRUE, 150, 4.0, TRUE),
-    (3, 7, FALSE, FALSE, 45, 1.2, FALSE);
+INSERT INTO
+    Animal (u_id, a_id, clean, healthy, age, weight, gender)
+OVERRIDING SYSTEM VALUE
+VALUES
+    (3, 5, TRUE, TRUE, 60, 1.8, 'F'),
+    (3, 6, TRUE, TRUE, 150, 4.0, 'M'),
+    (3, 7, FALSE, FALSE, 45, 1.2, 'F');
 
 -- Animaux de Charlie (u_id = 4)
-INSERT INTO Animal (u_id, a_id, clean, healthy, age, weight, a_gender) OVERRIDING SYSTEM VALUE VALUES
-    (4, 8, TRUE, TRUE, 300, 500.0, FALSE),
-    (4, 9, TRUE, TRUE, 80, 2.2, TRUE),
-    (4, 10, TRUE, TRUE, 10, 0.3, FALSE);
+INSERT INTO
+    Animal (u_id, a_id, clean, healthy, age, weight, gender)
+OVERRIDING SYSTEM VALUE
+VALUES
+    (4, 8, TRUE, TRUE, 300, 500.0, 'F'),
+    (4, 9, TRUE, TRUE, 80, 2.2, 'M'),
+    (4, 10, TRUE, TRUE, 10, 0.3, 'F');
 
 -- Animaux de Diana (u_id = 5)
-INSERT INTO Animal (u_id, a_id, clean, healthy, age, weight, a_gender) OVERRIDING SYSTEM VALUE VALUES
-    (5, 11, TRUE, TRUE, 40, 1.5, FALSE),
-    (5, 12, FALSE, TRUE, 20, 0.8, TRUE);
+INSERT INTO
+    Animal (u_id, a_id, clean, healthy, age, weight, gender)
+OVERRIDING SYSTEM VALUE
+VALUES
+    (5, 11, TRUE, TRUE, 40, 1.5, 'F'),
+    (5, 12, FALSE, TRUE, 20, 0.8, 'M');
 
-SELECT setval(pg_get_serial_sequence('Animal', 'a_id'), (SELECT MAX(a_id) FROM Animal));
+SELECT
+    setval(
+        pg_get_serial_sequence('Animal', 'a_id'),
+        (
+            SELECT
+                MAX(a_id)
+            FROM
+                Animal
+        )
+    );
 
 -- ============================================
 -- Poulets (sous-classe Chicken)
 -- ============================================
-INSERT INTO Chicken (a_id, chicken_type, fasting) VALUES
-    (1, 'coq', 0),
-    (2, 'poule', 0),
-    (3, 'poussin', 2),
-    (5, 'poule', 0),
-    (10, 'poussin', 0),
-    (11, 'poule', 1);
+INSERT INTO
+    Chicken (a_id, chickenType, fasting)
+VALUES
+    (1, 'R', 0),
+    (2, 'H', 0),
+    (3, 'C', 2),
+    (5, 'H', 0),
+    (10, 'C', 0),
+    (11, 'H', 1);
 
 -- ============================================
 -- Lapins (sous-classe Rabbit)
 -- ============================================
-INSERT INTO Rabbit (a_id, rabbit_type) VALUES
+INSERT INTO
+    Rabbit (a_id, rabbitType)
+VALUES
     (4, 'lapin'),
     (7, 'lapereau'),
     (9, 'lapin'),
@@ -102,14 +171,18 @@ INSERT INTO Rabbit (a_id, rabbit_type) VALUES
 -- ============================================
 -- Vaches (sous-classe Cow)
 -- ============================================
-INSERT INTO Cow (a_id) VALUES
+INSERT INTO
+    Cow (a_id)
+VALUES
     (6),
     (8);
 
 -- ============================================
 -- Stock (inventaire des utilisateurs)
 -- ============================================
-INSERT INTO Stock (u_id, productID, quantity) VALUES
+INSERT INTO
+    Stock (u_id, productID, quantity)
+VALUES
     (2, 2, 25),
     (2, 3, 10),
     (2, 7, 50),
@@ -124,7 +197,9 @@ INSERT INTO Stock (u_id, productID, quantity) VALUES
 -- ============================================
 -- Desktop (étalage / vitrine des utilisateurs)
 -- ============================================
-INSERT INTO Desktop (u_id, productID, quantity) VALUES
+INSERT INTO
+    Desktop (u_id, productID, quantity)
+VALUES
     (2, 2, 5),
     (2, 3, 3),
     (3, 2, 4),
@@ -137,7 +212,9 @@ INSERT INTO Desktop (u_id, productID, quantity) VALUES
 -- ============================================
 -- Market (produits mis en vente avec prix libre)
 -- ============================================
-INSERT INTO Market (u_id, productID, price) VALUES
+INSERT INTO
+    Market (u_id, productID, price)
+VALUES
     (2, 2, 6.0),
     (2, 7, 4.0),
     (3, 6, 2.5),
@@ -148,7 +225,9 @@ INSERT INTO Market (u_id, productID, price) VALUES
 -- ============================================
 -- Cooperative (produits dans la coopérative)
 -- ============================================
-INSERT INTO Cooperative (u_id, productID, is_open) VALUES
+INSERT INTO
+    Cooperative (u_id, productID, is_open)
+VALUES
     (1, 2, TRUE),
     (1, 3, TRUE),
     (1, 6, FALSE),
@@ -157,14 +236,66 @@ INSERT INTO Cooperative (u_id, productID, is_open) VALUES
 -- ============================================
 -- Événements (avec date)
 -- ============================================
-INSERT INTO Event (e_id, u_id, text, date_event) OVERRIDING SYSTEM VALUE VALUES
-    (1, 2, 'Alice a vendu 10 oeufs à Bob', '2025-02-01 10:00:00'),
-    (2, 3, 'Bob a acheté 10 oeufs à Alice', '2025-02-01 10:00:00'),
-    (3, 4, 'Charlie a vendu 2 lapins à Alice', '2025-02-05 14:00:00'),
-    (4, 2, 'La poule d''Alice a pondu 5 oeufs', '2025-02-08 07:30:00'),
-    (5, 5, 'Diana a mis de la laine en vente', '2025-02-09 09:00:00'),
-    (6, 3, 'Le lapereau de Bob est malade', '2025-02-11 16:00:00'),
-    (7, 4, 'Charlie a atteint le niveau 7', '2025-02-13 12:00:00'),
-    (8, 2, 'Le poussin d''Alice jeûne depuis 2 jours', '2025-02-14 08:00:00');
+INSERT INTO
+    Event (e_id, u_id, text, date_event)
+OVERRIDING SYSTEM VALUE
+VALUES
+    (
+        1,
+        2,
+        'Alice a vendu 10 oeufs à Bob',
+        '2025-02-01 10:00:00'
+    ),
+    (
+        2,
+        3,
+        'Bob a acheté 10 oeufs à Alice',
+        '2025-02-01 10:00:00'
+    ),
+    (
+        3,
+        4,
+        'Charlie a vendu 2 lapins à Alice',
+        '2025-02-05 14:00:00'
+    ),
+    (
+        4,
+        2,
+        'La poule d''Alice a pondu 5 oeufs',
+        '2025-02-08 07:30:00'
+    ),
+    (
+        5,
+        5,
+        'Diana a mis de la laine en vente',
+        '2025-02-09 09:00:00'
+    ),
+    (
+        6,
+        3,
+        'Le lapereau de Bob est malade',
+        '2025-02-11 16:00:00'
+    ),
+    (
+        7,
+        4,
+        'Charlie a atteint le niveau 7',
+        '2025-02-13 12:00:00'
+    ),
+    (
+        8,
+        2,
+        'Le poussin d''Alice jeûne depuis 2 jours',
+        '2025-02-14 08:00:00'
+    );
 
-SELECT setval(pg_get_serial_sequence('Event', 'e_id'), (SELECT MAX(e_id) FROM Event));
+SELECT
+    setval(
+        pg_get_serial_sequence('Event', 'e_id'),
+        (
+            SELECT
+                MAX(e_id)
+            FROM
+                Event
+        )
+    );
