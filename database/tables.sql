@@ -2,13 +2,10 @@ CREATE TABLE IF NOT EXISTS "user" (
     uid INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR(20),
     email VARCHAR(100),
-<<<<<<< HEAD
     gender genderEnum,
     ecus FLOAT,
-=======
     gender VARCHAR(20) CHECK (gender IN ('M', 'F')),
     ecus INTEGER,
->>>>>>> origin/main
     hibernation BOOLEAN DEFAULT FALSE,
     level INTEGER DEFAULT 1
 );
