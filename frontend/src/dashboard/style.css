@@ -16,6 +16,7 @@ main > svg {
 main > svg > path {
     cursor: pointer;
     fill: var(--color-secondary);
+    fill-opacity: 0;
     transition: fill-opacity 0.3s ease;
     animation: svg-path-shine 2.4s ease-in-out infinite;
     stroke-width: 10px;

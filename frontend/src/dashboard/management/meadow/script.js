@@ -1,5 +1,4 @@
-const API_URL = "http://localhost:8080/api";
-
+const API_URL = window.apiUrl || "http://localhost:8080/api";
 
 // Variables globales pour stocker les données des vaches et le lait
 let cows = [];
@@ -8,14 +7,12 @@ let healthyCount = 0;
 let cleanCount = 0;
 let milkFallback = 0;
 
-
 // Fonction pour récupérer la valeur d'un cookie par son nom
 function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(";").shift();
 }
-
 
 // Fonction d'initialisation du pré et de chargement des données des vaches depuis l'API
 async function initializeMeadow() {
@@ -147,14 +144,11 @@ async function initializeMeadow() {
         document.getElementById("cow-count").textContent = cows.length;
         document.getElementById("milk-count").textContent = milkFallback;
         document.getElementById("sick-count").textContent =
-            (Math.round(
-                ((cows.length - healthyCount) / cows.length) *
-                    100,
-            ) || 0) + "%";
+            (Math.round(((cows.length - healthyCount) / cows.length) * 100) ||
+                0) + "%";
         document.getElementById("dirty-count").textContent =
-            (Math.round(
-                ((cows.length - cleanCount) / cows.length) * 100,
-            ) || 0) + "%";
+            (Math.round(((cows.length - cleanCount) / cows.length) * 100) ||
+                0) + "%";
         updateActionMenuCosts();
     } catch (error) {
         console.error("Impossible de charger le pré :", error);
@@ -211,28 +205,27 @@ function updateActionMenuCosts() {
 function feedAll() {
     for (const cow of cows) {
         if (!cow.fedToday) {
-            // Appel à l'API pour nourrir la vache 
+            // Appel à l'API pour nourrir la vache
             fetch(`${API_URL}/cows/${cow.id}/feed`, {
-            headers: new Headers({
-                Authorization: "Bearer " + jwt,
-            }),
-        });
+                headers: new Headers({
+                    Authorization: "Bearer " + jwt,
+                }),
+            });
             cow.fedToday = true;
         }
     }
     updateActionMenuCosts();
-
 }
 
 function waterAll() {
     for (const cow of cows) {
         if (!cow.wateredToday) {
-            // Appel à l'API pour abreuver la vache 
+            // Appel à l'API pour abreuver la vache
             fetch(`${API_URL}/cows/${cow.id}/water`, {
-            headers: new Headers({
-                Authorization: "Bearer " + jwt,
-            }),
-        });
+                headers: new Headers({
+                    Authorization: "Bearer " + jwt,
+                }),
+            });
             cow.wateredToday = true;
         }
     }
@@ -242,12 +235,12 @@ function waterAll() {
 function healAll() {
     for (const cow of cows) {
         if (!cow.healthy) {
-            // Appel à l'API pour soigner la vache 
+            // Appel à l'API pour soigner la vache
             fetch(`${API_URL}/cows/${cow.id}/heal`, {
-            headers: new Headers({
-                Authorization: "Bearer " + jwt,
-            }),
-        });
+                headers: new Headers({
+                    Authorization: "Bearer " + jwt,
+                }),
+            });
             cow.healthy = true;
         }
     }
@@ -257,12 +250,12 @@ function healAll() {
 function cleanAll() {
     for (const cow of cows) {
         if (!cow.clean) {
-            // Appel à l'API pour nettoyer la vache 
+            // Appel à l'API pour nettoyer la vache
             fetch(`${API_URL}/cows/${cow.id}/clean`, {
-            headers: new Headers({
-                Authorization: "Bearer " + jwt,
-            }),
-        });
+                headers: new Headers({
+                    Authorization: "Bearer " + jwt,
+                }),
+            });
             cow.clean = true;
         }
     }
