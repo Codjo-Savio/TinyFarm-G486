@@ -38,20 +38,21 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers("/api/public/**").permitAll()
-                                .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
-                                .requestMatchers("/api/auth/logout").permitAll()
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated())
                 .oauth2Login(oauth -> oauth
+                        .authorizationEndpoint(
+                                endpoint -> endpoint.baseUri("/api/auth/login/oauth2/authorization/"))
+                        .redirectionEndpoint(
+                                endpoint -> endpoint.baseUri("/api/auth/login/oauth2/code/*"))
                         .userInfoEndpoint(info -> info.userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
-                        .failureHandler(oAuth2FailureHandler)
-                )
+                        .failureHandler(oAuth2FailureHandler))
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         HeaderWriterLogoutHandler clearSiteData = new HeaderWriterLogoutHandler(
                 new ClearSiteDataHeaderWriter(Directive.COOKIES));
         http.logout((logout) -> logout
-                .logoutUrl("/logout")
+                .logoutUrl("/api/auth/logout")
                 .logoutSuccessUrl("/")
                 .deleteCookies("jwt", "JSESSIONID")
                 .invalidateHttpSession(true)

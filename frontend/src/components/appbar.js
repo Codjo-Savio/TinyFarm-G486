@@ -45,7 +45,7 @@ class AppBar extends HTMLElement {
     async logout() {
         const jwt = this.getCookie("jwt");
 
-        let res = await fetch(`${this.API_URL.replace("/api", "")}/logout`, {
+        let res = await fetch(`${this.API_URL}/auth/logout`, {
             method: "POST",
             credentials: "include",
             redirect: "manual",

@@ -167,5 +167,5 @@ fetch(`${API_URL}/classement`)
 
 // Section de code pour la connexion avec Github
 async function auth() {
-    window.location.href = `${API_URL}/auth/oauth2/authorization/github`;
+    window.location.href = `${API_URL}/auth/login/oauth2/authorization/github`;
 }
