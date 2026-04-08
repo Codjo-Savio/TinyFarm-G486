@@ -7,8 +7,6 @@ services:
       POSTGRES_DB: tinyfarm
       POSTGRES_USER: tinyfarm486
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - 5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/tables.sql:/docker-entrypoint-initdb.d/01-tables.sql:ro
@@ -24,8 +22,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tinyfarm
       SPRING_DATASOURCE_USERNAME: tinyfarm486
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-      # SECRETS_USERNAME: ${DB_USER:-tinyfarm_user}
-      # SECRETS_PASSWORD_PATH: ${DB_PASSWORD:-tinyfarm_password}
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_REDIRECT_URI: "{baseUrl}/api/auth/login/oauth2/code/github"
