@@ -8,11 +8,13 @@ import com.api.tinyfarm.model.Stock;
 import com.api.tinyfarm.model.StockId;
 import com.api.tinyfarm.model.Transaction;
 import com.api.tinyfarm.model.User;
+import com.api.tinyfarm.repository.TransactionRepository;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authorization.method.AuthorizeReturnObject;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
@@ -24,9 +26,14 @@ public class StockServiceTest {
 
     private Stock testStock;
     private Long testUserId;
+    private Float testNbEcu;
     private Long testProductId;
 
+    @Autowired
     private UserService userService;
+
+    @Autowired
+    private TransactionService transactionService;
 
     @BeforeEach
     void setup() throws Exception {
@@ -34,6 +41,7 @@ public class StockServiceTest {
 
         testUserId = 1L;
         testProductId = 10L;
+        testNbEcu = 1500f;
 
         testStock = new Stock();
         testStock.setId(new StockId(testUserId, testProductId));
@@ -163,19 +171,8 @@ public class StockServiceTest {
         testStock = stockService.create(testStock);
         */
 
-        // Création d'une transaction test
-
-        Transaction transaction = new Transaction();
-        transaction.setId(13L);
-        transaction.setBuyer(testUserId);
-        transaction.setSeller(24L);
-        transaction.setProduct(testProductId);
-        transaction.setQuantity(250);
-        transaction.setTotalPrice(500);
-
         // Création d'un User
         User buyer = new User();
-        buyer.setId(2L);
         buyer.setEmail("buyer@lovetobuy.com");
         buyer.setGender(User.Gender.F);
         buyer.setHibernation(false);
@@ -183,20 +180,64 @@ public class StockServiceTest {
         buyer.setName("Véronica");
         buyer.setEcus(1500F);
 
-        stockService.buy(transaction.getId());
-        Stock sfound = stockService.findById(testUserId, testProductId);
-        User uFound = userService.findById(2L);
+        userService.create(buyer);
+
+        Long buyerId = userService.findByEmail("buyer@lovetobuy.com").getId();
+
+        // Création d'une transaction test
+
+        Transaction transaction = new Transaction();
+        transaction.setBuyer(buyerId);
+        transaction.setSeller(24L);
+        transaction.setProduct(testProductId);
+        transaction.setQuantity(250);
+        transaction.setTotalPrice(500);
+
+        transactionService.create(transaction);
+
+        Long transactionId = transactionService
+            .findByBuyer(transaction.getBuyer())
+            .getBuyer();
+
+        // Données avant achats :
+
+        // ProductId de l'ancien stock :
+
+        Long pastProductId = testStock.getProductId();
+
+        // Quantité du stock :
+
+        int pastQuantity = testStock.getQuantity();
+
+        // Nombre d'écu du buyer :
+
+        Float pastEcu = buyer.getEcus();
+
+        // On achète :
+        stockService.buy(transactionId);
+
+        // On vérifie les données :
+
+        // Le Stock :
+        Stock stockFound = stockService.findById(
+            buyer.getId(),
+            transaction.getProduct()
+        );
+
+        // Le Buyer :
+
+        User buyerFound = userService.findById(buyerId);
 
         // Test Quantité de produit
-        assertEquals(testStock.getProductId(), sfound.getProductId());
+        assertEquals(pastProductId, stockFound.getProductId());
         assertEquals(
-            testStock.getQuantity() - transaction.getQuantity(),
-            sfound.getQuantity()
+            pastQuantity - transaction.getQuantity(),
+            stockFound.getQuantity()
         );
         // Test Ecus
         assertEquals(
-            buyer.getEcus() - transaction.getTotalPrice(),
-            uFound.getEcus()
+            pastEcu - transaction.getTotalPrice(),
+            buyerFound.getEcus()
         );
     }
 
