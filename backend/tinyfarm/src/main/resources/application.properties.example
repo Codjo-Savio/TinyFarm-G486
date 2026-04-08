@@ -9,7 +9,7 @@ spring.security.oauth2.client.provider.github.authorization-uri=https://github.c
 spring.security.oauth2.client.provider.github.token-uri=https://github.com/login/oauth/access_token
 spring.security.oauth2.client.provider.github.user-info-uri=https://api.github.com/user
 spring.security.oauth2.client.registration.github.redirect-uri={baseUrl}/api/auth/login/oauth2/code/github
-tinyfarm.frontend.url=http://localhost:3000/dashboard
+tinyfarm.frontend.url=http://localhost:3000
 
 spring.application.name=tinyfarm
 spring.datasource.url=jdbc:h2:mem:tinyfarmdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
