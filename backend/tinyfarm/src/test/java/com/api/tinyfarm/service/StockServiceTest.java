@@ -159,19 +159,32 @@ public class StockServiceTest {
     }
 
     @Test
-    void shouldModifyStockByBuying() {
-        /* Stock
-        testUserId = 1L;
-        testProductId = 10L;
+    void shouldModifyStockByBuying() throws Exception {
+        // Création d'un User Seller
+        User seller = new User();
+        seller.setEmail("seller@sellingisfun.com");
+        seller.setGender(User.Gender.M);
+        seller.setHibernation(false);
+        seller.setLevel(10);
+        seller.setName("Jean");
+        seller.setEcus(0F);
 
-        testStock = new Stock();
-        testStock.setId(new StockId(testUserId, testProductId));
-        testStock.setQuantity(1000);
-        testStock.setCollectible(false);
-        testStock = stockService.create(testStock);
-        */
+        userService.create(seller);
 
-        // Création d'un User
+        Long sellerId = userService
+            .findByEmail("seller@sellingisfun.com")
+            .getId();
+
+        // Remove the stock created in setUp for testUserId and create one for the seller
+        stockService.deleteByUser(testUserId);
+
+        Stock sellerStock = new Stock();
+        sellerStock.setId(new StockId(sellerId, testProductId));
+        sellerStock.setQuantity(1000);
+        sellerStock.setCollectible(false);
+        sellerStock = stockService.create(sellerStock);
+
+        // Création d'un User Buyer
         User buyer = new User();
         buyer.setEmail("buyer@lovetobuy.com");
         buyer.setGender(User.Gender.F);
@@ -188,7 +201,7 @@ public class StockServiceTest {
 
         Transaction transaction = new Transaction();
         transaction.setBuyer(buyerId);
-        transaction.setSeller(24L);
+        transaction.setSeller(sellerId);
         transaction.setProduct(testProductId);
         transaction.setQuantity(250);
         transaction.setTotalPrice(500);
@@ -197,30 +210,40 @@ public class StockServiceTest {
 
         Long transactionId = transactionService
             .findByBuyer(transaction.getBuyer())
-            .getBuyer();
+            .getId();
 
         // Données avant achats :
 
         // ProductId de l'ancien stock :
 
-        Long pastProductId = testStock.getProductId();
+        Long pastProductId = sellerStock.getId().getProductID();
 
         // Quantité du stock :
 
-        int pastQuantity = testStock.getQuantity();
+        int pastQuantity = sellerStock.getQuantity();
 
         // Nombre d'écu du buyer :
 
         Float pastEcu = buyer.getEcus();
+
+        // Nombre d'écu du seller :
+
+        Float pastSellerEcu = seller.getEcus();
 
         // On achète :
         stockService.buy(transactionId);
 
         // On vérifie les données :
 
-        // Le Stock :
-        Stock stockFound = stockService.findById(
-            buyer.getId(),
+        // Le Stock du vendeur :
+        Stock sellerStockFound = stockService.findById(
+            sellerId,
+            transaction.getProduct()
+        );
+
+        // Le Stock du buyer (devrait être créé) :
+        Stock buyerStockFound = stockService.findById(
+            buyerId,
             transaction.getProduct()
         );
 
@@ -228,16 +251,31 @@ public class StockServiceTest {
 
         User buyerFound = userService.findById(buyerId);
 
-        // Test Quantité de produit
-        assertEquals(pastProductId, stockFound.getProductId());
+        // Le Seller :
+
+        User sellerFound = userService.findById(sellerId);
+
+        // Test Quantité de produit du vendeur (doit diminuer)
+        assertEquals(pastProductId, sellerStockFound.getProductId());
         assertEquals(
             pastQuantity - transaction.getQuantity(),
-            stockFound.getQuantity()
+            sellerStockFound.getQuantity()
         );
-        // Test Ecus
+
+        // Test Quantité de produit du buyer (doit augmenter)
+        assertEquals(pastProductId, buyerStockFound.getProductId());
+        assertEquals(transaction.getQuantity(), buyerStockFound.getQuantity());
+
+        // Test Ecus buyer (doit diminuer)
         assertEquals(
             pastEcu - transaction.getTotalPrice(),
             buyerFound.getEcus()
+        );
+
+        // Test Ecus seller (doit augmenter)
+        assertEquals(
+            pastSellerEcu + transaction.getTotalPrice(),
+            sellerFound.getEcus()
         );
     }
 
