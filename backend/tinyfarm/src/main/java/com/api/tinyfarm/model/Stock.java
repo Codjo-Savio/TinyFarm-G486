@@ -14,15 +14,15 @@ public class Stock {
 
     @EmbeddedId
     @AttributeOverrides({
-        @AttributeOverride(name = "uid", column = @Column(name = "uid", nullable = false)),
-        @AttributeOverride(name = "productID", column = @Column(name = "productID", nullable = false))
+            @AttributeOverride(name = "uid", column = @Column(name = "uid", nullable = false)),
+            @AttributeOverride(name = "productID", column = @Column(name = "product_id", nullable = false))
     })
     private StockId id;
 
     @Column(name = "uid", insertable = false, updatable = false)
     private Long userId;
 
-    @Column(name = "productID", insertable = false, updatable = false)
+    @Column(name = "product_id", insertable = false, updatable = false)
     private Long productId;
 
     @Column(name = "quantity", nullable = false)
