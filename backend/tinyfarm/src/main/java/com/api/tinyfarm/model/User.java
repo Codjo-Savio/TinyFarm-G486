@@ -56,10 +56,6 @@ public class User {
     // default values for ecus and level
     @PrePersist
     public void prePersist() {
-        this.ecus = 1500F;
-        this.hibernation = false;
-        this.level = 1;
-
         if (this.ecus == null) {
             this.ecus = 1500F;
         }
