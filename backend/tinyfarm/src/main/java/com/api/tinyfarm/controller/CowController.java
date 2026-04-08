@@ -2,11 +2,10 @@ package com.api.tinyfarm.controller;
 
 import com.api.tinyfarm.model.Cow;
 import com.api.tinyfarm.service.CowService;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/cows")
@@ -52,12 +51,17 @@ public class CowController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(
+                HttpStatus.INTERNAL_SERVER_ERROR
+            ).build();
         }
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<Cow> update(@PathVariable Long id, @RequestBody Cow cow) {
+    public ResponseEntity<Cow> update(
+        @PathVariable Long id,
+        @RequestBody Cow cow
+    ) {
         try {
             return ResponseEntity.ok(cowService.update(id, cow));
         } catch (Exception e) {
@@ -82,6 +86,56 @@ public class CowController {
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    // --- Actions ---
+
+    @PostMapping("/{id}/feed")
+    public ResponseEntity<Cow> feedCow(
+        @PathVariable Long id,
+        @RequestParam Long userId
+    ) {
+        try {
+            return ResponseEntity.ok(cowService.feedCow(id, userId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/{id}/water")
+    public ResponseEntity<Cow> waterCow(
+        @PathVariable Long id,
+        @RequestParam Long userId
+    ) {
+        try {
+            return ResponseEntity.ok(cowService.waterCow(id, userId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/{id}/clean")
+    public ResponseEntity<Cow> cleanCow(
+        @PathVariable Long id,
+        @RequestParam Long userId
+    ) {
+        try {
+            return ResponseEntity.ok(cowService.cleanCow(id, userId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PostMapping("/{id}/heal")
+    public ResponseEntity<Cow> healCow(
+        @PathVariable Long id,
+        @RequestParam Long userId
+    ) {
+        try {
+            return ResponseEntity.ok(cowService.healCow(id, userId));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }
