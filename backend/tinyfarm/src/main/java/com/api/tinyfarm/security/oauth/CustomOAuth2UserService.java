@@ -25,7 +25,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(request);
 
         String email = (String) oAuth2User.getAttributes().get("email");
-        String name = (String) oAuth2User.getAttributes().get("name");
+        String name = (String) oAuth2User.getAttributes().get("login");
 
         if (email == null) {
             email = fetchPrimaryEmailFromGitHub(request.getAccessToken().getTokenValue());

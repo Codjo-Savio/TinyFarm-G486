@@ -58,6 +58,16 @@ public class UserController {
         }
     }
 
+    @PatchMapping("/hibernate/id/{id}")
+    public ResponseEntity<Void> hibernate(@PathVariable Long id) {
+        try {
+            userService.hibernate(id);
+            return ResponseEntity.ok().build();
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     // DELETE /users/1 → supprimer un user
     @DeleteMapping("/id/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {

@@ -161,67 +161,70 @@ public class ChickenService {
     // --- Fin de journée ---
 
     public void processEndOfDay(Long userId) {
-        List<Chicken> userChickens = chickenRepository.findByUserId(userId);
+        User user = userService.findById(userId);
+        if(user.getHibernation() == false) {
+            List<Chicken> userChickens = chickenRepository.findByUserId(userId);
 
-        long activeRoosters = 0;
-        long activeHens = 0;
+            long activeRoosters = 0;
+            long activeHens = 0;
 
-        for (Chicken chicken : userChickens) {
-            // 1. Santé
-            if (handleHealth(chicken) != 0){
-                continue;
-            }
-
-            // 2. Faim, Soif et Poids
-            if (handleFood(chicken) != 0){
-                continue;
-            }
-
-            // Poids max
-            if (chicken.getWeight() > 3.5f) {
-                chicken.setWeight(3.5f);
-            }
-
-            // Mort par maigreur
-            if (chicken.getWeight() <= 0f) {
-                chickenRepository.delete(chicken);
-                continue;
-            }
-
-            // 3. Âge et Évolution
-            chicken.setAge(
-                (chicken.getAge() == null ? 0 : chicken.getAge()) + 1
-            );
-
-            // 4. Changement de type de poulet
-            handleType(chicken);
-            
-            // 5. Saleté
-            if (!chicken.getClean()){
-                if (chicken.getChickenType() == Chicken.ChickenType.L) {
-                    chicken.setChickenType(Chicken.ChickenType.H);
-                } else if (chicken.getChickenType() == Chicken.ChickenType.B) {
-                    chicken.setChickenType(Chicken.ChickenType.R);
+            for (Chicken chicken : userChickens) {
+                // 1. Santé
+                if (handleHealth(chicken) != 0) {
+                    continue;
                 }
+
+                // 2. Faim, Soif et Poids
+                if (handleFood(chicken) != 0) {
+                    continue;
+                }
+
+                // Poids max
+                if (chicken.getWeight() > 3.5f) {
+                    chicken.setWeight(3.5f);
+                }
+
+                // Mort par maigreur
+                if (chicken.getWeight() <= 0f) {
+                    chickenRepository.delete(chicken);
+                    continue;
+                }
+
+                // 3. Âge et Évolution
+                chicken.setAge(
+                        (chicken.getAge() == null ? 0 : chicken.getAge()) + 1
+                );
+
+                // 4. Changement de type de poulet
+                handleType(chicken);
+
+                // 5. Saleté
+                if (!chicken.getClean()) {
+                    if (chicken.getChickenType() == Chicken.ChickenType.L) {
+                        chicken.setChickenType(Chicken.ChickenType.H);
+                    } else if (chicken.getChickenType() == Chicken.ChickenType.B) {
+                        chicken.setChickenType(Chicken.ChickenType.R);
+                    }
+                }
+
+                // Comptage pour la ponte (doit être adulte, propre, sain, et nourri)
+                if (chicken.getChickenType() == Chicken.ChickenType.B) {
+                    activeRoosters++;
+                } else if (chicken.getChickenType() == Chicken.ChickenType.L) {
+                    activeHens++;
+                }
+
+                // Réinitialisation journalière
+                chicken.setFedToday(false);
+                chicken.setWateredToday(false);
+                chicken.setClean(false); // Le poulailler devient sale tous les jours
+
+                chickenRepository.save(chicken);
             }
 
-            // Comptage pour la ponte (doit être adulte, propre, sain, et nourri)
-            if (chicken.getChickenType() == Chicken.ChickenType.B) {
-                activeRoosters++;
-            } else if (chicken.getChickenType() == Chicken.ChickenType.L) {
-                activeHens++;
-            }
-
-            // Réinitialisation journalière
-            chicken.setFedToday(false);
-            chicken.setWateredToday(false);
-            chicken.setClean(false); // Le poulailler devient sale tous les jours
-
-            chickenRepository.save(chicken);
+            // 4. Ponte et Vente automatique des œufs (vendus le jour même)
+            handleEggs(userId, activeRoosters, activeHens);
         }
-
-        // 4. Ponte et Vente automatique des œufs (vendus le jour même)
-        handleEggs(userId, activeRoosters, activeHens);
     }
 
     // renvoi un code 1 si le poulet meurt
