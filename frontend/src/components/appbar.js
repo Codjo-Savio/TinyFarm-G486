@@ -1,5 +1,5 @@
 class AppBar extends HTMLElement {
-    API_URL = "http://localhost:8080/api";
+    API_URL = window.apiUrl || "http://localhost:8080/api";
 
     constructor() {
         super();
