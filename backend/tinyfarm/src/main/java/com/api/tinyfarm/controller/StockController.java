@@ -72,6 +72,26 @@ public class StockController {
         }
     }
 
+    @PostMapping("/sell/{tid}")
+    public ResponseEntity<Void> sell(@PathVariable Long tid) {
+        try {
+            stockService.sell(tid);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @PostMapping("/buy/{tid}")
+    public ResponseEntity<Void> buy(@PathVariable Long tid) {
+        try {
+            stockService.buy(tid);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
     @PutMapping("/user/{userId}/product/{productId}")
     public ResponseEntity<Stock> update(
             @PathVariable Long userId,

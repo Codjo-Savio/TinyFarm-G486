@@ -45,7 +45,7 @@ public class User {
     private Gender gender;
 
     @Column(name = "ecus")
-    private Integer ecus;
+    private Float ecus;
 
     @Column(name = "hibernation")
     private Boolean hibernation;
@@ -57,7 +57,7 @@ public class User {
     @PrePersist
     public void prePersist() {
         if (this.ecus == null) {
-            this.ecus = 1500;
+            this.ecus = 1500F;
         }
 
         if (this.hibernation == null) {
