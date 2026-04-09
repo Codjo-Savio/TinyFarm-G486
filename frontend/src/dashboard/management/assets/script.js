@@ -74,7 +74,9 @@ function displayPanier() {
         }
     }
 
-    document.getElementById("totalPrice").textContent = `$${total}`;
+    // Arrondir à 2 décimales pour éviter les erreurs de précision des flottants
+    const totalArrondi = Math.round(total * 100) / 100;
+    document.getElementById("totalPrice").textContent = `$${totalArrondi.toFixed(2)}`;
 
     document.querySelector(".cart-list").innerHTML = "";
 
@@ -137,9 +139,9 @@ function modifierPrix(nomProduit) {
     const priceSpan = document.getElementById(
         `price-${nomProduit.replace(/'/g, "\\'")}`,
     );
-    const currentPrice = priceSpan.textContent.replace("$", "");
+    const currentPrice = parseFloat(priceSpan.textContent.replace("$", ""));
     const inputHTML = `
-        <input type="number" id="new-price-${nomProduit.replace(/'/g, "\\'")}" value="${currentPrice}" min="0" step="0.01">
+        <input type="number" id="new-price-${nomProduit.replace(/'/g, "\\'")}" value="${currentPrice.toFixed(2)}" min="0" step="0.01">
     `;
     priceSpan.innerHTML = inputHTML;
     document.getElementById(
@@ -163,10 +165,12 @@ function confirmerPrix(nomProduit) {
     if (nouveauPrix !== null) {
         for (const category of Object.values(inventaire)) {
             if (category[nomProduit]) {
-                category[nomProduit].price = parseFloat(nouveauPrix);
+                // Arrondir à 2 décimales pour éviter les erreurs de précision
+                const prixArrondi = Math.round(parseFloat(nouveauPrix) * 100) / 100;
+                category[nomProduit].price = prixArrondi;
                 document.getElementById(
                     `price-${nomProduit.replace(/'/g, "\\'")}`,
-                ).textContent = `$${nouveauPrix}`;
+                ).textContent = `$${prixArrondi.toFixed(2)}`;
                 break; // Sortir de la boucle une fois le produit trouvé
             }
         }
@@ -182,4 +186,5 @@ function confirmerPrix(nomProduit) {
             "onclick",
             `modifierPrix('${nomProduit.replace(/'/g, "\\'")}')`,
         ); // Changer la fonction onclick pour confirmer le nouveau prix
+    displayPanier(); // Mettre à jour le panier pour refléter les changements de prix
 }
