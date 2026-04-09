@@ -5,6 +5,10 @@ import com.api.tinyfarm.model.Rabbit;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.RabbitRepository;
 import java.util.List;
+import java.util.UUID;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,6 +42,10 @@ public class RabbitService {
     }
 
     public Rabbit create(Rabbit rabbit) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
+            rabbit.setUserId(currentUser.getId());
+        }
         return rabbitRepository.save(rabbit);
     }
 
@@ -146,68 +154,70 @@ public class RabbitService {
     }
 
     public void processEndOfDay(Long userId) {
-        List<Rabbit> userRabbits = rabbitRepository.findByUserId(userId);
+        User user = userService.findById(userId);
+        if(user.getHibernation() == false){
+            List<Rabbit> userRabbits = rabbitRepository.findByUserId(userId);
 
-        long adultCount = userRabbits
-            .stream()
-            .filter(r -> r.getRabbitType() == Rabbit.RabbitTypeEnum.lapin)
-            .count();
-        long babyCount = userRabbits
-            .stream()
-            .filter(r -> r.getRabbitType() == Rabbit.RabbitTypeEnum.lapereau)
-            .count();
+            long adultCount = userRabbits
+                    .stream()
+                    .filter(r -> r.getRabbitType() == Rabbit.RabbitTypeEnum.lapin)
+                    .count();
+            long babyCount = userRabbits
+                    .stream()
+                    .filter(r -> r.getRabbitType() == Rabbit.RabbitTypeEnum.lapereau)
+                    .count();
 
-        for (Rabbit rabbit : userRabbits) {
-            if (!rabbit.getClean() || !rabbit.getHealthy()) {
-                if (Math.random() > 0.5) {
+            for (Rabbit rabbit : userRabbits) {
+                if (!rabbit.getClean() || !rabbit.getHealthy()) {
+                    if (Math.random() > 0.5) {
+                        rabbitRepository.delete(rabbit);
+                        if (
+                                rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapin
+                        ) adultCount--;
+                        else babyCount--;
+                        continue;
+                    }
+                }
+
+                if (!rabbit.getFedToday()) {
                     rabbitRepository.delete(rabbit);
                     if (
-                        rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapin
+                            rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapin
                     ) adultCount--;
                     else babyCount--;
                     continue;
                 }
-            }
 
-            if (!rabbit.getFedToday()) {
-                rabbitRepository.delete(rabbit);
-                if (
-                    rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapin
-                ) adultCount--;
-                else babyCount--;
-                continue;
-            }
+                if (rabbit.getFedToday() && !rabbit.getWateredToday()) {
+                    // survit, mais ne grandit pas
+                } else if (rabbit.getFedToday() && rabbit.getWateredToday()) {
+                    rabbit.setAge(rabbit.getAge() + 1);
 
-            if (rabbit.getFedToday() && !rabbit.getWateredToday()) {
-                // survit mais ne grandit pas
-            } else if (rabbit.getFedToday() && rabbit.getWateredToday()) {
-                rabbit.setAge(rabbit.getAge() + 1);
-
-                if (
-                    rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapereau &&
-                    rabbit.getAge() >= 30
-                ) {
-                    if (adultCount < 50) {
-                        rabbit.setRabbitType(Rabbit.RabbitTypeEnum.lapin);
-                        rabbit.setGender(
-                            Math.random() > 0.5
-                                ? Animal.AnimalGender.M
-                                : Animal.AnimalGender.F
-                        );
-                        adultCount++;
-                        babyCount--;
+                    if (
+                            rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapereau &&
+                                    rabbit.getAge() >= 30
+                    ) {
+                        if (adultCount < 50) {
+                            rabbit.setRabbitType(Rabbit.RabbitTypeEnum.lapin);
+                            rabbit.setGender(
+                                    Math.random() > 0.5
+                                            ? Animal.AnimalGender.M
+                                            : Animal.AnimalGender.F
+                            );
+                            adultCount++;
+                            babyCount--;
+                        }
                     }
                 }
+
+                rabbit.setFedToday(false);
+                rabbit.setWateredToday(false);
+                rabbit.setClean(false); // devient sale le lendemain
+
+                rabbitRepository.save(rabbit);
             }
-
-            rabbit.setFedToday(false);
-            rabbit.setWateredToday(false);
-            rabbit.setClean(false); // devient sale le lendemain
-
-            rabbitRepository.save(rabbit);
+            handleReproduction(userId, adultCount, babyCount);
         }
-
-        handleReproduction(userId, adultCount, babyCount);
     }
 
     private void handleReproduction(
@@ -244,6 +254,7 @@ public class RabbitService {
                 baby.setHealthy(true);
                 baby.setFedToday(false);
                 baby.setWateredToday(false);
+                baby.setName("Baby-" + UUID.randomUUID().toString().substring(0, 5));
                 rabbitRepository.save(baby);
                 currentBabies++;
             }

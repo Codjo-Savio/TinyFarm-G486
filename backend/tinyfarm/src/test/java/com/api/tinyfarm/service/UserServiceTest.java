@@ -66,4 +66,19 @@ public class UserServiceTest {
         assertEquals(0, userService.findAll().size());
     }
 
+    @Test
+    void shouldHibernateUser() {
+        User user = new User();
+        user.setName("Colorado");
+        user.setEmail("usertest@gmail.com");
+        user.setGender(User.Gender.F);
+
+        User created = userService.create(user);
+
+        userService.hibernate(created.getId());
+
+        User updated = userService.findById(created.getId());
+        assertTrue(updated.getHibernation());
+    }
+
 }

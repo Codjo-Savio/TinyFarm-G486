@@ -2,8 +2,12 @@ package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Market;
 import com.api.tinyfarm.model.MarketID;
+import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.MarketRepository;
 import java.util.List;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +46,10 @@ public class MarketService {
 
     public Market create(Market market) {
         syncMarketId(market);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
+            market.setUserId(currentUser.getId());
+        }
         return marketRepository.save(market);
     }
 
