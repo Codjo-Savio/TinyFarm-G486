@@ -79,4 +79,6 @@ public class Animal {
             wateredToday = true;
         }
     }
+
+
 }
