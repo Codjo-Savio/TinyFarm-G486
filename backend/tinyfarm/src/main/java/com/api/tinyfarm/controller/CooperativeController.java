@@ -34,7 +34,7 @@ public class CooperativeController {
     }
 
     @DeleteMapping("/{description}")
-    public ResponseEntity<void> deleteByDescription(@PathVariable String description) {
+    public ResponseEntity<Integer> deleteByDescription(@PathVariable String description) {
         try {
             cooperativeService.deleteLessExpensiveWithDescription(description);
             return ResponseEntity.noContent().build();
