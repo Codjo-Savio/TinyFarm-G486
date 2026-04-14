@@ -8,6 +8,7 @@ import com.api.tinyfarm.service.CooperativeService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,4 +33,13 @@ public class CooperativeController {
         }
     }
 
+    @DeleteMapping("/{description}")
+    public ResponseEntity<void> deleteByDescription(@PathVariable String description) {
+        try {
+            cooperativeService.deleteLessExpensiveWithDescription(description);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }

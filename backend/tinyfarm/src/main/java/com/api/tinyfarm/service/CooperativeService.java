@@ -46,4 +46,28 @@ public class CooperativeService {
 
         return productPrices;
     }
+
+    public void deleteLessExpensiveWithDescription(String description) {
+        List<Cooperative> cooperatives = cooperativeRepository.findAll();
+        List<Cooperative> matchingCooperatives = cooperatives.stream()
+                .filter(coop -> {
+                    Product product = productService.findById(coop.getProductId());
+                    return product != null && description.equals(product.getDescription());
+                })
+                .collect(Collectors.toList());
+
+        if (!matchingCooperatives.isEmpty()) {
+            Cooperative leastExpensiveCoop = matchingCooperatives.stream()
+                    .min((c1, c2) -> {
+                        Product p1 = productService.findById(c1.getProductId());
+                        Product p2 = productService.findById(c2.getProductId());
+                        return Float.compare(p1.getPrice(), p2.getPrice());
+                    })
+                    .orElse(null);
+
+            if (leastExpensiveCoop != null) {
+                cooperativeRepository.delete(leastExpensiveCoop);
+            }
+        }
+    }
 }
