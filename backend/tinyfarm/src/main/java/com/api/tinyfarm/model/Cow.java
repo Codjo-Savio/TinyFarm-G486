@@ -53,7 +53,7 @@ public class Cow extends Animal {
     @Column(name = "hay_today")
     private Boolean hayToday = false;
 
-    @Column(name = 'sick_days')
+    @Column(name = "sick_days")
     private int sickDays;
 
     @PrePersist
