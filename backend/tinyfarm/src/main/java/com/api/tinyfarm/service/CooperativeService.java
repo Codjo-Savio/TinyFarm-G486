@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.api.tinyfarm.model.Cooperative;
-import com.api.tinyfarm.model.Product;
 import com.api.tinyfarm.repository.CooperativeRepository;
 import com.api.tinyfarm.repository.ProductRepository;
 
@@ -18,9 +17,6 @@ public class CooperativeService {
 
     @Autowired
     private CooperativeRepository cooperativeRepository;
-    @Autowired
-    private ProductRepository productRepository;
-
     
     public HashMap<Long, Float> getAvailableProducts() {
         HashMap<Long, Float> productPrices = new HashMap<>();
