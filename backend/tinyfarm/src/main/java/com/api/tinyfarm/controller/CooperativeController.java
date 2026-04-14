@@ -33,6 +33,26 @@ public class CooperativeController {
         }
     }
 
+    @GetMapping("/isOpen")
+    public ResponseEntity<Boolean> getIsOpen() {
+        try {
+            return ResponseEntity.ok(cooperativeService.isOpen());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/time")
+    public ResponseEntity<String> getTime() {
+        try {
+            return ResponseEntity.ok(cooperativeService.getTime());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+
     @DeleteMapping("/{idBuyer}/{description}")
     public ResponseEntity<Integer> deleteByDescription(@PathVariable Long idBuyer, @PathVariable String description) {
         try {

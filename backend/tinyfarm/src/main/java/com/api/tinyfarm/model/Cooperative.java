@@ -26,8 +26,4 @@ public class Cooperative {
 
     @Column(name = "price")
     private Float price;
-
-    @Column(name = "isOpen")
-    private Boolean isOpen;
-
 }

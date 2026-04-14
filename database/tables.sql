@@ -131,6 +131,5 @@ CREATE TABLE IF NOT EXISTS cooperative
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     price FLOAT,
-    isOpen BOOLEAN,
     PRIMARY KEY (uid, productID)
 );

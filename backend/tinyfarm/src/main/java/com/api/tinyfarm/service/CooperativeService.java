@@ -1,8 +1,11 @@
 package com.api.tinyfarm.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 import com.api.tinyfarm.model.Cooperative;
 import com.api.tinyfarm.model.Product;
@@ -10,7 +13,7 @@ import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.CooperativeRepository;
 import com.api.tinyfarm.repository.ProductRepository;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -124,4 +127,46 @@ public class CooperativeService {
 
         cooperativeRepository.deleteByUserIdAndProductId(uid, pid);
     }
+
+    // handling open or closen hours
+    private static final ZoneId ZONE = ZoneId.of("Europe/Paris");
+
+
+    private boolean isBetween(LocalTime t, LocalTime start, LocalTime end) {
+        if (start.isBefore(end)) {
+            return !t.isBefore(start) && t.isBefore(end);
+        } else {
+            return !t.isBefore(start) || t.isBefore(end); // enjambe minuit
+        }
+    }
+
+    private boolean isWeekend(DayOfWeek day) {
+        return day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY;
+    }
+
+    private boolean isOpenWeekday(LocalTime t) {
+        return isBetween(t, LocalTime.of(5, 0),  LocalTime.of(14, 0))
+                || isBetween(t, LocalTime.of(17, 0), LocalTime.of(20, 0))
+                || isBetween(t, LocalTime.of(22, 0), LocalTime.of(3, 0));
+    }
+
+    private boolean isOpenWeekend(LocalTime t) {
+        return isBetween(t, LocalTime.of(9, 0),  LocalTime.of(14, 0))
+                || isBetween(t, LocalTime.of(19, 0), LocalTime.of(3, 0));
+    }
+
+    public boolean isOpen() {
+        ZonedDateTime now = ZonedDateTime.now(ZONE);
+        LocalTime time = now.toLocalTime();
+        DayOfWeek day = now.getDayOfWeek();
+
+        return isWeekend(day) ? isOpenWeekend(time) : isOpenWeekday(time);
+    }
+
+
+    public String getTime(){
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
+        return now.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+    }
 }
+
