@@ -1,3 +1,11 @@
 {
-    "postCreateCommand": "sdk install java 21.0.1-ms && sdk use java 21.0.1-ms"
+    "name": "TinyFarmDevContainer",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",  // Any generic, debian-based image.
+    "features": {
+        "ghcr.io/devcontainers/features/java:1": {
+            "version": "21",
+            "installMaven":"true",
+            "mavenVersion":"4.0.0-rc-5"
+        }
+    }
 }
