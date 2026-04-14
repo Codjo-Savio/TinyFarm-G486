@@ -76,7 +76,7 @@ public class CowService {
 
         if (user.getEcus() >= 5){
             user.setEcus(user.getEcus() - 5);
-            user.update(userId, user);
+            userService.update(userId, user);
 
             cow.setHayToday(true);
             cow.setFedToday(true);
@@ -127,7 +127,7 @@ public class CowService {
 
         if (user.getEcus() >= 3){
             user.setEcus(user.getEcus() - 3);
-            user.update(userId, user);
+            userService.update(userId, user);
 
             cow.setClean(true);
             return cowRepository.save(cow);
@@ -147,7 +147,7 @@ public class CowService {
 
         if (user.getEcus() >= 6){
             user.setEcus(user.getEcus() - 6);
-            user.update(userId, user);
+            userService.update(userId, user);
 
             cow.setHealthy(true);
             return cowRepository.save(cow);
@@ -161,7 +161,7 @@ public class CowService {
     /**
      * gère la quantité de lait produite par les vaches d'un utilisateur
      */
-    public void milking(Long CowID){
+    public void milking(Long cowID){
         Cow cow = findById(cowId);
 
         //si elle peut produire
