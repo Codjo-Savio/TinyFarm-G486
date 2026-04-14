@@ -51,6 +51,15 @@ class TfBottomActions extends HTMLElement {
 			font-variation-settings:var(--font-var-icon);
         }
 
+        .bottom-actions {
+            transition: opacity .3s;
+            opacity: 0;
+        }
+
+        .bottom-actions.ready {
+            opacity: 1;
+        }
+
 		.links {
 			display: flex;
 			gap: 24px;
@@ -76,8 +85,8 @@ class TfBottomActions extends HTMLElement {
 			padding: 16px 24px;
 			box-shadow: var(--shadow);
 			transition:
-				transform 0.3s,
-				background-color 0.3s;
+				transform .3s,
+				background-color .3s;
 		}
 
 		.links > a:hover {
@@ -159,19 +168,6 @@ class TfBottomActions extends HTMLElement {
         .bottom-actions.small .large {
 			font-size: 30px;
 		}
-
-        .bottom-actions #coop .infos,
-        .bottom-actions #marketplace .infos,
-        .bottom-actions #time {
-            opacity: 0;
-            transition: opacity .3s;
-        }
-
-        .bottom-actions.ready #coop .infos,
-        .bottom-actions.ready #marketplace .infos,
-        .bottom-actions.ready #time {
-            opacity: 1;
-        }
 
 		@media (max-width: 900px) {
 			.bottom-actions {
