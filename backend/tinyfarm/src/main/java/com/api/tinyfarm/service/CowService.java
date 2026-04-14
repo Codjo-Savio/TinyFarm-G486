@@ -107,7 +107,7 @@ public class CowService {
 
         if (user.getEcus() >= 2){
             user.setEcus(user.getEcus() - 2);
-            user.update(userId, user);
+            userService.update(userId, user);
 
             cow.setWateredToday(true);
             return cowRepository.save(cow);
@@ -225,10 +225,7 @@ public class CowService {
 
         if (cow.getHealthy() != null && !cow.getHealthy()){
             cow.setSickDays(
-                (cow.getSickDays() == null
-                        ? 0
-                        : cow.getSickDays()) + 1
-                );
+                (cow.getSickDays() + 1);
         } else {
             cow.setSickDays(0);
             cow.setMilking(true);
