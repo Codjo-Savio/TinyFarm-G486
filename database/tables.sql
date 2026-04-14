@@ -99,7 +99,8 @@ CREATE TABLE IF NOT EXISTS cow
     cowType cowTypeEnum,
     milking BOOLEAN DEFAULT FALSE,
     milk INTEGER DEFAULT 0,
-    hay_today BOOLEAN DEFAULT FALSE; 
+    hay_today BOOLEAN DEFAULT FALSE,
+    sick_days INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS event
