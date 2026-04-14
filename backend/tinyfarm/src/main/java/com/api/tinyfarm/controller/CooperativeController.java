@@ -23,9 +23,9 @@ public class CooperativeController {
     }
 
     @GetMapping
-    public ResponseEntity<HashMap<Product, Float>> getAll() {
+    public ResponseEntity<HashMap<Long, Float>> getAll() {
         try {
-            HashMap<Product, Float> productPrices = cooperativeService.getAvailableProducts();
+            HashMap<Long, Float> productPrices = cooperativeService.getAvailableProducts();
             return ResponseEntity.ok(productPrices);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
