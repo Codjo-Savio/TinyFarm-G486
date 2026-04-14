@@ -224,8 +224,7 @@ public class CowService {
         Cow cow = findById(cowId);
 
         if (cow.getHealthy() != null && !cow.getHealthy()){
-            cow.setSickDays(
-                (cow.getSickDays() + 1);
+            cow.setSickDays(cow.getSickDays() + 1);
         } else {
             cow.setSickDays(0);
             cow.setMilking(true);
