@@ -115,6 +115,7 @@ in which you will copy and paste the content of the two exemple (respectively) b
   * récupérer un market par UserId                   Get("/id/{id}")
   * récupérer un market par ProductId                Get("/product/{productId}")
   * récupérer un market par price                    Get("/price/{price}")
+  * récupérer un market par quantity                 Get("/quantity/{quantity})
 
   * ajouter un market                                Post("")
     

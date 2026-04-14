@@ -119,6 +119,7 @@ CREATE TABLE IF NOT EXISTS market
         ON DELETE CASCADE
         ON UPDATE CASCADE,
     price FLOAT NOT NULL,
+    quantity INTEGER NOT NULL,
     PRIMARY KEY (uid, productID)
 );
 

@@ -13,10 +13,15 @@ import lombok.NoArgsConstructor;
 public class Market {
 
     @EmbeddedId
-    @AttributeOverrides({
+    @AttributeOverrides(
+        {
             @AttributeOverride(name = "userId", column = @Column(name = "uid")),
-            @AttributeOverride(name = "productID", column = @Column(name = "product_id"))
-    })
+            @AttributeOverride(
+                name = "productID",
+                column = @Column(name = "product_id")
+            ),
+        }
+    )
     private MarketID marketId;
 
     @Column(name = "uid", insertable = false, updatable = false)
@@ -27,4 +32,7 @@ public class Market {
 
     @Column(name = "price")
     private Float price;
+
+    @Column(name = "quantity")
+    private int quantity;
 }
