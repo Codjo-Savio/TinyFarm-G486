@@ -1,4 +1,4 @@
-class Layout extends HTMLElement {
+class TfLayout extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
@@ -36,4 +36,4 @@ class Layout extends HTMLElement {
     }
 }
 
-customElements.define("app-layout", Layout);
+customElements.define("tf-layout", TfLayout);

@@ -1,4 +1,4 @@
-class AppBar extends HTMLElement {
+class TfAppBar extends HTMLElement {
     API_URL = window.apiUrl || "http://localhost:8080/api";
 
     constructor() {
@@ -57,7 +57,7 @@ class AppBar extends HTMLElement {
         });
         console.log("Logout response:", res);
         if (res.ok || res.status === 0) {
-            // Status= 0 when spring redirects to /login?logout
+            // Status = 0 when Spring redirects to /login?logout
             window.location.href = "/";
         }
     }
@@ -273,4 +273,4 @@ class AppBar extends HTMLElement {
     }
 }
 
-customElements.define("app-bar", AppBar);
+customElements.define("tf-app-bar", TfAppBar);
