@@ -33,10 +33,10 @@ public class CooperativeController {
         }
     }
 
-    @DeleteMapping("/{description}")
-    public ResponseEntity<Integer> deleteByDescription(@PathVariable String description) {
+    @DeleteMapping("/{idBuyer}/{description}")
+    public ResponseEntity<Integer> deleteByDescription(@PathVariable Long idBuyer, @PathVariable String description) {
         try {
-            cooperativeService.deleteLessExpensiveWithDescription(description);
+            cooperativeService.deleteLessExpensiveWithDescription(idBuyer, description);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

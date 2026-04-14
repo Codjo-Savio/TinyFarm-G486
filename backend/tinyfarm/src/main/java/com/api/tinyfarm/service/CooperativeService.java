@@ -1,5 +1,6 @@
 package com.api.tinyfarm.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +26,27 @@ public class CooperativeService {
     private ProductRepository productRepository;
     @Autowired
     private UserRepository userRepository;
-    
+
+    public Integer getMediumPriceForProduct(String description) {
+        List<Product> products = new ArrayList<>();
+        
+        for (Cooperative coop : cooperativeRepository.findAll()) {
+            for (Product product : productRepository.findByDescription(description)) {
+                if (product.getId().equals(coop.getProductId())) {
+                    products.add(product);
+                }
+            }
+        }
+        if (products.isEmpty()) {
+            return null; // No products with the given description
+        }
+        Float totalPrices = 0f;
+        for (Product product : products) {
+            totalPrices += product.getPrice();
+        }
+        return (int) (totalPrices / products.size());
+    }
+
     public HashMap<Long, Float> getAvailableProducts() {
         HashMap<Long, Float> productPrices = new HashMap<>();
         Map<Long, Float> totalPricesByProductId = new HashMap<>();
@@ -59,7 +80,7 @@ public class CooperativeService {
         return productPrices;
     }
 
-    public void deleteLessExpensiveWithDescription(String description) {
+    public void deleteLessExpensiveWithDescription(Long idBuyer, String description) {
         List<Cooperative> cooperatives = cooperativeRepository.findAll();
         List<Product> products = productRepository.findByDescription(description);
         HashMap<String, Product> productMap = new HashMap<>();
@@ -84,13 +105,23 @@ public class CooperativeService {
         if (uid == null || pid == null)
             return;
 
-        User user = userRepository.findById(uid).orElse(null);
-        if (user == null) return;
+        User sellerUser = userRepository.findById(uid).orElse(null);
+        User buyerUser = userRepository.findById(idBuyer).orElse(null);
+        if (sellerUser == null || buyerUser == null) return;
 
-        user.setEcus(
-            user.getEcus() + 
-            cooperativeRepository.getByUserIdAndProductId(uid, pid).price
+        sellerUser.setEcus(
+            sellerUser.getEcus() + 
+            getMediumPriceForProduct(description)
         );
+
+        buyerUser.setEcus(
+            buyerUser.getEcus() - 
+            getMediumPriceForProduct(description)
+        );
+
+        userRepository.save(sellerUser);
+        userRepository.save(buyerUser);
+
         cooperativeRepository.deleteByUserIdAndProductId(uid, pid);
     }
 }
