@@ -5,6 +5,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -22,6 +23,9 @@ import java.time.Instant;
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final JwtEncoder jwtEncoder;
+
+    @Value("${tinyfarm.frontend.url}")
+    private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -50,7 +54,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         cookie.setPath("/");
         cookie.setMaxAge(3600);
         response.addCookie(cookie);
-        response.sendRedirect("http://localhost:3000/dashboard");
-
+        String dashboardUrl = this.frontendUrl;
+        if (this.frontendUrl.substring(this.frontendUrl.length() - 1) != "/") {
+            // Add a trailing slash if not present
+            dashboardUrl += "/";
+        }
+        dashboardUrl += "dashboard";
+        response.sendRedirect(dashboardUrl);
     }
 }

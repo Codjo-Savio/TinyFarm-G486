@@ -1,16 +1,16 @@
 package com.api.tinyfarm.repository;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.api.tinyfarm.model.User;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
-import static org.junit.jupiter.api.Assertions.*;
-import java.util.Optional;
-import java.util.List;
-
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -31,7 +31,7 @@ public class UserRepositoryTest {
         user.setName("Marcel");
         user.setEmail("usertest@gmail.com");
         user.setGender(User.Gender.M);
-        user.setEcus(1500);
+        user.setEcus(1500F);
         user.setLevel(1);
 
         // ACT
@@ -40,7 +40,7 @@ public class UserRepositoryTest {
         // ASSERT
         assertNotNull(saved.getId()); // PK = u_id
         assertEquals("Marcel", saved.getName());
-        assertEquals(1500, saved.getEcus());
+        assertEquals(1500F, saved.getEcus());
         assertEquals(1, saved.getLevel());
     }
 
@@ -87,15 +87,15 @@ public class UserRepositoryTest {
         // ARRANGE
         User user = new User();
         user.setName("Marcel");
-        user.setEcus(1500);
+        user.setEcus(1500F);
         userRepository.save(user);
 
         // ACT — vend 1 oeuf à 8 écus
-        user.setEcus(1508);
+        user.setEcus(1508F);
         User updated = userRepository.save(user);
 
         // ASSERT
-        assertEquals(1508, updated.getEcus());
+        assertEquals(1508F, updated.getEcus());
     }
 
     @Test

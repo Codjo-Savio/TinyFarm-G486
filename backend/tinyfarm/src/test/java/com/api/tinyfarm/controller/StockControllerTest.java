@@ -1,5 +1,6 @@
 package com.api.tinyfarm.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -8,8 +9,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.api.tinyfarm.model.Stock;
 import com.api.tinyfarm.model.StockId;
+import com.api.tinyfarm.model.Transaction;
+import com.api.tinyfarm.model.User;
+import com.api.tinyfarm.repository.StockRepository;
+import com.api.tinyfarm.repository.UserRepository;
 import com.api.tinyfarm.service.StockService;
+import com.api.tinyfarm.service.TransactionService;
+import com.api.tinyfarm.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,22 +39,80 @@ public class StockControllerTest extends AuthenticatedControllerTestSupport {
     private StockService stockService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
+    private TransactionService transactionService;
+
+    @Autowired
+    private StockRepository stockRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     private Stock testStock;
     private Long testUserId = 1L;
     private Long testProductId = 10L;
 
+    private User buyer;
+    private User seller;
+    private Stock sellerStock;
+    private Transaction transaction;
+
+    private static final AtomicLong testCounter = new AtomicLong(0);
+
     @BeforeEach
     void setup() throws Exception {
-        stockService.deleteAll();
+        long testId = testCounter.incrementAndGet();
 
-        // Créer et sauvegarder le Stock avec des IDs simples
+        // Clean up all data for test isolation
+        stockService.deleteAll();
+        transactionService.deleteAll();
+        userRepository.deleteAll();
+
+        // Create test stock
         testStock = new Stock();
         testStock.setId(new StockId(testUserId, testProductId));
         testStock.setCollectible(false);
         testStock.setQuantity(1000);
         testStock = stockService.create(testStock);
+
+        // Create seller with unique email
+        seller = new User();
+        seller.setName("Vendeur Test");
+        seller.setEmail("vendeur_" + testId + "@test.com");
+        seller.setEcus(100.0f);
+        seller.setGender(User.Gender.F);
+        seller.setHibernation(false);
+        seller = userService.create(seller);
+
+        // Create buyer with unique email
+        buyer = new User();
+        buyer.setName("Acheteur Test");
+        buyer.setEmail("acheteur_" + testId + "@test.com");
+        buyer.setEcus(200.0f);
+        buyer.setGender(User.Gender.M);
+        buyer.setHibernation(false);
+        buyer = userService.create(buyer);
+
+        // Create seller's stock
+        sellerStock = new Stock();
+        sellerStock.setId(new StockId(seller.getId(), 1L));
+        sellerStock.setQuantity(10);
+        sellerStock.setCollectible(false);
+        sellerStock = stockService.create(sellerStock);
+
+        // Create transaction
+        transaction = new Transaction();
+        transaction.setSeller(seller.getId());
+        transaction.setBuyer(buyer.getId());
+        transaction.setProduct(1L);
+        transaction.setQuantity(3);
+        transaction.setTotalPrice(30.0f);
+        transaction = transactionService.create(transaction);
     }
 
     // Create Test
@@ -67,7 +133,7 @@ public class StockControllerTest extends AuthenticatedControllerTestSupport {
             .andExpect(status().isCreated());
     }
 
-    // Find Test
+    // Find Tests
     @Test
     void shouldFindById() throws Exception {
         mockMvc
@@ -109,7 +175,7 @@ public class StockControllerTest extends AuthenticatedControllerTestSupport {
             .andExpect(status().isOk());
     }
 
-    // Not Find Test
+    // Not Found Tests
     @Test
     void shouldNotFindById() throws Exception {
         mockMvc
@@ -155,7 +221,7 @@ public class StockControllerTest extends AuthenticatedControllerTestSupport {
             .andExpect(status().isOk());
     }
 
-    // Delete Test
+    // Delete Tests
     @Test
     void shouldDeleteStockById() throws Exception {
         mockMvc
@@ -188,5 +254,57 @@ public class StockControllerTest extends AuthenticatedControllerTestSupport {
                 )
             )
             .andExpect(status().isNoContent());
+    }
+
+    // Sell Test
+    @Test
+    void shouldModifyBySelling() throws Exception {
+        mockMvc
+            .perform(
+                post("/api/stocks/sell/{tid}", transaction.getId()).with(
+                    authenticated()
+                )
+            )
+            .andExpect(status().isOk());
+
+        // Verify seller's stock decreased
+        Stock updatedSellerStock = stockService.findById(seller.getId(), 1L);
+        assertEquals(7, updatedSellerStock.getQuantity()); // 10 - 3
+
+        // Verify buyer's stock was created
+        Stock buyerStock = stockService.findById(buyer.getId(), 1L);
+        assertEquals(3, buyerStock.getQuantity()); // 0 + 3
+
+        // Verify ecus were transferred correctly
+        User updatedSeller = userService.findById(seller.getId());
+        User updatedBuyer = userService.findById(buyer.getId());
+        assertEquals(130.0f, updatedSeller.getEcus()); // 100 + 30
+        assertEquals(170.0f, updatedBuyer.getEcus()); // 200 - 30
+    }
+
+    // Buy Test
+    @Test
+    void shouldModifyByBuying() throws Exception {
+        mockMvc
+            .perform(
+                post("/api/stocks/buy/{tid}", transaction.getId()).with(
+                    authenticated()
+                )
+            )
+            .andExpect(status().isOk());
+
+        // Verify seller's stock decreased
+        Stock updatedSellerStock = stockService.findById(seller.getId(), 1L);
+        assertEquals(7, updatedSellerStock.getQuantity()); // 10 - 3
+
+        // Verify buyer's stock was created
+        Stock buyerStock = stockService.findById(buyer.getId(), 1L);
+        assertEquals(3, buyerStock.getQuantity()); // 0 + 3
+
+        // Verify ecus were transferred correctly
+        User updatedSeller = userService.findById(seller.getId());
+        User updatedBuyer = userService.findById(buyer.getId());
+        assertEquals(130.0f, updatedSeller.getEcus()); // 100 + 30
+        assertEquals(170.0f, updatedBuyer.getEcus()); // 200 - 30
     }
 }

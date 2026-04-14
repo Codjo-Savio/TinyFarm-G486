@@ -35,7 +35,15 @@ public class ChickenServiceTest {
 
     @Test
     void shouldCreateChicken() {
-        User user = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000, false, 1);
+        User user = new User(
+            2L,
+            "Brad",
+            "usertest@gmail.com",
+            User.Gender.M,
+            2000F,
+            false,
+            1
+        );
 
         Animal animal = new Animal();
         animal.setUserId(2L);
@@ -59,7 +67,15 @@ public class ChickenServiceTest {
 
     @Test
     void shouldReturnAllChickens() {
-        User user = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000, false, 1);
+        User user = new User(
+            2L,
+            "Brad",
+            "usertest@gmail.com",
+            User.Gender.M,
+            2000F,
+            false,
+            1
+        );
 
         Animal animal = new Animal();
         animal.setUserId(2L);
@@ -86,7 +102,7 @@ public class ChickenServiceTest {
         User user = new User();
         user.setName("Farmer");
         user.setEmail("usertest@gmail.com");
-        user.setEcus(100);
+        user.setEcus(100F);
         user = userRepository.save(user);
 
         Chicken chicken = new Chicken();
@@ -111,7 +127,7 @@ public class ChickenServiceTest {
         User user = new User();
         user.setName("Farmer");
         user.setEmail("usertest@gmail.com");
-        user.setEcus(100);
+        user.setEcus(100F);
         user = userRepository.save(user);
 
         Chicken chicken = new Chicken();
@@ -136,7 +152,7 @@ public class ChickenServiceTest {
         User user = new User();
         user.setName("Farmer");
         user.setEmail("usertest@gmail.com");
-        user.setEcus(100);
+        user.setEcus(100F);
         user = userRepository.save(user);
 
         Chicken chicken = new Chicken();
@@ -164,7 +180,7 @@ public class ChickenServiceTest {
         User user = new User();
         user.setName("Farmer");
         user.setEmail("usertest@gmail.com");
-        user.setEcus(100);
+        user.setEcus(100F);
         user = userRepository.save(user);
 
         Chicken rooster = new Chicken();
@@ -190,18 +206,29 @@ public class ChickenServiceTest {
         chickenService.feedChicken(createdHen.getId(), user.getId());
 
         // Save original money minus feeding costs (100 - 3 - 3 = 94)
-        int initialEcus = userRepository.findById(user.getId()).get().getEcus();
+        Float initialEcus = userRepository
+            .findById(user.getId())
+            .get()
+            .getEcus();
 
         chickenService.processEndOfDay(user.getId());
 
         // Check if money increased due to egg sale (8 ecus per egg)
-        int finalEcus = userRepository.findById(user.getId()).get().getEcus();
+        Float finalEcus = userRepository.findById(user.getId()).get().getEcus();
         assert (finalEcus >= initialEcus); // Might be same if 0 eggs laid, but usually >
     }
 
     @Test
     void shouldDeleteChicken() {
-        User user = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000, false, 1);
+        User user = new User(
+            2L,
+            "Brad",
+            "usertest@gmail.com",
+            User.Gender.M,
+            2000F,
+            false,
+            1
+        );
 
         Animal animal = new Animal();
         animal.setUserId(2L);

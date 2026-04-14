@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 
 @SpringBootTest
@@ -102,5 +103,15 @@ public class UserControllerTest extends AuthenticatedControllerTestSupport {
         );
         mockMvc.perform(delete("/api/users/id/3").with(authenticated()))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void shouldHibernateUser() throws Exception {
+        mockMvc.perform(patch("/api/users/hibernate/id/1").with(authenticated()))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/users/id/1").with(authenticated()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.hibernation").value(true));
     }
 }

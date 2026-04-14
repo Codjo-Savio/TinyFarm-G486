@@ -37,7 +37,7 @@ public class RabbitServiceTest {
         com.api.tinyfarm.model.User user = new com.api.tinyfarm.model.User();
         user.setName("Farmer");
         user.setEmail("usertest@gmail.com");
-        user.setEcus(100);
+        user.setEcus(100F);
         user = userRepository.save(user);
 
         Rabbit rabbit = new Rabbit();
@@ -64,7 +64,7 @@ public class RabbitServiceTest {
         com.api.tinyfarm.model.User user = new com.api.tinyfarm.model.User();
         user.setName("Farmer");
         user.setEmail("usertest@gmail.com");
-        user.setEcus(100);
+        user.setEcus(100F);
         user = userRepository.save(user);
 
         Rabbit rabbit = new Rabbit();
@@ -89,7 +89,7 @@ public class RabbitServiceTest {
         com.api.tinyfarm.model.User user = new com.api.tinyfarm.model.User();
         user.setName("Farmer");
         user.setEmail("usertest@gmail.com");
-        user.setEcus(100);
+        user.setEcus(100F);
         user = userRepository.save(user);
 
         Rabbit rabbit = new Rabbit();
@@ -119,7 +119,7 @@ public class RabbitServiceTest {
         com.api.tinyfarm.model.User user = new com.api.tinyfarm.model.User();
         user.setName("Farmer");
         user.setEmail("usertest@gmail.com");
-        user.setEcus(100);
+        user.setEcus(100F);
         user = userRepository.save(user);
 
         Rabbit male = new Rabbit();
