@@ -2,6 +2,8 @@ package com.api.tinyfarm.controller;
 
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.security.oauth.CustomOAuth2User;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/auth")
 public class AuthenticationController {
-
     @GetMapping("/me")
-    public ResponseEntity<User> getUser(@AuthenticationPrincipal User user){
+    public ResponseEntity<User> getUser(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(user);
     }
 }

@@ -5,6 +5,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -23,11 +24,13 @@ import java.time.Instant;
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final JwtEncoder jwtEncoder;
 
+    @Value("${tinyfarm.frontend.url}")
+    private String frontendUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
-                                       HttpServletResponse response,
-                                       Authentication authentication) throws IOException {
+            HttpServletResponse response,
+            Authentication authentication) throws IOException {
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         User user = oAuth2User.getUser();
         Instant now = Instant.now();
@@ -42,17 +45,21 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
         Jwt token = jwtEncoder.encode(JwtEncoderParameters.from(
                 JwsHeader.with(MacAlgorithm.HS256).build(),
-                claims
-        ));
+                claims));
         String jwtValue = token.getTokenValue();
 
         Cookie cookie = new Cookie("jwt", jwtValue);
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false);
         cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(3600);
         response.addCookie(cookie);
-        response.sendRedirect("http://localhost:3000/dashboard");
-
+        String dashboardUrl = this.frontendUrl;
+        if (this.frontendUrl.substring(this.frontendUrl.length() - 1) != "/") {
+            // Add a trailing slash if not present
+            dashboardUrl += "/";
+        }
+        dashboardUrl += "dashboard";
+        response.sendRedirect(dashboardUrl);
     }
 }

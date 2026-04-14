@@ -22,7 +22,7 @@ public class CowControllerTest extends AuthenticatedControllerTestSupport {
     void setup() throws Exception {
         cowService.deleteAll();
         String json = """
-                {
+               {
                     "id" : 1,
                     "cowType" : "D",
                     "name" : "Marguerite",

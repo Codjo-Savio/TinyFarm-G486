@@ -1,6 +1,5 @@
 package com.api.tinyfarm.model;
 
-import jakarta.persistence.*;
 import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 import lombok.AllArgsConstructor;

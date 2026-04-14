@@ -1,6 +1,7 @@
 package com.api.tinyfarm.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "rabbit")
+@PrimaryKeyJoinColumn(name = "aid")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,10 +21,20 @@ public class Rabbit extends Animal {
         lapin,
     }
 
+    @NotNull(message = "The name is obligatory")
     @Column(name = "name", length = 50)
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "rabbitType")
+    @Column(name = "rabbit_type")
     private RabbitTypeEnum rabbitType;
+
+    @PrePersist
+    @Override
+    public void prePersist() {
+        super.prePersist();
+        if (this.rabbitType == null) {
+            this.rabbitType = RabbitTypeEnum.lapereau;
+        }
+    }
 }

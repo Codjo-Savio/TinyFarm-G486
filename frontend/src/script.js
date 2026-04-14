@@ -10,6 +10,7 @@
 // - ecus: number
 let usersData = [];
 const rankingTable = document.querySelector(".rankingTableContent");
+const API_URL = window.apiUrl || "http://localhost:8080/api";
 
 /**
  * Met à jour l'état de chargement du tableau de classement
@@ -130,7 +131,7 @@ function sortTable(column, order) {
 
 // Au chargement de la page, récupérer les données des utilisateurs depuis l'API et les afficher dans le tableau de classement
 setLoadingState(true);
-fetch("http://localhost:8080/api/classement")
+fetch(`${API_URL}/classement`)
     .then((response) => {
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
@@ -164,29 +165,7 @@ fetch("http://localhost:8080/api/classement")
         setLoadingState(false);
     });
 
-// Section de code pour la connexion avec Github (à implémenter)
-// Fake pour l'instant, à remplacer par une vraie fonction d'authentification avec Github
+// Section de code pour la connexion avec Github
 async function auth() {
-    // Appel à l'API de création d'un utilisateur de test (à remplacer par une vraie fonction d'authentification avec Github)
-    let user;
-
-    try {
-        const userRes = await fetch("http://localhost:8080/api/users/id/1");
-        user = await userRes.json();
-    } catch (e) {
-        user = await (
-            await fetch("http://localhost:8080/api/users", {
-                method: "POST",
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ name: "Test User", gender: "F" }),
-            })
-        ).json();
-    }
-
-    localStorage.setItem("tinyfarm-user-id", user.id);
-
-    window.location.href = "/dashboard";
+    window.location.href = `${API_URL}/auth/login/oauth2/authorization/github`;
 }

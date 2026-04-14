@@ -1,7 +1,11 @@
 package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Cow;
+import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.CowRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,11 +13,9 @@ import java.util.List;
 @Service
 public class CowService {
 
-    private final CowRepository cowRepository;
-
-    public CowService(CowRepository cowRepository) {
-        this.cowRepository = cowRepository;
-    }
+    @Autowired
+    private CowRepository cowRepository;
+    @Autowired
 
     public List<Cow> findAll() {
         return cowRepository.findAll();
@@ -30,6 +32,10 @@ public class CowService {
     }
 
     public Cow create(Cow cow) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
+            cow.setUserId(currentUser.getId());
+        }
         return cowRepository.save(cow);
     }
 
