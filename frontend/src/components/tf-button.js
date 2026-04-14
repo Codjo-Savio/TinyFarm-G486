@@ -186,7 +186,7 @@ class TfButton extends HTMLElement {
 
     update() {
         this.tfButton.disabled = this.disabled || this.loading;
-        this.tfButton.className = `${this.variant} ${this.size} ${this.loading && "loading"}`;
+        this.tfButton.className = `${this.variant} ${this.size} ${this.loading ? "loading" : ""}`;
 
         const currentIcon = this.tfButton.querySelector(
             ".material-symbols-rounded",
