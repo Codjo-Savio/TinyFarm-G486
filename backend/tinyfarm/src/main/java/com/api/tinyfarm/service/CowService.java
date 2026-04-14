@@ -161,7 +161,7 @@ public class CowService {
     /**
      * gère la quantité de lait produite par les vaches d'un utilisateur
      */
-    public void milking(Long cowID){
+    public void milking(Long cowId){
         Cow cow = findById(cowId);
 
         //si elle peut produire
