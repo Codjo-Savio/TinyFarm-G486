@@ -67,9 +67,6 @@ public class Animal {
         if (healthy == null) {
             healthy = true;
         }
-        if (age == null) {
-            age = 0;
-        }
         if (weight == null) {
             weight = 1f;
         }
