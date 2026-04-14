@@ -63,5 +63,11 @@ public class Cow extends Animal {
         if (this.cowType == null) {
             this.cowType = CowType.C;
         }
+        if (this.milk == null){
+            this.milk = 0;
+        }
+        if (this.hayToday == null) {
+            this.hayToday = true;
+        }
     }
 }

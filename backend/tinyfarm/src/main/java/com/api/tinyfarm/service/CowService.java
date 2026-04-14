@@ -161,31 +161,31 @@ public class CowService {
     /**
      * gère la quantité de lait produite par les vaches d'un utilisateur
      */
-    public void milking(Long UserID){
-        List<Cow> userCows = cowRepository.findByUserId(UserID);
+    public void milking(Long CowID){
+        Cow cow = findById(cowId);
 
-        for (Cow cow : userCows){
-
-            //si elle peut produire
-            if (cow.getMilking()){
-                // et qu'elle a été traite (i.e. elle n'a pas de lait)
-                if (cow.getMilk() == 0){
-                    cow.setMilk(8);
-                } else {
-                    cow.setMilk(cow.getMilk() + 4)
-                }
-            }
-
-            if (cow.getMilk() == 16){
-                cow.setMilking(false);
+        //si elle peut produire
+        if (cow.getMilking()){
+            // et qu'elle a été traite (i.e. elle n'a pas de lait)
+            if (cow.getMilk() == 0){
+                cow.setMilk(8);
+            } else {
+                cow.setMilk(cow.getMilk() + 4);
             }
         }
+
+        if (cow.getMilk() == 16){
+            cow.setMilking(false);
+        }
+        
+        cowRepository.save(cow);
     }
 
     /**
      * ajuste le poid de la vache en fonction de ce qu'elle a mangé dans la journée
      */
-    private void handleWeight(Cow cow){
+    private Cow handleWeight(Long cowId){
+        Cow cow = findById(cowId);
 
         if (cow.getWateredToday()){
             if(cow.getHayToday()){
@@ -208,6 +208,33 @@ public class CowService {
         }
 
         // eau seule ne fait rien
+
+        // poids max = 750 kg
+        if (cow.getWeight() > 750.0f) {
+            cow.setWeight(750.0f);
+        }
+        
+        return cowRepository.save(cow);
+    }
+
+    /**
+     * gère la santé d'une vache séléctionnée
+     */
+    private Cow handleHealth(Long cowId){
+        Cow cow = findById(cowId);
+
+        if (cow.getHealthy() != null && !cow.getHealthy()){
+            cow.setSickDays(
+                (cow.getSickDays() == null
+                        ? 0
+                        : cow.getSickDays()) + 1
+                );
+        } else {
+            cow.setSickDays(0);
+            cow.setMilking(true);
+        }
+
+        return cowRepository.save(cow);
     }
 
     /**
@@ -218,18 +245,15 @@ public class CowService {
 
         for (Cow cow : userCows) {
             // 1. Santé
-            if (!handleHealth(cow)) {
+            cow = handleHealth(cow.getId());
+
+            if (cow.getSickDays() == 4) {
                 cowRepository.delete(cow);
                 continue;
             }
 
             // 2. Poids
-            handleWeight(cow);
-
-            // poids max = 750 kg
-            if (cow.getWeight() > 750.0f) {
-                cow.setWeight(750.0f);
-            }
+            cow = handleWeight(cow.getId());
 
             // reset journaliers
             cow.setFedToday(false);
@@ -246,31 +270,6 @@ public class CowService {
 
             cowRepository.save(cow);
         }
-    }
-
-    /**
-     * gère la santé d'une vache séléctionnée
-     */
-    private Boolean handleHealth(Cow cow){
-        Boolean out = true;
-
-        if (cow.getHealthy() != null && !cow.getHealthy()){
-            cow.setSickDays(
-                (cow.getSickDays() == null
-                        ? 0
-                        : cow.getSickDays()) + 1
-                );
-            
-            if (cow.getSickDays() >= 4){
-                return false;
-            }
-
-        } else {
-            cow.setSickDays(0);
-            cow.setMilking(true);
-        }
-
-        return out;
     }
 
 }
