@@ -44,14 +44,19 @@
                             ><span class="material-symbols-rounded"
                                 >shopping_cart</span
                             >
-                            Achats restants : 10</span
+                            Achats restants :</span
                         >
                         <span class="stock-info"
                             ><span class="material-symbols-rounded">store</span>
                             En stock :
                         </span>
-                        <button class="btn-sell">
-                            <!-- Need to redirect to sell page once implemented -->
+                        <button
+                            class="btn-sell"
+                            onclick="
+                                window.location.href =
+                                    '/dashboard/management/assets'
+                            "
+                        >
                             <span class="material-symbols-rounded"> sell </span>
                             Vendre
                         </button>
