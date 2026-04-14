@@ -1,6 +1,10 @@
 class TfBottomActions extends HTMLElement {
     API_URL = "/fakeapi";
 
+    static get observedAttributes() {
+        return ["size", "variant"];
+    }
+
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
@@ -8,6 +12,14 @@ class TfBottomActions extends HTMLElement {
 
     connectedCallback() {
         this.render();
+    }
+
+    get size() {
+        return this.getAttribute("size") || "normal";
+    }
+
+    get variant() {
+        return this.getAttribute("variant") || "normal";
     }
 
     async fetchTradeOverview() {
@@ -47,6 +59,12 @@ class TfBottomActions extends HTMLElement {
             bottom: 24px;
 		}
 
+        .bottom-actions.small .links {
+            flex-direction: column;
+            left: -50px;
+            gap: 16px;
+        }
+
 		.links > a {
 			text-decoration: none;
 			color: var(--color-primary);
@@ -67,16 +85,56 @@ class TfBottomActions extends HTMLElement {
 			transform: translateY(-4px);
 		}
 
+        .bottom-actions.small .links > a {
+            padding: 12px;
+            padding-left: 60px;
+            height: 48px;
+        }
+
+        .bottom-actions.small .links > a > .small-legend {
+            display: block;
+            position: absolute;
+            text-wrap-mode: nowrap;
+            left: 110px;
+            background-color: var(--color-secondary);
+            box-shadow: var(--shadow);
+            padding: 4px 8px;
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity .3s;
+            pointer-events: none;
+        }
+
+        .bottom-actions .links > a > .small-legend {
+            display: none;
+        }
+
+        .bottom-actions.small .links > a:hover {
+            transform: translateX(10px);
+        }
+
+        .bottom-actions.small .links > a:hover > .small-legend {
+            opacity: 1;
+        }
+
 		.links > a > div {
 			display: flex;
 			flex-direction: column;
 		}
+
+        .bottom-actions.small .links > a > div {
+            display: none;
+        }
 
 		.label {
 			font-size: var(--font-size-body-large);
 			font-weight: bold;
 			margin-bottom: 4px;
 		}
+
+        .bottom-actions.small .links > a > div > .infos {
+            display: none;
+        }
 
 		#time {
 			box-shadow: var(--shadow);
@@ -96,6 +154,10 @@ class TfBottomActions extends HTMLElement {
 
 		.large {
 			font-size: 40px;
+		}
+
+        .bottom-actions.small .large {
+			font-size: 30px;
 		}
 
         .bottom-actions #coop .infos,
@@ -130,9 +192,9 @@ class TfBottomActions extends HTMLElement {
 
         const template = document.createElement("template");
         template.innerHTML = `
-		<div class="bottom-actions">
+		<div class="bottom-actions ${this.size}">
 			<div class="links">
-				<a id="coop" href="/dashboard/trade/cooperative?from=/dashboard">
+				<a id="coop" ${this.variant === "marketplace-only" ? 'style="display: none;"' : ""} href="/dashboard/trade/cooperative?from=/dashboard">
 					<span class="material-symbols-rounded large">
 						storefront
 					</span>
@@ -140,8 +202,9 @@ class TfBottomActions extends HTMLElement {
 						<span class="label">Coopérative</span>
 						<span class="infos">En stock : -</span>
 					</div>
+                    <div class="small-legend">Coopérative</div>
 				</a>
-				<a id="marketplace" href="/dashboard/trade/marketplace?from=/dashboard">
+				<a id="marketplace" ${this.variant === "coop-only" ? 'style="display: none;"' : ""} href="/dashboard/trade/marketplace?from=/dashboard">
 					<span class="material-symbols-rounded large">
 						groups
 					</span>
@@ -149,6 +212,7 @@ class TfBottomActions extends HTMLElement {
 						<span class="label">Marché</span>
 						<span class="infos">En stock : -</span>
 					</div>
+                    <div class="small-legend">Marché</div>
 				</a>
 			</div>
 			<div id="time">
