@@ -1,6 +1,7 @@
 package com.api.tinyfarm.service;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import com.api.tinyfarm.model.Cooperative;
 import com.api.tinyfarm.model.Product;
@@ -8,13 +9,9 @@ import com.api.tinyfarm.repository.CooperativeRepository;
 import com.api.tinyfarm.repository.ProductRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.api.tinyfarm.model.Market;
-import com.api.tinyfarm.model.User;
 
 @Service
 public class CooperativeService {
@@ -23,25 +20,36 @@ public class CooperativeService {
     private CooperativeRepository cooperativeRepository;
     @Autowired
     private ProductRepository productRepository;
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private UserService userService;
 
     
-    public HashMap<Product, Float> getAvailableProducts() {
-        HashMap<Product, Float> productPrices = new HashMap<>();
+    public HashMap<Long, Float> getAvailableProducts() {
+        HashMap<Long, Float> productPrices = new HashMap<>();
+        Map<Long, Float> totalPricesByProductId = new HashMap<>();
+        Map<Long, Integer> countsByProductId = new HashMap<>();
 
         List<Cooperative> cooperatives = cooperativeRepository.findAll();
         for (Cooperative coop : cooperatives) {
             Long productId = coop.getProductId();
-            Long userId = coop.getUserId();
-            User user = userService.findById(userId);
-            Product product = productService.findById(productId);
-            Market market = 
-            if (product != null) {
-                productPrices.put(product, productPrices.getOrDefault(product, 0F) + product.getPrice());
+            Float price = coop.getPrice();
+
+            if (productId == null || price == null) {
+                continue;
             }
+
+            totalPricesByProductId.merge(productId, price, Float::sum);
+            countsByProductId.merge(productId, 1, Integer::sum);
+        }
+
+        for (Map.Entry<Long, Float> entry : totalPricesByProductId.entrySet()) {
+            Long productId = entry.getKey();
+            Integer count = countsByProductId.get(productId);
+
+            if (productId == null || count == null || count == 0) {
+                continue;
+            }
+
+            Float averagePrice = entry.getValue() / count;
+            productPrices.put(productId, averagePrice);
         }
 
         return productPrices;
