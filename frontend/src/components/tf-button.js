@@ -1,4 +1,4 @@
-class CustomButton extends HTMLElement {
+class TfButton extends HTMLElement {
     static get observedAttributes() {
         return ["variant", "disabled", "icon", "size"];
     }
@@ -85,7 +85,7 @@ class CustomButton extends HTMLElement {
             <slot></slot>
         </button>
         `;
-        this.button = this.shadowRoot.querySelector("button");
+        this.tfButton = this.shadowRoot.querySelector("button");
     }
 
     connectedCallback() {
@@ -113,21 +113,21 @@ class CustomButton extends HTMLElement {
     }
 
     update() {
-        this.button.disabled = this.disabled;
-        this.button.className = `${this.variant} ${this.size}`;
+        this.tfButton.disabled = this.disabled;
+        this.tfButton.className = `${this.variant} ${this.size}`;
 
-        const currentIcon = this.button.querySelector(
+        const currentIcon = this.tfButton.querySelector(
             ".material-symbols-rounded",
         );
         if (this.icon) {
             const icon = currentIcon ?? document.createElement("span");
             icon.classList.add("material-symbols-rounded");
             icon.textContent = this.icon;
-            this.button.prepend(icon);
+            this.tfButton.prepend(icon);
         } else if (currentIcon) {
-            this.button.removeChild(currentIcon);
+            this.tfButton.removeChild(currentIcon);
         }
     }
 }
 
-customElements.define("custom-button", CustomButton);
+customElements.define("tf-button", TfButton);

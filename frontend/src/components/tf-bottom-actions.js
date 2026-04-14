@@ -1,4 +1,4 @@
-class BottomActions extends HTMLElement {
+class TfBottomActions extends HTMLElement {
     API_URL = "/fakeapi";
 
     constructor() {
@@ -198,4 +198,4 @@ class BottomActions extends HTMLElement {
     }
 }
 
-customElements.define("bottom-actions", BottomActions);
+customElements.define("tf-bottom-actions", TfBottomActions);
