@@ -130,6 +130,7 @@ CREATE TABLE IF NOT EXISTS cooperative
     productID INTEGER NOT NULL REFERENCES product(productID)
         ON DELETE CASCADE
         ON UPDATE CASCADE,
+    price FLOAT,
     isOpen BOOLEAN,
     PRIMARY KEY (uid, productID)
 );

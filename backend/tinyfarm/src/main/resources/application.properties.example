@@ -1,10 +1,13 @@
-spring.security.oauth2.client.registration.github.client-id=
-spring.security.oauth2.client.registration.github.client-secret=
-spring.security.oauth2.client.registration.github.github-pat=
-jwt.secret=
-jwt.expiration-ms=
+# Port
+server.port=8080
 
+# OAuth2 GitHub
+spring.security.oauth2.client.registration.github.client-id=Ov23liHIjnb2FMYkMGGZ
+spring.security.oauth2.client.registration.github.client-secret=43875e45a7cf1fc104f0a06b312e360c18e9d962
+spring.security.oauth2.client.registration.github.scope=read:user, user:email
+jwt.secret=£*@TinyFarmAppSecret!@G486M!ThisIs@Secret&
 
+#spring.security.jwt.expiration-ms=10000
 spring.security.oauth2.client.provider.github.authorization-uri=https://github.com/login/oauth/authorize
 spring.security.oauth2.client.provider.github.token-uri=https://github.com/login/oauth/access_token
 spring.security.oauth2.client.provider.github.user-info-uri=https://api.github.com/user

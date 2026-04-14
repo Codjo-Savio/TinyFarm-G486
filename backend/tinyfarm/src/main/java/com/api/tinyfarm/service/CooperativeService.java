@@ -1,31 +1,49 @@
 package com.api.tinyfarm.service;
 
+import java.util.HashMap;
+
 import com.api.tinyfarm.model.Cooperative;
 import com.api.tinyfarm.model.Product;
 import com.api.tinyfarm.repository.CooperativeRepository;
 import com.api.tinyfarm.repository.ProductRepository;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.api.tinyfarm.model.Market;
+import com.api.tinyfarm.model.User;
 
 @Service
 public class CooperativeService {
 
-    private final CooperativeRepository cooperativeRepository;
-    private final ProductRepository productRepository;
+    @Autowired
+    private CooperativeRepository cooperativeRepository;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private UserService userService;
 
-    public CooperativeService(CooperativeRepository cooperativeRepository, ProductRepository productRepository) {
-        this.cooperativeRepository = cooperativeRepository;
-        this.productRepository = productRepository;
-    }
+    
+    public HashMap<Product, Float> getAvailableProducts() {
+        HashMap<Product, Float> productPrices = new HashMap<>();
 
-    public List<Product> getAvailableProducts() {
-        if (cooperativeService.isOpen)
-        List<Cooperative> openCooperatives = cooperativeRepository.findByIsOpen(true);
-        List<Long> productIds = openCooperatives.stream()
-            .map(Cooperative::getProductId)
-            .collect(Collectors.toList());
-        return productRepository.findAllById(productIds);
+        List<Cooperative> cooperatives = cooperativeRepository.findAll();
+        for (Cooperative coop : cooperatives) {
+            Long productId = coop.getProductId();
+            Long userId = coop.getUserId();
+            User user = userService.findById(userId);
+            Product product = productService.findById(productId);
+            Market market = 
+            if (product != null) {
+                productPrices.put(product, productPrices.getOrDefault(product, 0F) + product.getPrice());
+            }
+        }
+
+        return productPrices;
     }
 }

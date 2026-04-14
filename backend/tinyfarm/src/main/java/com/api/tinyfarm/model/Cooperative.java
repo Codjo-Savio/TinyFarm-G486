@@ -24,6 +24,9 @@ public class Cooperative {
     @Column(name = "productID", insertable = false, updatable = false)
     private Long productId;
 
+    @Column(name = "price")
+    private Float price;
+
     @Column(name = "isOpen")
     private Boolean isOpen;
 

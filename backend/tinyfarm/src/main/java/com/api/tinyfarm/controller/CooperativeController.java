@@ -1,5 +1,7 @@
 package com.api.tinyfarm.controller;
 
+import java.util.HashMap;
+
 import com.api.tinyfarm.model.Cooperative;
 import com.api.tinyfarm.model.Product;
 import com.api.tinyfarm.service.CooperativeService;
@@ -21,10 +23,10 @@ public class CooperativeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAll() {
+    public ResponseEntity<HashMap<Product, Float>> getAll() {
         try {
-            List<Product> products = cooperativeService.getAvailableProducts();
-            return ResponseEntity.ok(products);
+            HashMap<Product, Float> productPrices = cooperativeService.getAvailableProducts();
+            return ResponseEntity.ok(productPrices);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
