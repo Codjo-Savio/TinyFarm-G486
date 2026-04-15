@@ -196,10 +196,10 @@ body {
     padding: 0;
 }
 
-.market-stats {
+.cows-stats {
     display: flex;
     align-items: center;
-    gap: 40px;
+    gap: 20px;
     font-weight: var(--font-weight-subtitle);
     font-size: var(--font-size-body);
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -227,7 +227,7 @@ h2.category-title {
 .game-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-    gap: 40px;
+    gap: 20px;
     flex: 1;
     min-height: 0;
     padding-top: 5px;
@@ -256,18 +256,12 @@ h2.category-title {
 }
 
 @media (max-width: 1350px) {
-    body {
-        overflow-y: auto;
-        height: auto;
-    }
-
     .container {
         padding: 20px;
     }
 
     .game-grid {
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 30px;
         padding-top: 20px;
     }
 
@@ -278,25 +272,12 @@ h2.category-title {
 }
 
 @media (max-width: 768px) {
-    :root {
-        --font-size-title: 36px;
-        --font-size-body-large: 20px;
-        --font-size-body: 16px;
-    }
-
-    .top-bar {
-        padding: 0 15px;
-        height: auto;
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-
     .sub-header {
         flex-direction: column;
         align-items: flex-start;
     }
 
-    .market-stats {
+    .cows-stats {
         width: 100%;
         justify-content: space-between;
         margin-top: 15px;
@@ -332,6 +313,7 @@ h2.category-title {
     display: flex;
     flex-direction: column;
     flex: 1;
+    gap: 40px;
     background-color: transparent;
     padding: 0;
     border-radius: 0;
@@ -339,25 +321,17 @@ h2.category-title {
 
 .animal-title {
     font-size: var(--font-size-subtitle);
-    grid-template-columns: repeat(1, 1fr);
     justify-content: space-between;
     align-items: center;
-    height: 1px;
-    position: relative;
-    top: 35px;
     display: flex;
-    gap: 10px;
+    gap: 12px;
 }
 
-.animal-state {
+.animal-title > .badges {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    padding: 15px 10px 15px 10px;
-    border-radius: 100px;
-    background-color: var(--color-secondary);
-    font-size: var(--font-size-mini);
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: end;
 }
 
 .animal-content {
@@ -365,8 +339,6 @@ h2.category-title {
     flex-direction: column;
     align-items: flex-start;
     gap: 15px;
-    margin-top: 75px;
-    margin-bottom: 60px;
 }
 
 .animal-content div {
@@ -388,61 +360,18 @@ h2.category-title {
 }
 
 .food-state {
-    width: 50%;
+    width: 100%;
 }
 
-.food-state-line-place-holder {
-    width: 50%;
-    height: 10px;
-    background-color: var(--color-secondary);
-    border-radius: 10px;
-}
-
-.food-state-line {
-    width: 50%;
-    height: 100%;
-    background-color: var(--color-primary);
-    border-radius: 10px;
+.food-state > tf-progress-bar {
+    width: 100%;
+    max-width: 200px;
 }
 
 .animal-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
     margin-top: auto;
-}
-
-.animal-actions .action-button {
-    width: 100%;
-    min-width: 0;
-    justify-content: center;
-    gap: 4px;
-    padding: 8px 6px;
-    font-size: 13px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.animal-actions .action-button .material-symbols-rounded {
-    font-size: 16px;
-}
-
-.animal-actions button[active="true"] {
-    background-color: var(--color-primary);
-    color: var(--color-secondary);
-    border: none;
-    padding: 10px 13px 10px 13px;
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-.animal-actions button[active="false"] {
-    background-color: var(--color-surface-dark);
-    color: var(--color-secondary);
-    border: none;
-    padding: 10px 13px 10px 13px;
-    border-radius: 10px;
-    cursor: auto;
 }
