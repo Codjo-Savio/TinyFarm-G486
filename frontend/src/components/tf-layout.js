@@ -20,7 +20,6 @@ class TfLayout extends HTMLElement {
         .layout {
             display: flex;
             flex-direction: column;
-            height: 100%;
             min-height: 0;
         }
         `;
