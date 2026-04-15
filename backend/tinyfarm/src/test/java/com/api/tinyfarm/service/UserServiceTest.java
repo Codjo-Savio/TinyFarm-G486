@@ -15,7 +15,7 @@ public class UserServiceTest {
     UserService userService;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         userService.deleteAllUsers();
     }
 
@@ -53,7 +53,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void shouldDeleteUser(){
+    void shouldDeleteUser() {
         User user = new User();
         user.setName("Colorado");
         user.setEmail("usertest@gmail.com");
@@ -81,4 +81,11 @@ public class UserServiceTest {
         assertTrue(updated.getHibernation());
     }
 
+    @Test
+    void shouldReturnFormattedParisTime() {
+        String time = userService.getTime();
+
+        assertNotNull(time);
+        assertTrue(time.matches("\\d{2}:\\d{2}:\\d{2}"));
+    }
 }

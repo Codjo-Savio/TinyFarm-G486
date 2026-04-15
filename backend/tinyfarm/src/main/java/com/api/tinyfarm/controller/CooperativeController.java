@@ -2,8 +2,6 @@ package com.api.tinyfarm.controller;
 
 import java.util.HashMap;
 
-import com.api.tinyfarm.model.Cooperative;
-import com.api.tinyfarm.model.Product;
 import com.api.tinyfarm.service.CooperativeService;
 
 import org.springframework.http.HttpStatus;
@@ -41,17 +39,6 @@ public class CooperativeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
-    @GetMapping("/time")
-    public ResponseEntity<String> getTime() {
-        try {
-            return ResponseEntity.ok(cooperativeService.getTime());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-
 
     @DeleteMapping("/{idBuyer}/{description}")
     public ResponseEntity<Integer> deleteByDescription(@PathVariable Long idBuyer, @PathVariable String description) {

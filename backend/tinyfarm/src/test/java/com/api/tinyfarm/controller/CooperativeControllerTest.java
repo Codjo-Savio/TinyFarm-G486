@@ -38,9 +38,9 @@ class CooperativeControllerTest extends AuthenticatedControllerTestSupport {
         when(cooperativeService.getAvailableProducts()).thenReturn(productPrices);
 
         mockMvc
-            .perform(get("/api/cooperative").with(authenticated()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.10").value(15.0));
+                .perform(get("/api/cooperative").with(authenticated()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.10").value(15.0));
     }
 
     @Test
@@ -48,26 +48,16 @@ class CooperativeControllerTest extends AuthenticatedControllerTestSupport {
         when(cooperativeService.isOpen()).thenReturn(true);
 
         mockMvc
-            .perform(get("/api/cooperative/isOpen").with(authenticated()))
-            .andExpect(status().isOk())
-            .andExpect(content().string("true"));
-    }
-
-    @Test
-    void shouldReturnCurrentTime() throws Exception {
-        when(cooperativeService.getTime()).thenReturn("10:15:30");
-
-        mockMvc
-            .perform(get("/api/cooperative/time").with(authenticated()))
-            .andExpect(status().isOk())
-            .andExpect(content().string("10:15:30"));
+                .perform(get("/api/cooperative/isOpen").with(authenticated()))
+                .andExpect(status().isOk())
+                .andExpect(content().string("true"));
     }
 
     @Test
     void shouldDeleteCooperativeByBuyerAndDescription() throws Exception {
         mockMvc
-            .perform(delete("/api/cooperative/2/Milk").with(authenticated()))
-            .andExpect(status().isNoContent());
+                .perform(delete("/api/cooperative/2/Milk").with(authenticated()))
+                .andExpect(status().isNoContent());
 
         verify(cooperativeService).deleteLessExpensiveWithDescription(2L, "Milk");
     }
@@ -77,18 +67,18 @@ class CooperativeControllerTest extends AuthenticatedControllerTestSupport {
         when(cooperativeService.getAvailableProducts()).thenThrow(new RuntimeException("boom"));
 
         mockMvc
-            .perform(get("/api/cooperative").with(authenticated()))
-            .andExpect(status().isInternalServerError());
+                .perform(get("/api/cooperative").with(authenticated()))
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
     void shouldReturnInternalServerErrorWhenDeletionFails() throws Exception {
         doThrow(new RuntimeException("boom"))
-            .when(cooperativeService)
-            .deleteLessExpensiveWithDescription(2L, "Milk");
+                .when(cooperativeService)
+                .deleteLessExpensiveWithDescription(2L, "Milk");
 
         mockMvc
-            .perform(delete("/api/cooperative/2/Milk").with(authenticated()))
-            .andExpect(status().isInternalServerError());
+                .perform(delete("/api/cooperative/2/Milk").with(authenticated()))
+                .andExpect(status().isInternalServerError());
     }
 }
