@@ -14,7 +14,6 @@ class TfCard extends HTMLElement {
         .card {
             display: flex;
             flex-direction: column;
-            height: 100%;
             background-color: var(--color-surface-dark);
             padding: 20px;
             border-radius: var(--radius);

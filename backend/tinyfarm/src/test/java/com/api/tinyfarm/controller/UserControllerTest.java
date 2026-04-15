@@ -5,13 +5,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import com.api.tinyfarm.service.UserService;
+
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -20,87 +25,87 @@ public class UserControllerTest extends AuthenticatedControllerTestSupport {
     @Autowired
     MockMvc mockMvc;
 
+    @MockBean
+    private UserService userService;
+
     // setup
     @BeforeEach
-    void setup() throws  Exception{
+    void setup() throws Exception {
         String json = """
-                {
-                     "id" : 1,
-                     "name" : "Eldoraldo",
-                     "email" : "usertest@gmail.com",
-                     "gender" : "F",
-                     "ecus" : "10",
-                     "level" : "1"
-                }
-        """;
+                        {
+                             "id" : 1,
+                             "name" : "Eldoraldo",
+                             "email" : "usertest@gmail.com",
+                             "gender" : "F",
+                             "ecus" : "10",
+                             "level" : "1"
+                        }
+                """;
         mockMvc.perform(
-                        post("/api/users")
-                                .with(authenticated())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(json)
-        );
+                post("/api/users")
+                        .with(authenticated())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json));
     }
 
-    // tests of the POST  
+    // tests of the POST
     @Test
-    void shouldCreateUser() throws Exception{
+    void shouldCreateUser() throws Exception {
         String json = """
-                {
-                    "id" : 2,
-                     "name" : "Bigfarm",
-                     "email" : "usertest@gmail.com",
-                     "gender" : "M",
-                     "ecus" : "10",
-                     "level" : "1"
-                }
-        """;
+                        {
+                            "id" : 2,
+                             "name" : "Bigfarm",
+                             "email" : "usertest@gmail.com",
+                             "gender" : "M",
+                             "ecus" : "10",
+                             "level" : "1"
+                        }
+                """;
         mockMvc.perform(
-                        post("/api/users")
-                                .with(authenticated())
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(json)
-                )
+                post("/api/users")
+                        .with(authenticated())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
                 .andExpect(status().isOk());
     }
 
     // tests of the GET
     @Test
-    void shouldReturnUsers() throws Exception{
+    void shouldReturnUsers() throws Exception {
         mockMvc.perform(get("/api/users").with(authenticated()))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void shouldReturnUserById() throws  Exception{
+    void shouldReturnUserById() throws Exception {
         mockMvc.perform(get("/api/users/id/1").with(authenticated()))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void userShouldNotBeFoundById() throws  Exception{
+    void userShouldNotBeFoundById() throws Exception {
         mockMvc.perform(get("/api/users/id/0").with(authenticated()))
                 .andExpect(status().isNotFound());
     }
 
     // test of the DELETE
     @Test
-    void shouldDeleteUserById() throws  Exception{
+    void shouldDeleteUserById() throws Exception {
         String json = """
-                {
-                    "id" : 3,
-                     "name" : "Colorado",
-                     "email" : "usertest@gmail.com",
-                     "gender" : "F",
-                     "ecus" : "100",
-                     "level" : "1"
-                }
-        """;
+                        {
+                            "id" : 3,
+                             "name" : "Colorado",
+                             "email" : "usertest@gmail.com",
+                             "gender" : "F",
+                             "ecus" : "100",
+                             "level" : "1"
+                        }
+                """;
         mockMvc.perform(
                 post("/api/users")
                         .with(authenticated())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(json)
-        );
+                        .content(json));
         mockMvc.perform(delete("/api/users/id/3").with(authenticated()))
                 .andExpect(status().isNoContent());
     }

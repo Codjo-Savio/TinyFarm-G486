@@ -1,5 +1,7 @@
 class TfBottomActions extends HTMLElement {
-    API_URL = "/fakeapi";
+    FAKE_API_URL = "/fakeapi";
+    API_URL = window.apiUrl || "http://localhost:8080/api";
+    timeIntervalId;
 
     static get observedAttributes() {
         return ["size", "variant"];
@@ -23,13 +25,30 @@ class TfBottomActions extends HTMLElement {
     }
 
     async fetchTradeOverview() {
-        const res = await fetch(this.API_URL + "/trade/overview.json");
+        const res = await fetch(this.FAKE_API_URL + "/trade/overview.json");
         return await res.json();
     }
 
-    async fetchTime() {
-        const res = await fetch(this.API_URL + "/time.json");
-        return await res.json();
+    getAoeTime() {
+        // AoE time = UTC-12
+        const currentTime = new Date();
+        return new Date(currentTime.getTime() - 12 * 60 * 60 * 1000);
+    }
+
+    setTime() {
+        const time = this.getAoeTime();
+        const aoeHours = time.getUTCHours();
+        const aoeMinutes = time.getUTCMinutes();
+        const remainingHours = 23 - aoeHours;
+        const remainingMinutes = 59 - aoeMinutes;
+        const prettyRemaining =
+            remainingHours === 0
+                ? `${remainingMinutes}min`
+                : `${remainingHours}h`;
+        this.shadowRoot.querySelector("#time .current").textContent =
+            `${aoeHours.toString().padStart(2, "0")}:${aoeMinutes.toString().padStart(2, "0")} AoE`;
+        this.shadowRoot.querySelector("#time .remaining").textContent =
+            prettyRemaining;
     }
 
     async render() {
@@ -215,11 +234,18 @@ class TfBottomActions extends HTMLElement {
 				<span class="material-symbols-rounded">
 					schedule
 				</span>
-				<span><b class="current">- AoE</b> • Fin du jour : <b class="remaining">-</b></span>
+				<span><b class="current"></b> • Fin du jour dans <b class="remaining"></b></span>
 			</div>
 		</div>
 		`;
         this.shadowRoot.appendChild(template.content.cloneNode(true));
+
+        if (this.timeIntervalId) {
+            clearInterval(this.timeIntervalId);
+        } else {
+            this.setTime();
+        }
+        this.timeIntervalId = setInterval(() => this.setTime(), 1000);
 
         try {
             // Fetch cooperative and marketplace data
@@ -232,23 +258,6 @@ class TfBottomActions extends HTMLElement {
                 this.shadowRoot
                     .querySelector("#marketplace .infos")
                     .textContent.replace("-", overview.marketplace.stock);
-
-            // Fetch time data
-            const time = await this.fetchTime();
-            this.shadowRoot.querySelector("#time .current").textContent =
-                this.shadowRoot
-                    .querySelector("#time .current")
-                    .textContent.replace(
-                        "-",
-                        `${time.aoe.min}:${time.aoe.sec}`,
-                    );
-            this.shadowRoot.querySelector("#time .remaining").textContent =
-                this.shadowRoot
-                    .querySelector("#time .remaining")
-                    .textContent.replace(
-                        "-",
-                        `${23 - time.aoe.min}h${60 - time.aoe.sec}min`,
-                    );
         } finally {
             // Set as ready
             this.shadowRoot

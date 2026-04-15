@@ -43,16 +43,14 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (Exception e) {
             return ResponseEntity.status(
-                HttpStatus.INTERNAL_SERVER_ERROR
-            ).build();
+                    HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @PutMapping("/id/{id}")
     public ResponseEntity<User> update(
-        @PathVariable Long id,
-        @RequestBody User user
-    ) {
+            @PathVariable Long id,
+            @RequestBody User user) {
         try {
             return ResponseEntity.ok(userService.update(id, user));
         } catch (Exception e) {
@@ -65,7 +63,7 @@ public class UserController {
         try {
             userService.hibernate(id);
             return ResponseEntity.ok().build();
-        }catch(Exception e){
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -84,9 +82,8 @@ public class UserController {
     // PATCH /users/1/ecus?amount=8 → ajouter des écus (vente d'un oeuf)
     @PatchMapping("/ecus/add/id/{id}")
     public ResponseEntity<User> addEcus(
-        @PathVariable Long id,
-        @RequestParam Float amount
-    ) {
+            @PathVariable Long id,
+            @RequestParam Float amount) {
         try {
             return ResponseEntity.ok(userService.addEcus(id, amount));
         } catch (Exception e) {
@@ -97,9 +94,8 @@ public class UserController {
     // PATCH /users/1/ecus/retirer?amount=3 → retirer des écus (nourrir un animal)
     @PatchMapping("/ecus/withdraw/id/{id}")
     public ResponseEntity<User> withdrawEcus(
-        @PathVariable Long id,
-        @RequestParam Float amount
-    ) {
+            @PathVariable Long id,
+            @RequestParam Float amount) {
         try {
             return ResponseEntity.ok(userService.withdrawEcus(id, amount));
         } catch (Exception e) {
