@@ -119,14 +119,4 @@ public class UserControllerTest extends AuthenticatedControllerTestSupport {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.hibernation").value(true));
     }
-
-    @Test
-    void shouldReturnCurrentTime() throws Exception {
-        when(userService.getTime()).thenReturn("10:15:30");
-
-        mockMvc
-                .perform(get("/api/users/aoe-time").with(authenticated()))
-                .andExpect(status().isOk())
-                .andExpect(content().string("10:15:30"));
-    }
 }

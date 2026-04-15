@@ -3,6 +3,7 @@ package com.api.tinyfarm.service;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -127,8 +128,8 @@ public class CooperativeService {
         cooperativeRepository.deleteByUserIdAndProductId(uid, pid);
     }
 
-    // handling open or closen hours
-    private static final ZoneId ZONE = ZoneId.of("Europe/Paris");
+    // handling open or closen hours in AoE (UTC-12)
+    private static final ZoneId ZONE = ZoneOffset.ofHours(-12);
 
     private boolean isBetween(LocalTime t, LocalTime start, LocalTime end) {
         if (start.isBefore(end)) {

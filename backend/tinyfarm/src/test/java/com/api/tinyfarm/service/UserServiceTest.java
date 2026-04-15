@@ -80,12 +80,4 @@ public class UserServiceTest {
         User updated = userService.findById(created.getId());
         assertTrue(updated.getHibernation());
     }
-
-    @Test
-    void shouldReturnFormattedParisTime() {
-        String time = userService.getTime();
-
-        assertNotNull(time);
-        assertTrue(time.matches("\\d{2}:\\d{2}:\\d{2}"));
-    }
 }

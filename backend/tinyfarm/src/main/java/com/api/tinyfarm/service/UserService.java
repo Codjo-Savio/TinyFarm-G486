@@ -107,9 +107,4 @@ public class UserService {
         int maxPurchase = user.getLevel() * 12; // niveau 1 = 12 achats par jour
         return purchaseNumberForToday < maxPurchase;
     }
-
-    public String getTime() {
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
-        return now.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-    }
 }

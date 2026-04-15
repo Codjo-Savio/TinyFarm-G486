@@ -102,13 +102,4 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
-
-    @GetMapping("/aoe-time")
-    public ResponseEntity<String> getTime() {
-        try {
-            return ResponseEntity.ok(userService.getTime());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
 }
