@@ -1,6 +1,6 @@
 class TfButton extends HTMLElement {
     static get observedAttributes() {
-        return ["variant", "disabled", "icon", "size"];
+        return ["variant", "disabled", "icon", "size", "loading"];
     }
 
     constructor() {
@@ -75,9 +75,77 @@ class TfButton extends HTMLElement {
             }
 
             button:disabled {
-                background-color: transparent;
+                background-color: var(--color-surface-dark);
                 color: var(--color-secondary);
                 cursor: not-allowed;
+            }
+
+            button.loading > * {
+                visibility: hidden;
+            }
+
+            button.loading::after {
+                /* Adapted from https://css-loaders.com/dots/ */
+                content: "";
+                position: absolute;
+                width: 40px;
+                aspect-ratio: 1;
+                --pattern: no-repeat radial-gradient(farthest-side, var(--color-secondary) 90%, #0000);
+                background: var(--pattern), var(--pattern), var(--pattern);
+                background-size: 25% 25%;
+                animation: loading 1.6s infinite;
+            }
+
+            @keyframes loading {
+                0% {
+                    background-position:
+                        0% -100%,
+                        50% -100%,
+                        100% -100%;
+                }
+
+                16.67% {
+                    background-position:
+                        0% 50%,
+                        50% -100%,
+                        100% -100%;
+                }
+
+                33.33% {
+                    background-position:
+                        0% 50%,
+                        50% 50%,
+                        100% -100%;
+                }
+
+                45%,
+                55% {
+                    background-position:
+                        0% 50%,
+                        50% 50%,
+                        100% 50%;
+                }
+
+                66.67% {
+                    background-position:
+                        0% 200%,
+                        50% 50%,
+                        100% 50%;
+                }
+
+                83.33% {
+                    background-position:
+                        0% 200%,
+                        50% 200%,
+                        100% 50%;
+                }
+
+                100% {
+                    background-position:
+                        0% 200%,
+                        50% 200%,
+                        100% 200%;
+                }
             }
         </style>
 
@@ -104,6 +172,10 @@ class TfButton extends HTMLElement {
         return this.hasAttribute("disabled");
     }
 
+    get loading() {
+        return this.hasAttribute("loading");
+    }
+
     get icon() {
         return this.getAttribute("icon") || null;
     }
@@ -113,8 +185,8 @@ class TfButton extends HTMLElement {
     }
 
     update() {
-        this.tfButton.disabled = this.disabled;
-        this.tfButton.className = `${this.variant} ${this.size}`;
+        this.tfButton.disabled = this.disabled || this.loading;
+        this.tfButton.className = `${this.variant} ${this.size} ${this.loading ? "loading" : ""}`;
 
         const currentIcon = this.tfButton.querySelector(
             ".material-symbols-rounded",
