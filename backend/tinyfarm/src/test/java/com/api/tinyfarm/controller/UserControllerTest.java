@@ -9,7 +9,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.api.tinyfarm.service.UserService;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -20,25 +23,22 @@ public class UserControllerTest extends AuthenticatedControllerTestSupport {
     @Autowired
     MockMvc mockMvc;
 
+    @Autowired
+    private UserService userService;
+
+    private Long createdUserId;
+
     // setup
     @BeforeEach
-    void setup() throws Exception {
-        String json = """
-                        {
-                             "id" : 1,
-                             "name" : "Eldoraldo",
-                             "email" : "usertest@gmail.com",
-                             "gender" : "F",
-                             "ecus" : "10",
-                             "level" : "1"
-                        }
-                """;
-        mockMvc.perform(
-                post("/api/users")
-                        .with(authenticated())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(status().isOk());
+    void setup() {
+        userService.deleteAllUsers();
+        var user = new com.api.tinyfarm.model.User();
+        user.setName("Eldoraldo");
+        user.setEmail("usertest@gmail.com");
+        user.setGender(com.api.tinyfarm.model.User.Gender.F);
+        user.setEcus(10F);
+        user.setLevel(1);
+        createdUserId = userService.create(user).getId();
     }
 
     // tests of the POST
@@ -71,7 +71,7 @@ public class UserControllerTest extends AuthenticatedControllerTestSupport {
 
     @Test
     void shouldReturnUserById() throws Exception {
-        mockMvc.perform(get("/api/users/id/1").with(authenticated()))
+        mockMvc.perform(get("/api/users/id/" + createdUserId).with(authenticated()))
                 .andExpect(status().isOk());
     }
 
@@ -105,10 +105,10 @@ public class UserControllerTest extends AuthenticatedControllerTestSupport {
 
     @Test
     void shouldHibernateUser() throws Exception {
-        mockMvc.perform(patch("/api/users/hibernate/id/1").with(authenticated()))
+        mockMvc.perform(patch("/api/users/hibernate/id/" + createdUserId).with(authenticated()))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/api/users/id/1").with(authenticated()))
+        mockMvc.perform(get("/api/users/id/" + createdUserId).with(authenticated()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.hibernation").value(true));
     }
