@@ -1,22 +1,19 @@
 const API_URL = "http://localhost:8080/api";
 let inventaire = {};
-const nomsProduits = {}; // Nouveau dictionnaire pour stocker les noms
+const nomsProduits = {}; 
 
 async function initialiserBoutique() {
     const container = document.getElementById("shop-container");
 
     try {
-        // 1. On récupère les détails des produits (pour avoir la description de chacun)
         const productsResponse = await fetch(`${API_URL}/products`);
         if (productsResponse.ok) {
             const productsList = await productsResponse.json();
-            // On remplit le dictionnaire : id -> description (ex: 1 -> "Botte de foin")
             productsList.forEach(p => {
                 nomsProduits[p.id] = p.description;
             });
         }
 
-        // 2. On récupère l'inventaire actuel (prix)
         const response = await fetch(`${API_URL}/cooperative`);
 
         if (!response.ok) {
@@ -25,10 +22,29 @@ async function initialiserBoutique() {
 
         inventaire = await response.json();
 
+
+        try {
+            const appBar = document.querySelector("app-bar");
+            const user = await appBar.fetchUser();
+            
+            const resAchats = await fetch(`${API_URL}/users/id/${user.id}/achats-restants`);
+            const achatsRestants = resAchats.ok ? await resAchats.json() : user.level * 12;
+            const enStock = Object.keys(inventaire).length;
+            
+            const statsContainer = document.querySelector(".market-stats");
+            if (statsContainer) {
+                statsContainer.innerHTML = `
+                    <span><span class="material-symbols-rounded">shopping_cart</span> Achats restants : ${achatsRestants}</span>
+                    <span><span class="material-symbols-rounded">store</span> En stock : ${enStock}</span>
+                `;
+            }
+        } catch (e) {
+            console.error("Erreur stats :", e);
+        }
+
         container.innerHTML = "";
 
         for (const [idProduit, prix] of Object.entries(inventaire)) {
-            // On récupère le vrai nom du produit grâce à l'ID, ou un nom par défaut si on ne le trouve pas
             const nomAffiche = nomsProduits[idProduit] || `${idProduit}`;
             
             const productHTML = `
@@ -59,15 +75,12 @@ async function initialiserBoutique() {
 document.addEventListener("DOMContentLoaded", initialiserBoutique);
 
 // Partie panier
-let inventaire = {};
 const panier = {};
 
 function displayPanier() {
-    // Logique pour afficher le contenu du panier
     let total = 0;
 
     for (const [idProduit, quantite] of Object.entries(panier)) {
-        // 'inventaire[idProduit]' contient maintenant directement le prix (Float)
         const prix = inventaire[idProduit];
         if (prix !== undefined) {
             total += prix * quantite;
@@ -111,7 +124,6 @@ function displayPanier() {
 displayPanier();
 
 function ajouterAuPanier(nomProduit) {
-    // Logique pour ajouter le produit au panier
     if (panier[nomProduit]) {
         panier[nomProduit]++;
     } else {
@@ -122,7 +134,6 @@ function ajouterAuPanier(nomProduit) {
 }
 
 function retirerDuPanier(nomProduit) {
-    // Logique pour retirer le produit du panier
     if (panier[nomProduit]) {
         panier[nomProduit]--;
         if (panier[nomProduit] <= 0) {
