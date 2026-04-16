@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Animal {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "aid", nullable = false)
@@ -79,6 +78,5 @@ public class Animal {
             wateredToday = true;
         }
     }
-
 
 }
