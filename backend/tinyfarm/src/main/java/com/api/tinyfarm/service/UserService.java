@@ -3,15 +3,11 @@ package com.api.tinyfarm.service;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.UserRepository;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
-
     private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
@@ -37,12 +33,13 @@ public class UserService {
                     existing.setGender(gender);
                     return userRepository.save(existing);
                 })
-                .orElseGet(() -> userRepository.save(
-                        User.builder()
-                                .email(email)
-                                .name(name)
-                                .gender(gender)
-                                .build()));
+                .orElseGet(() -> {
+                    return userRepository.save(User.builder()
+                            .email(email)
+                            .name(name)
+                            .gender(gender)
+                            .build());
+                });
     }
 
     public User findById(Long id) {
@@ -61,6 +58,10 @@ public class UserService {
         return userRepository
                 .findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + email));
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.findByEmail(email).isPresent();
     }
 
     public User create(User user) {
