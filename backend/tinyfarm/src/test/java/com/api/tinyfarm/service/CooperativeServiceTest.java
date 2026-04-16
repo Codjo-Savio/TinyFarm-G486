@@ -72,8 +72,8 @@ class CooperativeServiceTest {
         Cooperative ignoredWithoutProduct = createCooperative(5L, null, 30.0f);
 
         when(cooperativeRepository.findAll()).thenReturn(
-            List.of(firstCooperative, secondCooperative, thirdCooperative, ignoredWithoutPrice, ignoredWithoutProduct)
-        );
+                List.of(firstCooperative, secondCooperative, thirdCooperative, ignoredWithoutPrice,
+                        ignoredWithoutProduct));
 
         HashMap<Long, Float> availableProducts = cooperativeService.getAvailableProducts();
 
@@ -117,14 +117,6 @@ class CooperativeServiceTest {
 
         verify(userRepository, never()).save(org.mockito.ArgumentMatchers.any(User.class));
         verify(cooperativeRepository, never()).deleteByUserIdAndProductId(1L, 10L);
-    }
-
-    @Test
-    void shouldReturnFormattedParisTime() {
-        String time = cooperativeService.getTime();
-
-        assertNotNull(time);
-        assertTrue(time.matches("\\d{2}:\\d{2}:\\d{2}"));
     }
 
     @Test

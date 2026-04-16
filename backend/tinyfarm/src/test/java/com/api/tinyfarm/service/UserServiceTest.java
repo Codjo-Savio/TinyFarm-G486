@@ -15,7 +15,7 @@ public class UserServiceTest {
     UserService userService;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         userService.deleteAllUsers();
     }
 
@@ -53,7 +53,7 @@ public class UserServiceTest {
     }
 
     @Test
-    void shouldDeleteUser(){
+    void shouldDeleteUser() {
         User user = new User();
         user.setName("Colorado");
         user.setEmail("usertest@gmail.com");
@@ -80,5 +80,4 @@ public class UserServiceTest {
         User updated = userService.findById(created.getId());
         assertTrue(updated.getHibernation());
     }
-
 }
