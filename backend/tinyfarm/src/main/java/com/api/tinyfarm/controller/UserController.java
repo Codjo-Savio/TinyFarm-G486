@@ -3,6 +3,7 @@ package com.api.tinyfarm.controller;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.service.UserService;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,8 @@ public class UserController {
     @GetMapping("/id/{id}")
     public ResponseEntity<User> getById(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(userService.findById(id));
+            User user = Objects.requireNonNull(userService.findById(id));
+            return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
