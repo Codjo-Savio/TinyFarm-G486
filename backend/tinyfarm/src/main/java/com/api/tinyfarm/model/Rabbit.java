@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Rabbit extends Animal {
-
     public enum RabbitTypeEnum {
         lapereau,
         lapin,

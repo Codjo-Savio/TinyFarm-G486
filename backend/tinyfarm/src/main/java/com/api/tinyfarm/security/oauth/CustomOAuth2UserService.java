@@ -51,13 +51,13 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         boolean userAlreadyExists = userService.existsByEmail(email);
         User user = userService.findOrCreateOAuthUser(email, name, null);
         if (!userAlreadyExists) {
-            createStarterResources();
+            createStarterResources(user);
         }
 
         return new CustomOAuth2User(oAuth2User.getAttributes(), user);
     }
 
-    private void createStarterResources() {
+    private void createStarterResources(User owner) {
         // 8 young rabbits
         List<String> rabbitNames = Arrays.asList("Carotte", "Panpan", "Choco", "Iris", "Napoléon", "Pinou",
                 "Oréo", "Olaf");
@@ -65,6 +65,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             Rabbit rabbit = new Rabbit();
             rabbit.setName(rabbitName);
             rabbit.setRabbitType(RabbitTypeEnum.lapereau);
+            rabbit.setUserId(owner.getId());
             this.rabbitService.create(rabbit);
         }
 
@@ -72,12 +73,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Cow cow = new Cow();
         cow.setName("Nathalie");
         cow.setCowType(CowType.D);
+        cow.setUserId(owner.getId());
         this.cowService.create(cow);
 
         // 1 rooster
         Chicken rooster = new Chicken();
         rooster.setName("Coco");
         rooster.setChickenType(ChickenType.R);
+        rooster.setUserId(owner.getId());
         this.chickenService.create(rooster);
 
         // 3 hens
@@ -86,6 +89,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             Chicken hen = new Chicken();
             hen.setName(henName);
             hen.setChickenType(ChickenType.H);
+            hen.setUserId(owner.getId());
             this.chickenService.create(hen);
         }
     }
