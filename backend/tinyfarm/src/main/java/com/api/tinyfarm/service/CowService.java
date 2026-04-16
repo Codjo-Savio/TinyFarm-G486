@@ -18,7 +18,7 @@ public class CowService {
     @Autowired
     private UserService userService;
     @Autowired
-    private  AnimalService animalService;
+    private AnimalService animalService;
 
     public List<Cow> findAll() {
         return cowRepository.findAll();
@@ -70,11 +70,11 @@ public class CowService {
      * nourri une vache avec de la paille
      * si impossible, elle sera nourrie avec de l'herbe
      */
-    public Cow hayCow(Long cowId, Long userId){
+    public Cow hayCow(Long cowId, Long userId) {
         Cow cow = findById(cowId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 5){
+        if (user.getEcus() >= 5) {
             user.setEcus(user.getEcus() - 5);
             userService.update(userId, user);
 
@@ -83,15 +83,14 @@ public class CowService {
             return cowRepository.save(cow);
         } else {
             throw new RuntimeException(
-                "Pas assez d'écus pour nourrir la vahe avec de la paille !"
-            );
+                    "Pas assez d'écus pour nourrir la vahe avec de la paille !");
         }
     }
 
     /**
      * nouri la vache avec de l'herbe
      */
-    public Cow grassCow(Long cowId){
+    public Cow grassCow(Long cowId) {
         Cow cow = findById(cowId);
 
         cow.setFedToday(true);
@@ -101,11 +100,11 @@ public class CowService {
     /**
      * abreuve une vache
      */
-    public Cow waterCow(Long cowId, Long userId){
+    public Cow waterCow(Long cowId, Long userId) {
         Cow cow = findById(cowId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 2){
+        if (user.getEcus() >= 2) {
             user.setEcus(user.getEcus() - 2);
             userService.update(userId, user);
 
@@ -113,19 +112,18 @@ public class CowService {
             return cowRepository.save(cow);
         } else {
             throw new RuntimeException(
-                "Pas assez d'écus pour abreuver la vache !"
-            );
+                    "Pas assez d'écus pour abreuver la vache !");
         }
     }
 
     /**
      * nettoie une vache
      */
-    public Cow cleanCow(Long cowId, Long userId){
+    public Cow cleanCow(Long cowId, Long userId) {
         Cow cow = findById(cowId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 3){
+        if (user.getEcus() >= 3) {
             user.setEcus(user.getEcus() - 3);
             userService.update(userId, user);
 
@@ -133,19 +131,18 @@ public class CowService {
             return cowRepository.save(cow);
         } else {
             throw new RuntimeException(
-                "Pas assez d'écus pour nettoyer la vache !"
-            );
+                    "Pas assez d'écus pour nettoyer la vache !");
         }
     }
 
     /**
      * soigne une vache
      */
-    public Cow healCow(Long cowId, Long userId){
+    public Cow healCow(Long cowId, Long userId) {
         Cow cow = findById(cowId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 6){
+        if (user.getEcus() >= 6) {
             user.setEcus(user.getEcus() - 6);
             userService.update(userId, user);
 
@@ -153,58 +150,57 @@ public class CowService {
             return cowRepository.save(cow);
         } else {
             throw new RuntimeException(
-                "Pas assez d'écus pour soigner la vache !"
-            );
+                    "Pas assez d'écus pour soigner la vache !");
         }
     }
 
     /**
      * gère la quantité de lait produite par les vaches d'un utilisateur
      */
-    public void milking(Long cowId){
+    public void milking(Long cowId) {
         Cow cow = findById(cowId);
 
-        //si elle peut produire
-        if (cow.getMilking()){
+        // si elle peut produire
+        if (cow.getMilking()) {
             // et qu'elle a été traite (i.e. elle n'a pas de lait)
-            if (cow.getMilk() == 0){
+            if (cow.getMilk() == 0) {
                 cow.setMilk(8);
             } else {
                 cow.setMilk(cow.getMilk() + 4);
             }
         }
 
-        if (cow.getMilk() == 16){
+        if (cow.getMilk() == 16) {
             cow.setMilking(false);
         }
-        
+
         cowRepository.save(cow);
     }
 
     /**
      * ajuste le poid de la vache en fonction de ce qu'elle a mangé dans la journée
      */
-    private Cow handleWeight(Long cowId){
+    public Cow handleWeight(Long cowId) {
         Cow cow = findById(cowId);
 
-        if (cow.getWateredToday()){
-            if(cow.getHayToday()){
+        if (cow.getWateredToday()) {
+            if (cow.getHayToday()) {
                 // paille herbe eau
                 cow.setWeight(cow.getWeight() + 9);
             } else {
-                //herbe eau
+                // herbe eau
                 cow.setWeight(cow.getWeight() + 6);
             }
-            
+
         } else {
-            if(cow.getHayToday()){
-                //paille herbe
+            if (cow.getHayToday()) {
+                // paille herbe
                 cow.setWeight(cow.getWeight() + 8);
             } else {
                 // herbe
                 cow.setWeight(cow.getWeight() + 5);
             }
-            
+
         }
 
         // eau seule ne fait rien
@@ -213,17 +209,17 @@ public class CowService {
         if (cow.getWeight() > 750.0f) {
             cow.setWeight(750.0f);
         }
-        
+
         return cowRepository.save(cow);
     }
 
     /**
      * gère la santé d'une vache séléctionnée
      */
-    private Cow handleHealth(Long cowId){
+    private Cow handleHealth(Long cowId) {
         Cow cow = findById(cowId);
 
-        if (cow.getHealthy() != null && !cow.getHealthy()){
+        if (cow.getHealthy() != null && !cow.getHealthy()) {
             cow.setSickDays(cow.getSickDays() + 1);
         } else {
             cow.setSickDays(0);
@@ -259,7 +255,7 @@ public class CowService {
             cow.setMilking(false); // et ne peut donc plus faire de lait
 
             // 1 chance sur 5 de tomber malade
-            if (Math.random() < 0.2){ 
+            if (Math.random() < 0.2) {
                 cow.setHealthy(false);
                 cow.setMilking(false);
             }
