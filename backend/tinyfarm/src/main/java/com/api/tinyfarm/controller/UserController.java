@@ -106,4 +106,18 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    // GET /api/users/id/{id}/achats-restants → récupérer les achats restants (basé sur le niveau)
+    @GetMapping("/id/{id}/achats-restants")
+    public ResponseEntity<Integer> getAchatsRestants(@PathVariable Long id) {
+        try {
+            int achatsRestants = 0;
+            while(userService.canBuy(id, achatsRestants)) {
+                achatsRestants++;
+            }
+            return ResponseEntity.ok(achatsRestants);
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
