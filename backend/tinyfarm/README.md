@@ -156,3 +156,6 @@ in which you will copy and paste the content of the two exemple (respectively) b
   * retirer un stock par UserId et ProductId        Delete("/user/{userId}/product/{productId}")
   * retirer un stock par UserId                     Delete("/user/{userId}")
   * retirer un stock par ProductId                  Delete("/product/{productId}")
+
+### Event ("/api/event")
+    * récupérer les events par id, et les supprimer de la database Get("/id/{id}")
