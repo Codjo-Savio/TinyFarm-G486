@@ -23,6 +23,17 @@ class TfLayout extends HTMLElement {
             height: 100%;
             min-height: 0;
         }
+        
+        /* 
+           Fix : Définit le slot comme un conteneur flex pour permettre aux enfants 
+           (comme <main>) d'utiliser flex: 1 et overflow-y: auto pour le défilement.
+        */
+        slot {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+        }
         `;
         this.shadowRoot.appendChild(style);
 

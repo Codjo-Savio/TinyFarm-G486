@@ -29,7 +29,46 @@
         <tf-layout>
             <tf-app-bar></tf-app-bar>
             <main>
-                <!-- Write your code here -->
+                <div class="taskbar">
+                    <div class="taskbar-left">
+                        <a href="/dashboard">
+                            <span class="material-symbols-rounded">arrow_back</span>
+                            Retour
+                        </a>
+                    </div>
+                    <div class="taskbar-right">
+                        <div>
+                            <span class="material-symbols-rounded">pets</span>
+                            <p id="chicken-count">--</p>
+                        </div>
+                        <div>
+                            <span class="material-symbols-rounded">egg</span>
+                            <p id="egg-count">--</p>
+                        </div>
+                        <button class="sell-button">
+                            <span class="material-symbols-rounded">sell</span>
+                            Vendre
+                        </button>
+                        <div class="dropdown">
+                            <button id="more-actions-btn" class="more-actions-button">
+                                <span class="material-symbols-rounded">more_horiz</span>
+                            </button>
+                            <div id="more-actions-content" class="dropdown-content">
+                                <button id="feed-all-btn">Nourrir tout</button>
+                                <button id="water-all-btn">Abreuver tout</button>
+                                <button id="heal-all-btn">Soigner tout</button>
+                                <button id="clean-all-btn">Nettoyer tout</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <section>
+                    <h1>Poulailler</h1>
+                    <div id="chicken-grid" class="grid-container">
+                        <!-- Les poules seront injectées ici par script.js -->
+                    </div>
+                </section>
             </main>
             <tf-bottom-actions size="small"></tf-bottom-actions>
         </tf-layout>
