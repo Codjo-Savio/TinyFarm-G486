@@ -66,7 +66,7 @@ function renderChickens() {
     grid.innerHTML = "";
 
     if (chickens.length === 0) {
-        grid.innerHTML = "<p>Vous n'avez pas encore de poules. Allez à la Coopérative pour en acheter !</p>";
+        grid.innerHTML = "<p>Vous n'avez pas de poules.</p>";
         return;
     }
 
