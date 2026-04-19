@@ -71,7 +71,7 @@ async function initializeHutch() {
                             </div>
                         </div>
                         <div class="animal-actions">
-                            <button class="action-button" onclick="feedRabbit(${rabbit.id},'${rabbit.name}')">Nourrir</button>
+                            <button class="action-button" onclick="feedRabbit(${rabbit.id})">Nourrir</button>
                             <button class="action-button">Abreuver</button>
                             <button class="action-button">Soigner</button>
                             <button class="action-button">Nettoyer</button>
@@ -92,25 +92,40 @@ document.addEventListener("DOMContentLoaded", initializeHutch);
 
 //Fonctions pour les actions sur les lapins (nourrir, soigner, nettoyer, abreuver)
 
-//Nourrir un lapin par son ID et son nom 
-async function feedRabbit(rabbitId,rabbitName) {
 
- 
+//Fonction pour recuperer  un utilisateur par son JWT
+async function fetchCurrentUserId() {
+    const response = await fetch(`${API_URL}/auth/me`, {
+        credentials: "include",
+    });
+
+    if (!response.ok) {
+        throw new Error(`Échec de récupération de l'utilisateur : ${response.status}`);
+    }
+
+    const user = await response.json();
+    return user.id;
+}
+
+//Nourrir un lapin par son ID
+async function feedRabbit(rabbitId) {
+    
+   const jwt=fetchCurrentUserId(rabbitId)
 }
 
 //Soigner un lapin par son ID et son nom
-async function healRabbit(rabbitId,rabbitName) {
-    
+async function healRabbit(rabbitId) {
+   
 }
 
 //Nettoyer un lapin par son ID et son nom
-async function cleanRabbit(rabbitId,rabbitName) {
+async function cleanRabbit(rabbitId) {
     
 }
 
 //Abreuver un lapin par son ID et son nom
 
-async function waterRabbit(rabbitId,rabbitName) {
+async function waterRabbit(rabbitId) {
     
 }
 
