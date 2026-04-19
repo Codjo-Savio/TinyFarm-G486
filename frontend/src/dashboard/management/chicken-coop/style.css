@@ -216,10 +216,14 @@ main {
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
-    transition: opacity 0.2s, background-color 0.2s;
-    font-size: 0.85rem;
-    flex: 1;
+    transition: opacity 0.2s, background-color: 0.2s;
+    font-size: 0.75rem; /* Slightly smaller to fit costs better */
+    flex: 1 1 0; /* Force equal width */
+    min-width: 0; /* Allow shrinking if needed */
     text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
 }
 
 .action-button:hover {
@@ -241,8 +245,6 @@ main {
 }
 
 .sell-button {
-    background-color: var(--color-gold) !important;
-    color: var(--color-gold-dark) !important;
     font-weight: bold;
 }
 

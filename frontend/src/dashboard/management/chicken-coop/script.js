@@ -2,6 +2,13 @@ const API_URL = window.apiUrl || "http://localhost:8080/api";
 let currentUser = null;
 let chickens = [];
 
+const ACTION_COSTS = {
+    feed: 3,
+    water: 1,
+    heal: 6,
+    clean: 3
+};
+
 // Helper to get cookies (needed for JWT)
 function getCookie(name) {
     const value = `; ${document.cookie}`;
@@ -55,7 +62,20 @@ function renderUI() {
 }
 
 function renderStats() {
-    document.getElementById("chicken-count").textContent = chickens.length;
+    const total = chickens.length;
+    document.getElementById("chicken-count").textContent = total;
+    
+    if (total > 0) {
+        const sickCount = chickens.filter(c => !c.healthy).length;
+        const dirtyCount = chickens.filter(c => !c.clean).length;
+        
+        document.getElementById("sick-percent").textContent = Math.round((sickCount / total) * 100) + "%";
+        document.getElementById("dirty-percent").textContent = Math.round((dirtyCount / total) * 100) + "%";
+    } else {
+        document.getElementById("sick-percent").textContent = "0%";
+        document.getElementById("dirty-percent").textContent = "0%";
+    }
+
     // Note: For now, egg count is not directly reachable via Chicken model in a simple way 
     // without more backend logic, so we'll leave it as is or default to 0.
     document.getElementById("egg-count").textContent = "0"; 
@@ -116,10 +136,18 @@ function renderChickens() {
                 </div>
             </div>
             <div class="animal-actions">
-                <button class="action-button" onclick="performAction(${chicken.id}, 'feed')" ${chicken.fedToday ? 'disabled' : ''}>Nourrir</button>
-                <button class="action-button" onclick="performAction(${chicken.id}, 'water')" ${chicken.wateredToday ? 'disabled' : ''}>Abreuver</button>
-                <button class="action-button" onclick="performAction(${chicken.id}, 'heal')" ${chicken.healthy ? 'disabled' : ''}>Soigner</button>
-                <button class="action-button" onclick="performAction(${chicken.id}, 'clean')" ${chicken.clean ? 'disabled' : ''}>Nettoyer</button>
+                <button class="action-button" onclick="performAction(${chicken.id}, 'feed')" ${chicken.fedToday ? 'disabled' : ''}>
+                    Nourrir ${chicken.fedToday ? '' : `(${ACTION_COSTS.feed}$)`}
+                </button>
+                <button class="action-button" onclick="performAction(${chicken.id}, 'water')" ${chicken.wateredToday ? 'disabled' : ''}>
+                    Abreuver ${chicken.wateredToday ? '' : `(${ACTION_COSTS.water}$)`}
+                </button>
+                <button class="action-button" onclick="performAction(${chicken.id}, 'heal')" ${chicken.healthy ? 'disabled' : ''}>
+                    Soigner ${chicken.healthy ? '' : `(${ACTION_COSTS.heal}$)`}
+                </button>
+                <button class="action-button" onclick="performAction(${chicken.id}, 'clean')" ${chicken.clean ? 'disabled' : ''}>
+                    Nettoyer ${chicken.clean ? '' : `(${ACTION_COSTS.clean}$)`}
+                </button>
             </div>
         `;
         grid.appendChild(item);
@@ -178,6 +206,27 @@ function setupDropdown() {
     const button = document.getElementById('more-actions-btn');
     const menu = document.getElementById('more-actions-content');
 
+    if (!button) return;
+
+    // Update bulk action labels with costs
+    const bulkButtons = {
+        feed: { id: "feed-all-btn", label: "Nourrir tout", filter: c => !c.fedToday },
+        water: { id: "water-all-btn", label: "Abreuver tout", filter: c => !c.wateredToday },
+        heal: { id: "heal-all-btn", label: "Soigner tout", filter: c => !c.healthy },
+        clean: { id: "clean-all-btn", label: "Nettoyer tout", filter: c => !c.clean }
+    };
+
+    Object.entries(bulkButtons).forEach(([key, config]) => {
+        const btn = document.getElementById(config.id);
+        if (btn) {
+            const count = chickens.filter(config.filter).length;
+            const totalCost = count * ACTION_COSTS[key];
+            btn.textContent = `${config.label} ${totalCost > 0 ? `(${totalCost}$)` : ''}`;
+            btn.onclick = () => performAll(key);
+        }
+    });
+
+
     if (button._hasListener) return;
 
     button.addEventListener('click', (event) => {
@@ -191,11 +240,6 @@ function setupDropdown() {
         menu.classList.remove('grid');
     });
 
-    document.getElementById("feed-all-btn").onclick = () => performAll('feed');
-    document.getElementById("water-all-btn").onclick = () => performAll('water');
-    document.getElementById("heal-all-btn").onclick = () => performAll('heal');
-    document.getElementById("clean-all-btn").onclick = () => performAll('clean');
-
     button._hasListener = true;
 }
 
@@ -204,3 +248,4 @@ document.addEventListener("DOMContentLoaded", fetchInitialData);
 
 // Expose performAction to global scope for inline onclick
 window.performAction = performAction;
+
