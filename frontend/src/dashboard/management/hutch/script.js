@@ -1,5 +1,11 @@
 const API_URL = window.apiUrl || "http://localhost:8080/api";
 
+//Les variables globales pour stocker les données des lapins
+let rabbits = [];
+
+
+
+
 function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -65,7 +71,7 @@ async function initializeHutch() {
                             </div>
                         </div>
                         <div class="animal-actions">
-                            <button class="action-button" onclick="feedRabbit(${rabbit.id})">Nourrir</button>
+                            <button class="action-button" onclick="feedRabbit(${rabbit.id},'${rabbit.name}')">Nourrir</button>
                             <button class="action-button">Abreuver</button>
                             <button class="action-button">Soigner</button>
                             <button class="action-button">Nettoyer</button>
@@ -83,3 +89,28 @@ async function initializeHutch() {
 
 // Appeler initializeHutch() dès que la page HTML est chargée
 document.addEventListener("DOMContentLoaded", initializeHutch);
+
+//Fonctions pour les actions sur les lapins (nourrir, soigner, nettoyer, abreuver)
+
+//Nourrir un lapin par son ID et son nom 
+async function feedRabbit(rabbitId,rabbitName) {
+
+ 
+}
+
+//Soigner un lapin par son ID et son nom
+async function healRabbit(rabbitId,rabbitName) {
+    
+}
+
+//Nettoyer un lapin par son ID et son nom
+async function cleanRabbit(rabbitId,rabbitName) {
+    
+}
+
+//Abreuver un lapin par son ID et son nom
+
+async function waterRabbit(rabbitId,rabbitName) {
+    
+}
+
