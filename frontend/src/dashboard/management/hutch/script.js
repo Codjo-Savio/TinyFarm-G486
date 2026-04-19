@@ -1,9 +1,6 @@
 const API_URL = window.apiUrl || "http://localhost:8080/api";
 
-//Les variables globales pour stocker les données des lapins
 let rabbits = [];
-
-
 
 
 function getCookie(name) {
@@ -72,13 +69,14 @@ async function initializeHutch() {
                         </div>
                         <div class="animal-actions">
                             <button class="action-button" onclick="feedRabbit(${rabbit.id})">Nourrir</button>
-                            <button class="action-button">Abreuver</button>
-                            <button class="action-button">Soigner</button>
-                            <button class="action-button">Nettoyer</button>
+                            <button class="action-button" onclick="waterRabbit(${rabbit.id})">Abreuver</button>
+                            <button class="action-button" onclick="healRabbit(${rabbit.id})">Soigner</button>
+                            <button class="action-button" onclick="cleanRabbit(${rabbit.id})">Nettoyer</button>
                         </div>
                     </div>
                 `;
             })
+            
             .join("");
 
         console.log("Lapins affichés avec succès");
@@ -90,42 +88,148 @@ async function initializeHutch() {
 // Appeler initializeHutch() dès que la page HTML est chargée
 document.addEventListener("DOMContentLoaded", initializeHutch);
 
-//Fonctions pour les actions sur les lapins (nourrir, soigner, nettoyer, abreuver)
 
-
-//Fonction pour recuperer  un utilisateur par son JWT
+// Récupère l'userId depuis le backend via le JWT
 async function fetchCurrentUserId() {
     const response = await fetch(`${API_URL}/auth/me`, {
         credentials: "include",
     });
 
     if (!response.ok) {
-        throw new Error(`Échec de récupération de l'utilisateur : ${response.status}`);
+        throw new Error(`Échec récupération utilisateur : ${response.status}`);
     }
 
     const user = await response.json();
     return user.id;
 }
 
+//Fonctions pour les actions sur les lapins (nourrir, soigner, nettoyer, abreuver)
+
 //Nourrir un lapin par son ID
 async function feedRabbit(rabbitId) {
-    
-   const jwt=fetchCurrentUserId(rabbitId)
-}
+    try {
+        const userId = await fetchCurrentUserId();
+        const jwt = getCookie("jwt");
 
-//Soigner un lapin par son ID et son nom
+        const response = await fetch(
+            `${API_URL}/rabbits/${rabbitId}/feed?userId=${userId}`,
+            {
+                method: "POST",
+                headers: new Headers({ Authorization: "Bearer " + jwt }),
+            }
+        );
+
+        if (!response.ok) {
+            alert(response.status === 400
+                ? "Impossible de nourrir ce lapin."
+                : `Erreur serveur ${response.status}`);
+            return;
+        }
+
+        const updatedRabbit = await response.json();
+        console.log(" Lapin nourri :", updatedRabbit);
+        await initializeHutch();
+
+    } catch (error) {
+        console.error("Erreur feedRabbit :", error);
+        alert("Impossible de nourrir ce lapin. Veuillez réessayer.");
+    }
+}
+    
+
+
+//Soigner un lapin par son ID 
 async function healRabbit(rabbitId) {
-   
+    try {
+        const userId = await fetchCurrentUserId();
+        const jwt = getCookie("jwt");
+
+        const response = await fetch(
+            `${API_URL}/rabbits/${rabbitId}/heal?userId=${userId}`,
+            {
+                method: "POST",
+                headers: new Headers({ Authorization: "Bearer " + jwt }),
+            }
+        );
+
+        if (!response.ok) {
+            alert(response.status === 400
+                ? "Impossible de soigner ce lapin."
+                : `Erreur serveur ${response.status}`);
+            return;
+        }
+
+        const updatedRabbit = await response.json();
+        console.log(" Lapin soigné :", updatedRabbit);
+        await initializeHutch();
+
+    } catch (error) {
+        console.error("Erreur healRabbit :", error);
+        alert("Impossible de soigner ce lapin. Veuillez réessayer.");
+    }
 }
 
-//Nettoyer un lapin par son ID et son nom
+//Nettoyer un lapin par son ID
 async function cleanRabbit(rabbitId) {
-    
+    try {
+        const userId = await fetchCurrentUserId();
+        const jwt = getCookie("jwt");
+
+        const response = await fetch(
+            `${API_URL}/rabbits/${rabbitId}/clean?userId=${userId}`,
+            {
+                method: "POST",
+                headers: new Headers({ Authorization: "Bearer " + jwt }),
+            }
+        );
+
+        if (!response.ok) {
+            alert(response.status === 400
+                ? "Impossible de nettoyer ce lapin."
+                : `Erreur serveur ${response.status}`);
+            return;
+        }
+
+        const updatedRabbit = await response.json();
+        console.log("Lapin nettoyé :", updatedRabbit);
+        await initializeHutch();
+
+    } catch (error) {
+        console.error("Erreur cleanRabbit :", error);
+        alert("Impossible de nettoyer ce lapin. Veuillez réessayer.");
+    }
 }
+
 
 //Abreuver un lapin par son ID et son nom
 
 async function waterRabbit(rabbitId) {
-    
+    try {
+        const userId = await fetchCurrentUserId();
+        const jwt = getCookie("jwt");
+
+        const response = await fetch(
+            `${API_URL}/rabbits/${rabbitId}/water?userId=${userId}`,
+            {
+                method: "POST",
+                headers: new Headers({ Authorization: "Bearer " + jwt }),
+            }
+        );
+
+        if (!response.ok) {
+            alert(response.status === 400
+                ? "Impossible d'abreuver ce lapin."
+                : `Erreur serveur ${response.status}`);
+            return;
+        }
+
+        const updatedRabbit = await response.json();
+        console.log(" Lapin abreuvé :", updatedRabbit);
+        await initializeHutch();
+
+    } catch (error) {
+        console.error("Erreur waterRabbit :", error);
+        alert("Impossible d'abreuver ce lapin. Veuillez réessayer.");
+    }
 }
 
