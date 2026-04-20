@@ -1,84 +1,185 @@
-// 🔥 Données TEMPORAIRES (sert uniquement à tester sans backend)
-// Chaque objet représente une poule avec ses infos
-const chickens = [
-    { name: "Jacqueline", type: "Pondeuse", weight: 1.5, food: 80 },
-    { name: "Jeannette", type: "Pondeuse", weight: 1.4, food: 60 },
-    { name: "Juliette", type: "Pondeuse", weight: 1.3, food: 30 },
-];
+const API_URL = "http://localhost:8080/api";
 
-// 🔧 Fonction qui crée UNE carte HTML pour une poule
-function createChickenCard(chicken) {
-    // Création du conteneur principal de la carte
-    const div = document.createElement("div");
+let chickens = [];
+let eggCount = 0;
+let currentUserId = null;
 
-    // On applique la classe CSS (important pour le style)
-    div.className = "grid-item";
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(";").shift();
+}
 
-    // On injecte tout le HTML de la carte
-    div.innerHTML = `
-        <!-- Nom de la poule -->
-        <div class="animal-title">
-            <h2>${chicken.name}</h2>
-        </div>
+function getJwtOrThrow() {
+    const jwt = getCookie("jwt");
 
-        <!-- Contenu principal -->
-        <div class="animal-content">
+    if (!jwt) {
+        throw new Error("JWT manquant");
+    }
 
-            <!-- Barre de nourriture -->
-            <div class="food-state">
-                <span class="material-symbols-rounded">nutrition</span>
+    return jwt;
+}
 
-                <!-- Barre grise -->
-                <div class="food-state-line-place-holder">
+function getAuthHeaders(jwt) {
+    return {
+        Authorization: "Bearer " + jwt,
+    };
+}
 
-                    <!-- Barre verte (largeur dynamique selon food %) -->
-                    <div class="food-state-line" style="width: ${chicken.food}%"></div>
+async function fetchCurrentUserId(jwt) {
+    if (currentUserId !== null) {
+        return currentUserId;
+    }
+
+    const response = await fetch(`${API_URL}/auth/me`, {
+        headers: getAuthHeaders(jwt),
+    });
+
+    if (!response.ok) {
+        throw new Error("Impossible de recuperer l'utilisateur connecte");
+    }
+
+    const user = await response.json();
+    currentUserId = user.id;
+
+    return currentUserId;
+}
+
+async function performChickenAction(chickenId, action) {
+    const jwt = getJwtOrThrow();
+    const userId = await fetchCurrentUserId(jwt);
+    const response = await fetch(
+        `${API_URL}/chickens/${chickenId}/${action}?userId=${userId}`,
+        {
+            method: "POST",
+            headers: getAuthHeaders(jwt),
+        },
+    );
+
+    if (!response.ok) {
+        throw new Error(`Action ${action} impossible (${response.status})`);
+    }
+}
+
+function renderChickenCard(chicken) {
+    return `
+        <div class="grid-item">
+            <div class="animal-title">
+                <h2>${chicken.name}</h2>
+            </div>
+
+            <div class="animal-content">
+                <div>
+                    <span class="material-symbols-rounded">egg</span>
+                    <p>${chicken.eggsLaid || 0} oeufs</p>
+                </div>
+
+                <div>
+                    <span class="material-symbols-rounded">calendar_today</span>
+                    <p>${chicken.age} jours</p>
                 </div>
             </div>
 
-            <!-- Type de poule -->
-            <div class="animal-type">
-                <span class="material-symbols-rounded">info</span>
-                <p>${chicken.type}</p>
-            </div>
+            <div class="animal-actions">
+                <button onclick="feed(${chicken.id})" class="action-button" ${
+                    chicken.fedToday ? "disabled" : ""
+                }>
+                    Nourrir
+                </button>
 
-            <!-- Poids -->
-            <div class="animal-weight">
-                <span class="material-symbols-rounded">weight</span>
-                <p>${chicken.weight} kg</p>
-            </div>
-        </div>
+                <button onclick="water(${chicken.id})" class="action-button" ${
+                    chicken.wateredToday ? "disabled" : ""
+                }>
+                    Abreuver
+                </button>
 
-        <!-- Boutons d'action -->
-        <div class="animal-actions">
-            <button class="action-button">Nourrir</button>
-            <button class="action-button">Abreuver</button>
-            <button class="action-button">Soigner</button>
-            <button class="action-button">Nettoyer</button>
+                <button onclick="heal(${chicken.id})" class="action-button" ${
+                    chicken.healthy ? "disabled" : ""
+                }>
+                    Soigner
+                </button>
+
+                <button onclick="clean(${chicken.id})" class="action-button" ${
+                    chicken.clean ? "disabled" : ""
+                }>
+                    Nettoyer
+                </button>
+            </div>
         </div>
     `;
-
-    // On retourne la carte prête à être ajoutée dans la page
-    return div;
 }
 
-// 🚀 Code exécuté quand la page est chargée
-document.addEventListener("DOMContentLoaded", () => {
-    // On récupère le conteneur où on va mettre les cartes
+async function initializeChickenCoop() {
     const container = document.querySelector(".grid-container");
 
-    // Pour chaque poule dans le tableau
-    chickens.forEach((chicken) => {
-        // On crée une carte
-        const card = createChickenCard(chicken);
+    try {
+        const jwt = getJwtOrThrow();
+        await fetchCurrentUserId(jwt);
 
-        // On l'ajoute dans le DOM (affichage à l'écran)
-        container.appendChild(card);
-    });
+        const response = await fetch(`${API_URL}/chickens`, {
+            headers: getAuthHeaders(jwt),
+        });
 
-    // 🔢 Mise à jour du compteur de poules en haut
-    document.getElementById("chicken-count").textContent = chickens.length;
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP : ${response.status}`);
+        }
 
-    // 🥚 Mise à jour du compteur d'œufs (exemple simple)
-    document.getElementById("egg-count").textContent = chickens.length * 2;
-});
+        chickens = await response.json();
+
+        if (!Array.isArray(chickens)) {
+            throw new Error("Format API invalide");
+        }
+
+        eggCount = 0;
+        container.innerHTML = "";
+
+        for (const chicken of chickens) {
+            container.insertAdjacentHTML("beforeend", renderChickenCard(chicken));
+            eggCount += chicken.eggsLaid || 0;
+        }
+
+        document.getElementById("chicken-count").textContent = chickens.length;
+        document.getElementById("egg-count").textContent = eggCount;
+    } catch (error) {
+        console.error("Erreur chargement poulailler :", error);
+        container.innerHTML = "<p>Erreur lors du chargement.</p>";
+    }
+}
+
+async function feed(id) {
+    try {
+        await performChickenAction(id, "feed");
+        await initializeChickenCoop();
+    } catch (error) {
+        console.error("Impossible de nourrir la poule :", error);
+    }
+}
+
+async function water(id) {
+    try {
+        await performChickenAction(id, "water");
+        await initializeChickenCoop();
+    } catch (error) {
+        console.error("Impossible d'abreuver la poule :", error);
+    }
+}
+
+async function heal(id) {
+    try {
+        await performChickenAction(id, "heal");
+        await initializeChickenCoop();
+    } catch (error) {
+        console.error("Impossible de soigner la poule :", error);
+    }
+}
+
+async function clean(id) {
+    try {
+        await performChickenAction(id, "clean");
+        await initializeChickenCoop();
+    } catch (error) {
+        console.error("Impossible de nettoyer la poule :", error);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", initializeChickenCoop);
