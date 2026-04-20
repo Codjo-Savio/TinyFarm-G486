@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Transaction {
-
     @Id
     @Column(name = "tid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,15 +33,15 @@ public class Transaction {
     @Column(name = "quantity")
     private Integer quantity;
 
-    @Column(name = "totalPrice")
+    @Column(name = "total_price")
     private float totalPrice;
 
-    @Column(name = "transactionDate")
+    @Column(name = "transaction_date")
     private LocalDateTime transactionDate;
 
     @PrePersist
     public void prePersist() {
-        if(this.transactionDate == null){
+        if (this.transactionDate == null) {
             this.transactionDate = LocalDateTime.now();
         }
     }

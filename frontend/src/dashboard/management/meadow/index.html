@@ -3,11 +3,18 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Pré</title>
+        <title>Pré - TinyFarm</title>
+        <link rel="icon" href="/assets/logo-128-rounded.png" />
+        <!-- Config -->
+        <script src="/config.js"></script>
         <!-- Components -->
-        <script src="/components/appbar.js"></script>
-        <script src="/components/bottom-actions.js"></script>
-        <script src="/components/layout.js"></script>
+        <script src="/components/tf-app-bar.js"></script>
+        <script src="/components/tf-bottom-actions.js"></script>
+        <script src="/components/tf-layout.js"></script>
+        <script src="/components/tf-card.js"></script>
+        <script src="/components/tf-pill.js"></script>
+        <script src="/components/tf-button.js"></script>
+        <script src="/components/tf-progress-bar.js"></script>
         <!-- Theme -->
         <link rel="stylesheet" href="/styles/theme.css" />
         <!-- Font -->
@@ -23,33 +30,27 @@
     </head>
 
     <body>
-        <app-layout>
-            <app-bar></app-bar>
+        <tf-layout>
+            <tf-app-bar></tf-app-bar>
             <main class="container">
                 <div class="sub-header">
-                    <a
+                    <tf-button
+                        icon="keyboard_backspace"
+                        variant="secondary"
                         onclick="
                             window.location.href = window.location.search
                                 ? window.location.search.replace('?from=', '')
                                 : '/dashboard'
                         "
-                        class="btn-back"
-                        ><span class="material-symbols-rounded">
-                            keyboard_backspace
-                        </span>
-                        Retour</a
+                        >Retour</tf-button
                     >
-                    <div class="market-stats">
-                        <div class="animal-state">
-                            <span class="material-symbols-rounded">
-                                heart_broken
-                            </span>
-                            <p>Malade : <span id="sick-count"></span></p>
-                        </div>
-                        <div class="animal-state">
-                            <span class="material-symbols-rounded"> mop </span>
-                            <p>Sale : <span id="dirty-count"></span></p>
-                        </div>
+                    <div class="cows-stats">
+                        <tf-pill icon="heart_broken"
+                            >Malade : <span id="sick-count"></span
+                        ></tf-pill>
+                        <tf-pill icon="heart_broken"
+                            >Sale : <span id="dirty-count"></span
+                        ></tf-pill>
                         <span
                             ><span class="material-symbols-rounded">pets</span>
                             <span id="cow-count"></span>
@@ -60,10 +61,9 @@
                             >
                             <span id="milk-count"></span>
                         </span>
-                        <button class="action-button">
-                            <span class="material-symbols-rounded">sell</span>
-                            Vendre
-                        </button>
+                        <tf-button icon="sell" variant="secondary"
+                            >Vendre</tf-button
+                        >
                         <div class="actions-wrapper">
                             <button
                                 class="menu-actions"
@@ -109,7 +109,7 @@
 
                 <div class="game-grid" id="game-grid"></div>
             </main>
-            <bottom-actions></bottom-actions>
-        </app-layout>
+            <tf-bottom-actions size="small"></tf-bottom-actions>
+        </tf-layout>
     </body>
 </html>

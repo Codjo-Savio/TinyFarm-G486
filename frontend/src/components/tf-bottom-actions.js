@@ -1,5 +1,11 @@
-class BottomActions extends HTMLElement {
-    API_URL = "/fakeapi";
+class TfBottomActions extends HTMLElement {
+    FAKE_API_URL = "/fakeapi";
+    API_URL = window.apiUrl || "http://localhost:8080/api";
+    timeIntervalId;
+
+    static get observedAttributes() {
+        return ["size", "variant"];
+    }
 
     constructor() {
         super();
@@ -10,14 +16,39 @@ class BottomActions extends HTMLElement {
         this.render();
     }
 
+    get size() {
+        return this.getAttribute("size") || "normal";
+    }
+
+    get variant() {
+        return this.getAttribute("variant") || "normal";
+    }
+
     async fetchTradeOverview() {
-        const res = await fetch(this.API_URL + "/trade/overview.json");
+        const res = await fetch(this.FAKE_API_URL + "/trade/overview.json");
         return await res.json();
     }
 
-    async fetchTime() {
-        const res = await fetch(this.API_URL + "/time.json");
-        return await res.json();
+    getAoeTime() {
+        // AoE time = UTC-12
+        const currentTime = new Date();
+        return new Date(currentTime.getTime() - 12 * 60 * 60 * 1000);
+    }
+
+    setTime() {
+        const time = this.getAoeTime();
+        const aoeHours = time.getUTCHours();
+        const aoeMinutes = time.getUTCMinutes();
+        const remainingHours = 23 - aoeHours;
+        const remainingMinutes = 59 - aoeMinutes;
+        const prettyRemaining =
+            remainingHours === 0
+                ? `${remainingMinutes}min`
+                : `${remainingHours}h`;
+        this.shadowRoot.querySelector("#time .current").textContent =
+            `${aoeHours.toString().padStart(2, "0")}:${aoeMinutes.toString().padStart(2, "0")} AoE`;
+        this.shadowRoot.querySelector("#time .remaining").textContent =
+            prettyRemaining;
     }
 
     async render() {
@@ -39,6 +70,15 @@ class BottomActions extends HTMLElement {
 			font-variation-settings:var(--font-var-icon);
         }
 
+        .bottom-actions {
+            transition: opacity .3s;
+            opacity: 0;
+        }
+
+        .bottom-actions.ready {
+            opacity: 1;
+        }
+
 		.links {
 			display: flex;
 			gap: 24px;
@@ -46,6 +86,12 @@ class BottomActions extends HTMLElement {
             left: 24px;
             bottom: 24px;
 		}
+
+        .bottom-actions.small .links {
+            flex-direction: column;
+            left: -50px;
+            gap: 16px;
+        }
 
 		.links > a {
 			text-decoration: none;
@@ -58,8 +104,8 @@ class BottomActions extends HTMLElement {
 			padding: 16px 24px;
 			box-shadow: var(--shadow);
 			transition:
-				transform 0.3s,
-				background-color 0.3s;
+				transform .3s,
+				background-color .3s;
 		}
 
 		.links > a:hover {
@@ -67,16 +113,56 @@ class BottomActions extends HTMLElement {
 			transform: translateY(-4px);
 		}
 
+        .bottom-actions.small .links > a {
+            padding: 12px;
+            padding-left: 60px;
+            height: 48px;
+        }
+
+        .bottom-actions.small .links > a > .small-legend {
+            display: block;
+            position: absolute;
+            text-wrap-mode: nowrap;
+            left: 110px;
+            background-color: var(--color-secondary);
+            box-shadow: var(--shadow);
+            padding: 4px 8px;
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity .3s;
+            pointer-events: none;
+        }
+
+        .bottom-actions .links > a > .small-legend {
+            display: none;
+        }
+
+        .bottom-actions.small .links > a:hover {
+            transform: translateX(10px);
+        }
+
+        .bottom-actions.small .links > a:hover > .small-legend {
+            opacity: 1;
+        }
+
 		.links > a > div {
 			display: flex;
 			flex-direction: column;
 		}
+
+        .bottom-actions.small .links > a > div {
+            display: none;
+        }
 
 		.label {
 			font-size: var(--font-size-body-large);
 			font-weight: bold;
 			margin-bottom: 4px;
 		}
+
+        .bottom-actions.small .links > a > div > .infos {
+            display: none;
+        }
 
 		#time {
 			box-shadow: var(--shadow);
@@ -98,18 +184,9 @@ class BottomActions extends HTMLElement {
 			font-size: 40px;
 		}
 
-        .bottom-actions #coop .infos,
-        .bottom-actions #marketplace .infos,
-        .bottom-actions #time {
-            opacity: 0;
-            transition: opacity .3s;
-        }
-
-        .bottom-actions.ready #coop .infos,
-        .bottom-actions.ready #marketplace .infos,
-        .bottom-actions.ready #time {
-            opacity: 1;
-        }
+        .bottom-actions.small .large {
+			font-size: 30px;
+		}
 
 		@media (max-width: 900px) {
 			.bottom-actions {
@@ -130,9 +207,9 @@ class BottomActions extends HTMLElement {
 
         const template = document.createElement("template");
         template.innerHTML = `
-		<div class="bottom-actions">
+		<div class="bottom-actions ${this.size}">
 			<div class="links">
-				<a id="coop" href="/dashboard/trade/cooperative?from=/dashboard">
+				<a id="coop" ${this.variant === "marketplace-only" ? 'style="display: none;"' : ""} href="/dashboard/trade/cooperative?from=/dashboard">
 					<span class="material-symbols-rounded large">
 						storefront
 					</span>
@@ -140,8 +217,9 @@ class BottomActions extends HTMLElement {
 						<span class="label">Coopérative</span>
 						<span class="infos">En stock : -</span>
 					</div>
+                    <div class="small-legend">Coopérative</div>
 				</a>
-				<a id="marketplace" href="/dashboard/trade/marketplace?from=/dashboard">
+				<a id="marketplace" ${this.variant === "coop-only" ? 'style="display: none;"' : ""} href="/dashboard/trade/marketplace?from=/dashboard">
 					<span class="material-symbols-rounded large">
 						groups
 					</span>
@@ -149,17 +227,25 @@ class BottomActions extends HTMLElement {
 						<span class="label">Marché</span>
 						<span class="infos">En stock : -</span>
 					</div>
+                    <div class="small-legend">Marché</div>
 				</a>
 			</div>
 			<div id="time">
 				<span class="material-symbols-rounded">
 					schedule
 				</span>
-				<span><b class="current">- AoE</b> • Fin du jour : <b class="remaining">-</b></span>
+				<span><b class="current"></b> • Fin du jour dans <b class="remaining"></b></span>
 			</div>
 		</div>
 		`;
         this.shadowRoot.appendChild(template.content.cloneNode(true));
+
+        if (this.timeIntervalId) {
+            clearInterval(this.timeIntervalId);
+        } else {
+            this.setTime();
+        }
+        this.timeIntervalId = setInterval(() => this.setTime(), 1000);
 
         try {
             // Fetch cooperative and marketplace data
@@ -172,23 +258,6 @@ class BottomActions extends HTMLElement {
                 this.shadowRoot
                     .querySelector("#marketplace .infos")
                     .textContent.replace("-", overview.marketplace.stock);
-
-            // Fetch time data
-            const time = await this.fetchTime();
-            this.shadowRoot.querySelector("#time .current").textContent =
-                this.shadowRoot
-                    .querySelector("#time .current")
-                    .textContent.replace(
-                        "-",
-                        `${time.aoe.min}:${time.aoe.sec}`,
-                    );
-            this.shadowRoot.querySelector("#time .remaining").textContent =
-                this.shadowRoot
-                    .querySelector("#time .remaining")
-                    .textContent.replace(
-                        "-",
-                        `${23 - time.aoe.min}h${60 - time.aoe.sec}min`,
-                    );
         } finally {
             // Set as ready
             this.shadowRoot
@@ -198,4 +267,4 @@ class BottomActions extends HTMLElement {
     }
 }
 
-customElements.define("bottom-actions", BottomActions);
+customElements.define("tf-bottom-actions", TfBottomActions);

@@ -1,0 +1,64 @@
+{
+    "poulailler": {
+        "oeufs": {
+            "quantity": 12,
+            "price": 3
+        },
+        "poulets": {
+            "quantity": 5,
+            "price": 10
+        }
+    },
+    "prés": {
+        "vaches": {
+            "quantity": 3,
+            "price": 50
+        },
+        "lait": {
+            "quantity": 150,
+            "price": 2
+        }
+    },
+    "clapier": {
+        "lapins": {
+            "quantity": 4,
+            "price": 15
+        }
+    },
+    "remise": {
+        "seringues": {
+            "quantity": 10,
+            "price": 5
+        },
+        "bottes de paille": {
+            "quantity": 5,
+            "price": 8
+        },
+        "sac de nourriture": {
+            "quantity": 20,
+            "price": 12
+        },
+        "sceau d'eau": {
+            "quantity": 2,
+            "price": 3
+        },
+        "savon": {
+            "quantity": 3,
+            "price": 2
+        }
+    },
+    "bureau": {
+        "Pierre à lécher (sel)": {
+            "quantity": 2,
+            "price": 1
+        },
+        "Lanterne à huile": {
+            "quantity": 1,
+            "price": 5
+        },
+        "Clôture électrique (rouleau 50m)": {
+            "quantity": 1,
+            "price": 100
+        }
+    }
+}

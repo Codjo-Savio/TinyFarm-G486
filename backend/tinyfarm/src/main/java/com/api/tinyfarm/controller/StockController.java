@@ -8,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/stocks")
 public class StockController {
 
@@ -24,16 +23,14 @@ public class StockController {
             return ResponseEntity.ok(stockService.findAll());
         } catch (Exception e) {
             return ResponseEntity.status(
-                HttpStatus.INTERNAL_SERVER_ERROR
-            ).build();
+                    HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping("/user/{userId}/product/{productId}")
     public ResponseEntity<Stock> getById(
-        @PathVariable Long userId,
-        @PathVariable Long productId
-    ) {
+            @PathVariable Long userId,
+            @PathVariable Long productId) {
         try {
             return ResponseEntity.ok(stockService.findById(userId, productId));
         } catch (Exception e) {
@@ -47,21 +44,18 @@ public class StockController {
             return ResponseEntity.ok(stockService.findByUser(userId));
         } catch (Exception e) {
             return ResponseEntity.status(
-                HttpStatus.INTERNAL_SERVER_ERROR
-            ).build();
+                    HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<Stock>> getByProduct(
-        @PathVariable Long productId
-    ) {
+            @PathVariable Long productId) {
         try {
             return ResponseEntity.ok(stockService.findByProduct(productId));
         } catch (Exception e) {
             return ResponseEntity.status(
-                HttpStatus.INTERNAL_SERVER_ERROR
-            ).build();
+                    HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -74,21 +68,38 @@ public class StockController {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (Exception e) {
             return ResponseEntity.status(
-                HttpStatus.INTERNAL_SERVER_ERROR
-            ).build();
+                    HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/sell/{tid}")
+    public ResponseEntity<Void> sell(@PathVariable Long tid) {
+        try {
+            stockService.sell(tid);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @PostMapping("/buy/{tid}")
+    public ResponseEntity<Void> buy(@PathVariable Long tid) {
+        try {
+            stockService.buy(tid);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
     @PutMapping("/user/{userId}/product/{productId}")
     public ResponseEntity<Stock> update(
-        @PathVariable Long userId,
-        @PathVariable Long productId,
-        @RequestBody Stock stock
-    ) {
+            @PathVariable Long userId,
+            @PathVariable Long productId,
+            @RequestBody Stock stock) {
         try {
             return ResponseEntity.ok(
-                stockService.update(userId, productId, stock)
-            );
+                    stockService.update(userId, productId, stock));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -96,9 +107,8 @@ public class StockController {
 
     @DeleteMapping("/user/{userId}/product/{productId}")
     public ResponseEntity<Void> delete(
-        @PathVariable Long userId,
-        @PathVariable Long productId
-    ) {
+            @PathVariable Long userId,
+            @PathVariable Long productId) {
         try {
             stockService.delete(userId, productId);
             return ResponseEntity.noContent().build();
@@ -114,8 +124,7 @@ public class StockController {
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.status(
-                HttpStatus.INTERNAL_SERVER_ERROR
-            ).build();
+                    HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -126,8 +135,7 @@ public class StockController {
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.status(
-                HttpStatus.INTERNAL_SERVER_ERROR
-            ).build();
+                    HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

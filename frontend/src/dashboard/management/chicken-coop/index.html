@@ -1,32 +1,24 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Dashboard</title>
+        <title>Poulailler - TinyFarm</title>
+        <link rel="icon" href="/assets/logo-128-rounded.png" />
 
-        <!-- Components -->
-        <script src="/components/appbar.js"></script>
-        <script src="/components/bottom-actions.js"></script>
-        <script src="/components/layout.js"></script>
+        <script src="/config.js"></script>
+        <script src="/components/tf-app-bar.js"></script>
+        <script src="/components/tf-bottom-actions.js"></script>
+        <script src="/components/tf-layout.js"></script>
 
-        <!-- Theme + global -->
         <link rel="stylesheet" href="/styles/theme.css" />
         <link rel="stylesheet" href="/styles/global.css" />
+        <link rel="stylesheet" href="style.css" />
 
-        <!-- Page CSS (CHEMIN CORRIGÉ) -->
-        <link
-            rel="stylesheet"
-            href="/dashboard/management/chicken-coop/style.css"
-        />
-
-        <!-- Icons (IMPORTANT) -->
         <link
             rel="stylesheet"
             href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         />
-
-        <!-- Font -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
@@ -34,25 +26,23 @@
             rel="stylesheet"
         />
 
-        <!-- Script (defer IMPORTANT) -->
         <script src="script.js" defer></script>
     </head>
 
     <body>
-        <app-layout>
-            <app-bar></app-bar>
+        <tf-layout>
+            <tf-app-bar></tf-app-bar>
 
             <main>
-                <!-- barre du haut -->
                 <div class="taskbar">
                     <div class="taskbar-left">
                         <a
                             style="cursor: pointer"
                             onclick="window.location.href = window.location.search ? window.location.search.replace('?from=', '') : '/dashboard'"
                         >
-                            <span class="material-symbols-rounded"
-                                >arrow_back</span
-                            >
+                            <span class="material-symbols-rounded">
+                                arrow_back
+                            </span>
                             Retour
                         </a>
                     </div>
@@ -75,16 +65,13 @@
                     </div>
                 </div>
 
-                <!-- contenu -->
                 <section>
                     <h1>Poulailler</h1>
-
-                    <!-- injecté par JS -->
                     <div class="grid-container"></div>
                 </section>
             </main>
 
-            <bottom-actions></bottom-actions>
-        </app-layout>
+            <tf-bottom-actions size="small"></tf-bottom-actions>
+        </tf-layout>
     </body>
 </html>

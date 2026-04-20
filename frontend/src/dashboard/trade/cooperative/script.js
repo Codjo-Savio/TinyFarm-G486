@@ -1,8 +1,23 @@
+const API_URL = "http://localhost:8080/api";
+let inventaire = {};
+const nomsProduits = {}; // Nouveau dictionnaire pour stocker les noms
+
 async function initialiserBoutique() {
     const container = document.getElementById("shop-container");
 
     try {
-        const response = await fetch("../../../fakeapi/trade/cooperative.json");
+        // 1. On récupère les détails des produits (pour avoir la description de chacun)
+        const productsResponse = await fetch(`${API_URL}/products`);
+        if (productsResponse.ok) {
+            const productsList = await productsResponse.json();
+            // On remplit le dictionnaire : id -> description (ex: 1 -> "Botte de foin")
+            productsList.forEach(p => {
+                nomsProduits[p.id] = p.description;
+            });
+        }
+
+        // 2. On récupère l'inventaire actuel (prix)
+        const response = await fetch(`${API_URL}/cooperative`);
 
         if (!response.ok) {
             throw new Error(`Erreur HTTP : ${response.status}`);
@@ -12,7 +27,10 @@ async function initialiserBoutique() {
 
         container.innerHTML = "";
 
-        for (const [nom, details] of Object.entries(inventaire)) {
+        for (const [idProduit, prix] of Object.entries(inventaire)) {
+            // On récupère le vrai nom du produit grâce à l'ID, ou un nom par défaut si on ne le trouve pas
+            const nomAffiche = nomsProduits[idProduit] || `${idProduit}`;
+            
             const productHTML = `
                 <div class="product-row">
                     <div class="prod-info">
@@ -20,13 +38,12 @@ async function initialiserBoutique() {
                             <span class="material-symbols-rounded">
                                 store
                             </span>
-                            ${details.stock}
                         </span>
-                        <span class="prod-name">${nom}</span>
+                        <span class="prod-name">${nomAffiche}</span>
                     </div>
                     <div class="prod-action">
-                        <span class="price">$${details.price}</span>
-                        <button class="btn-add" onclick="ajouterAuPanier('${nom.replace(/'/g, "\\'")}')">Ajouter</button>
+                        <span class="price">$${prix.toFixed(2)}</span>
+                        <button class="btn-add" onclick="ajouterAuPanier('${idProduit}')">Ajouter</button>
                     </div>
                 </div>
             `;
@@ -49,25 +66,25 @@ function displayPanier() {
     // Logique pour afficher le contenu du panier
     let total = 0;
 
-    for (const [nom, quantite] of Object.entries(panier)) {
-        // Supposons qu'on ait un tableau des produits avec leurs prix
-        // Cela devrait être remplacé par la vraie logique de récupération des prix
-        const produit = inventaire[nom];
-        if (produit) {
-            total += produit.price * quantite;
+    for (const [idProduit, quantite] of Object.entries(panier)) {
+        // 'inventaire[idProduit]' contient maintenant directement le prix (Float)
+        const prix = inventaire[idProduit];
+        if (prix !== undefined) {
+            total += prix * quantite;
         }
     }
 
-    document.getElementById("totalPrice").textContent = `$${total}`;
+    document.getElementById("totalPrice").textContent = `$${total.toFixed(2)}`;
 
     document.querySelector(".cart-list").innerHTML = "";
 
-    for (const [nom, quantite] of Object.entries(panier)) {
+    for (const [idProduit, quantite] of Object.entries(panier)) {
+        const nomAffiche = nomsProduits[idProduit] || `${idProduit}`;
         const productHTML = `
                             <div class="cart-item">
-                                    <span>${nom}</span>
+                                    <span>${nomAffiche}</span>
                                     <div class="qty-control">
-                                        <button class="btn-qty" onclick="retirerDuPanier('${nom.replace(/'/g, "\\'")}')">
+                                        <button class="btn-qty" onclick="retirerDuPanier('${idProduit}')">
                                             <span
                                                 class="material-symbols-rounded"
                                             >
@@ -75,7 +92,7 @@ function displayPanier() {
                                             </span>
                                         </button>
                                         <span>${quantite}</span>
-                                        <button class="btn-qty" onclick="ajouterAuPanier('${nom.replace(/'/g, "\\'")}')">
+                                        <button class="btn-qty" onclick="ajouterAuPanier('${idProduit}')">
                                             <span
                                                 class="material-symbols-rounded"
                                             >

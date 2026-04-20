@@ -1,78 +1,121 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Clapier</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Clapier - TinyFarm</title>
+        <link rel="icon" href="/assets/logo-128-rounded.png" />
 
-    <script src="/components/appbar.js"></script>
-    <script src="/components/bottom-actions.js"></script>
-    <script src="/components/layout.js"></script>
+        <script src="/config.js"></script>
+        <script src="/components/tf-app-bar.js"></script>
+        <script src="/components/tf-bottom-actions.js"></script>
+        <script src="/components/tf-layout.js"></script>
 
-    <link rel="stylesheet" href="/styles/theme.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Amaranth:wght@400;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" />
+        <link rel="stylesheet" href="/styles/theme.css" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded"
+        />
 
-    <link rel="stylesheet" href="style.css" />
-    <script src="script.js" defer></script>
-</head>
+        <link rel="stylesheet" href="style.css" />
+        <script src="script.js" defer></script>
+    </head>
 
-<body>
-    <app-layout>
-        <app-bar></app-bar>
+    <body>
+        <tf-layout>
+            <tf-app-bar></tf-app-bar>
 
-        <main class="container">
-            <div class="taskbar">
-                <div class="taskbar-left">
-                    <a
-                        class="btn-back"
-                        onclick="window.location.href = window.location.search ? window.location.search.replace('?from=', '') : '/dashboard'"
-                    >
-                        <span class="material-symbols-rounded">arrow_back</span>
-                        Retour
-                    </a>
-                </div>
-
-                <div class="taskbar-right">
-                    <div class="taskbar-stat">
-                        <span class="material-symbols-rounded">cruelty_free</span>
-                        <p id="rabbit-count">0/50</p>
-                        <p>Lapins</p>
+            <main class="container">
+                <div class="taskbar">
+                    <div class="taskbar-left">
+                        <a
+                            class="btn-back"
+                            onclick="window.location.href = window.location.search ? window.location.search.replace('?from=', '') : '/dashboard'"
+                        >
+                            <span class="material-symbols-rounded">
+                                arrow_back
+                            </span>
+                            Retour
+                        </a>
                     </div>
 
-                    <div class="taskbar-stat">
-                        <span class="material-symbols-rounded">pets</span>
-                        <p id="baby-rabbit-count">0/50</p>
-                        <p>Lapereaux</p>
-                    </div>
+                    <div class="taskbar-right">
+                        <div class="taskbar-stat">
+                            <span class="material-symbols-rounded">
+                                cruelty_free
+                            </span>
+                            <p id="rabbit-count">0/50</p>
+                            <p>Lapins</p>
+                        </div>
 
-                    <button class="sell-button" type="button">
-                        <span class="material-symbols-rounded">sell</span>
-                        Vendre
-                    </button>
+                        <div class="taskbar-stat">
+                            <span class="material-symbols-rounded">pets</span>
+                            <p id="baby-rabbit-count">0/50</p>
+                            <p>Lapereaux</p>
+                        </div>
 
-                    <div class="actions-wrapper">
-                        <button id="more-actions-btn" class="more-actions-button" type="button" onclick="toggleActionsMenu()">
-                            <span class="material-symbols-rounded">more_horiz</span>
+                        <button class="sell-button" type="button">
+                            <span class="material-symbols-rounded">sell</span>
+                            Vendre
                         </button>
 
-                        <div id="actions-menu" class="actions-menu">
-                            <button id="feed-all-btn" type="button" onclick="feedAll()">Nourrir tout</button>
-                            <button id="water-all-btn" type="button" onclick="waterAll()">Abreuver tout</button>
-                            <button id="heal-all-btn" type="button" onclick="healAll()">Soigner tout</button>
-                            <button id="clean-all-btn" type="button" onclick="cleanAll()">Nettoyer tout</button>
+                        <div class="actions-wrapper">
+                            <button
+                                id="more-actions-btn"
+                                class="more-actions-button"
+                                type="button"
+                                onclick="toggleActionsMenu()"
+                            >
+                                <span class="material-symbols-rounded">
+                                    more_horiz
+                                </span>
+                            </button>
+
+                            <div id="actions-menu" class="actions-menu">
+                                <button
+                                    id="feed-all-btn"
+                                    type="button"
+                                    onclick="feedAll()"
+                                >
+                                    Nourrir tout
+                                </button>
+                                <button
+                                    id="water-all-btn"
+                                    type="button"
+                                    onclick="waterAll()"
+                                >
+                                    Abreuver tout
+                                </button>
+                                <button
+                                    id="heal-all-btn"
+                                    type="button"
+                                    onclick="healAll()"
+                                >
+                                    Soigner tout
+                                </button>
+                                <button
+                                    id="clean-all-btn"
+                                    type="button"
+                                    onclick="cleanAll()"
+                                >
+                                    Nettoyer tout
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <section>
-                <h1 class="page-title">Clapier</h1>
-                <div class="game-grid" id="game-grid"></div>
-            </section>
-        </main>
+                <section>
+                    <h1 class="page-title">Clapier</h1>
+                    <div class="game-grid" id="game-grid"></div>
+                </section>
+            </main>
 
-        <bottom-actions></bottom-actions>
-    </app-layout>
-</body>
+            <tf-bottom-actions size="small"></tf-bottom-actions>
+        </tf-layout>
+    </body>
 </html>

@@ -146,6 +146,9 @@ in which you will copy and paste the content of the two exemple (respectively) b
   * récupérer tous les stocks                       Get("/product/{productId}")
 
   * ajouter un stock                                Post("")
+  // {tid} ==> transactionId
+  * vendre un produit                               Post("/sell/{tid}")
+  * acheter un produit                              Post("/buy/{tid}")
   
   * mettre à jour un stock                          Put("/user/{userId}/product/{productId}")
   

@@ -1,5 +1,5 @@
-class AppBar extends HTMLElement {
-    API_URL = "http://localhost:8080/api";
+class TfAppBar extends HTMLElement {
+    API_URL = window.apiUrl || "http://localhost:8080/api";
 
     constructor() {
         super();
@@ -23,13 +23,15 @@ class AppBar extends HTMLElement {
 
             if (!jwt) throw new Error();
 
-            const user = await (
-                await fetch(`${this.API_URL}/auth/me`, {
-                    headers: new Headers({
-                        Authorization: "Bearer " + jwt,
-                    }),
-                })
-            ).json();
+            const userRes = await fetch(`${this.API_URL}/auth/me`, {
+                headers: new Headers({
+                    Authorization: "Bearer " + jwt,
+                }),
+            });
+
+            if (userRes.status !== 200) throw new Error();
+
+            const user = await userRes.json();
 
             const res = await fetch(`${this.API_URL}/users/id/${user.id}`, {
                 headers: new Headers({
@@ -45,7 +47,7 @@ class AppBar extends HTMLElement {
     async logout() {
         const jwt = this.getCookie("jwt");
 
-        let res = await fetch(`${this.API_URL.replace("/api", "")}/logout`, {
+        let res = await fetch(`${this.API_URL}/auth/logout`, {
             method: "POST",
             credentials: "include",
             redirect: "manual",
@@ -55,7 +57,7 @@ class AppBar extends HTMLElement {
         });
         console.log("Logout response:", res);
         if (res.ok || res.status === 0) {
-            // Status= 0 when spring redirects to /login?logout
+            // Status = 0 when Spring redirects to /login?logout
             window.location.href = "/";
         }
     }
@@ -271,4 +273,4 @@ class AppBar extends HTMLElement {
     }
 }
 
-customElements.define("app-bar", AppBar);
+customElements.define("tf-app-bar", TfAppBar);

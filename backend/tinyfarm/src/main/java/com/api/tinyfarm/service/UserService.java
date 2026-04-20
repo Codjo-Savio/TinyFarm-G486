@@ -2,12 +2,12 @@ package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.UserRepository;
+
 import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
-
     private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
@@ -22,44 +22,46 @@ public class UserService {
         userRepository.deleteAll();
     }
 
-    public User findOrCreateOAuthUser(String email, String name, User.Gender gender) {
-        return userRepository.findByEmail(email)
+    public User findOrCreateOAuthUser(
+            String email,
+            String name,
+            User.Gender gender) {
+        return userRepository
+                .findByEmail(email)
                 .map(existing -> {
                     existing.setName(name);
                     existing.setGender(gender);
                     return userRepository.save(existing);
                 })
-                .orElseGet(() -> userRepository.save(
-                        User.builder()
-                                .email(email)
-                                .name(name)
-                                .gender(gender)
-                                .build()
-                ));
+                .orElseGet(() -> {
+                    return userRepository.save(User.builder()
+                            .email(email)
+                            .name(name)
+                            .gender(gender)
+                            .build());
+                });
     }
 
     public User findById(Long id) {
         return userRepository
-            .findById(id)
-            .orElseThrow(() ->
-                new RuntimeException("Utilisateur introuvable : " + id)
-            );
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + id));
     }
 
     public User findByName(String name) {
         return userRepository
                 .findByName(name)
-                .orElseThrow(() ->
-                        new RuntimeException("Utilisateur introuvable : " + name)
-                );
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + name));
     }
 
     public User findByEmail(String email) {
         return userRepository
                 .findByEmail(email)
-                .orElseThrow(() ->
-                        new RuntimeException("Utilisateur introuvable : " + email)
-                );
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + email));
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.findByEmail(email).isPresent();
     }
 
     public User create(User user) {
@@ -80,19 +82,25 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public User addEcus(Long id, Integer amount) {
+    public User addEcus(Long id, Float amount) {
         User user = findById(id);
         user.setEcus(user.getEcus() + amount);
         return userRepository.save(user);
     }
 
-    public User withdrawEcus(Long id, Integer amount) {
+    public User withdrawEcus(Long id, Float amount) {
         User user = findById(id);
         if (user.getEcus() < amount) {
             throw new RuntimeException("Pas assez d'écus !");
         }
         user.setEcus(user.getEcus() - amount);
         return userRepository.save(user);
+    }
+
+    public void hibernate(Long id) {
+        User user = findById(id);
+        user.setHibernation(true);
+        userRepository.save(user);
     }
 
     public boolean canBuy(Long id, Integer purchaseNumberForToday) {
