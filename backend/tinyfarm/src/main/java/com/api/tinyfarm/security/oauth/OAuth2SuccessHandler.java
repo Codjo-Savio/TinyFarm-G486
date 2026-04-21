@@ -49,13 +49,13 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String jwtValue = token.getTokenValue();
 
         Cookie cookie = new Cookie("jwt", jwtValue);
-        cookie.setHttpOnly(false);
+        cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(3600);
         response.addCookie(cookie);
         String dashboardUrl = this.frontendUrl;
-        if (this.frontendUrl.substring(this.frontendUrl.length() - 1) != "/") {
+        if (!this.frontendUrl.endsWith("/")) {
             // Add a trailing slash if not present
             dashboardUrl += "/";
         }

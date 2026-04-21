@@ -1,3 +1,5 @@
+import { fetchApiWithCredentials } from "/utils/fetch.js";
+
 class TfAppBar extends HTMLElement {
     API_URL = window.apiUrl || "http://localhost:8080/api";
 
@@ -35,13 +37,13 @@ class TfAppBar extends HTMLElement {
     }
 
     async logout() {
-        const jwt = this.getCookie("jwt");
-
-        let res = await fetchApiWithCredentials("/auth/logout", "POST");
-        // if (res.ok || res.status === 0) {
-        //     // Status = 0 when Spring redirects to /login?logout
-        //     window.location.href = "/";
-        // }
+        const res = await fetchApiWithCredentials("/auth/logout", "POST");
+        if (res.ok) {
+            window.location.href = "/";
+        } else {
+            console.error("Cannot logout the user");
+            console.erreur(await res.text());
+        }
     }
 
     showHibernateDialog() {
@@ -237,15 +239,9 @@ class TfAppBar extends HTMLElement {
             </div>
         `;
 
-        let script = document.createElement("script");
+        const script = document.createElement("script");
         script.src = "/components/tf-dialog.js";
-        document
-            .getElementsByTagName("head")[0]
-            .appendChild(script.cloneNode());
-        script.src = "/utils/fetch.js";
-        document
-            .getElementsByTagName("head")[0]
-            .appendChild(script.cloneNode());
+        document.getElementsByTagName("head")[0].appendChild(script);
 
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(template.content.cloneNode(true));
