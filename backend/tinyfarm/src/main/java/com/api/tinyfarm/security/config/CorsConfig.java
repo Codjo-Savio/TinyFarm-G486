@@ -20,7 +20,7 @@ public class CorsConfig {
 
         configuration.setAllowedOrigins(List.of(this.frontendUrl));
 
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "PUT", "DELETE"));
 
         configuration.setAllowedHeaders(List.of("*"));
 
