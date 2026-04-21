@@ -7,3 +7,5 @@ async function fetchApiWithCredentials(endpoint, method = "GET") {
         credentials: "include",
     });
 }
+
+export { fetchApiWithCredentials, API_URL };

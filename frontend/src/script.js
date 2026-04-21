@@ -1,5 +1,7 @@
 // Ce fichier contient le code JavaScript pour la page de classement des joueurs.
 
+import { fetchApiWithCredentials, API_URL } from "/utils/fetch.js";
+
 // usersData est un tableau qui stocke les données des utilisateurs récupérées depuis l'API ou le fichier de secours.
 // c'est une variable globale.
 // Chaque élément de usersData est un objet représentant un utilisateur, avec les propriétés suivantes :
@@ -184,5 +186,7 @@ fetchApiWithCredentials("/classement")
 // Section de code pour la connexion avec Github
 async function auth() {
     document.querySelector("#github")?.setAttribute("loading", "");
-    fetchApiWithCredentials("/auth/login/oauth2/authorization/github");
+    window.location.href = `${API_URL}/auth/login/oauth2/authorization/github`;
 }
+
+document.querySelector("#github").addEventListener("click", auth);
