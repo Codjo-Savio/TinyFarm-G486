@@ -1,55 +1,67 @@
 <!doctype html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Clapier - TinyFarm</title>
+        <link rel="icon" href="/assets/logo-128-rounded.png" />
+        <!-- Config -->
+        <script src="/config.js"></script>
+        <!-- Components -->
+        <script src="/components/tf-app-bar.js"></script>
+        <script src="/components/tf-bottom-actions.js"></script>
+        <script src="/components/tf-layout.js"></script>
+        <!-- Theme -->
+        <link rel="stylesheet" href="/styles/theme.css" />
+        <!-- Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+            rel="stylesheet"
+        />
+        <!-- Custom page style and script -->
+        <link rel="stylesheet" href="style.css" />
+        <script src="script.js"></script>
+    </head>
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Clapier - TinyFarm</title>
-    <link rel="icon" href="/assets/logo-128-rounded.png" />
-    <!-- Config -->
-    <script src="/config.js"></script>
-    <!-- Components -->
-    <script src="/components/tf-app-bar.js"></script>
-    <script src="/components/tf-bottom-actions.js"></script>
-    <script src="/components/tf-layout.js"></script>
-    <!-- Theme -->
-    <link rel="stylesheet" href="/styles/theme.css" />
-    <!-- Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap"
-        rel="stylesheet" />
-    <!-- Custom page style and script -->
-    <link rel="stylesheet" href="style.css" />
-    <script src="script.js"></script>
-</head>
-
-<body>
-    <tf-layout>
-        <tf-app-bar></tf-app-bar>
-        <main>
-            <div class="taskbar">
-                <div class="taskbar-left">
-                    <a style="cursor: pointer;"
-                        onclick="window.location.href = window.location.search ?  window.location.search.replace('?from=', '') : '/dashboard'">
-                        <span class="material-symbols-rounded">arrow_back</span> Retour </a>
+    <body>
+        <tf-layout>
+            <tf-app-bar></tf-app-bar>
+            <main>
+                <div class="taskbar">
+                    <div class="taskbar-left">
+                        <a
+                            style="cursor: pointer"
+                            onclick="
+                                window.location.href = window.location.search
+                                    ? window.location.search.replace(
+                                          '?from=',
+                                          '',
+                                      )
+                                    : '/dashboard'
+                            "
+                        >
+                            <span class="material-symbols-rounded"
+                                >arrow_back</span
+                            >
+                            Retour
+                        </a>
+                    </div>
+                    <div class="taskbar-right"></div>
                 </div>
-
-                 <div class="taskbar-right">
-
-                 </div>
-             </div>
-             <section>
-                <h1>Clapier</h1>
-                <div class="grid-container">
-
-                  
-                </div>
-            </section>
-
-        </main>
-        <tf-bottom-actions size="small"></tf-bottom-actions>
-    </tf-layout>
-</body>
-
+                <section>
+                    <h1>Clapier</h1>
+                
+                        <div class="grid-container"> </div>
+                    <div class="footer">
+                        <div class="footer-right">
+                            <div class="cooperative"></div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+            <tf-bottom-actions size="small"></tf-bottom-actions>
+        </tf-layout>
+    </body>
 </html>
