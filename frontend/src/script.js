@@ -10,7 +10,6 @@
 // - ecus: number
 let usersData = [];
 const rankingTable = document.querySelector(".rankingTableContent");
-const API_URL = window.apiUrl || "http://localhost:8080/api";
 
 /**
  * Met à jour l'état de chargement du tableau de classement
@@ -148,7 +147,7 @@ setRelease();
 
 // Au chargement de la page, récupérer les données des utilisateurs depuis l'API et les afficher dans le tableau de classement
 setLoadingState(true);
-fetch(`${API_URL}/classement`)
+fetchApiWithCredentials("/classement")
     .then((response) => {
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
@@ -185,5 +184,5 @@ fetch(`${API_URL}/classement`)
 // Section de code pour la connexion avec Github
 async function auth() {
     document.querySelector("#github")?.setAttribute("loading", "");
-    window.location.href = `${API_URL}/auth/login/oauth2/authorization/github`;
+    fetchApiWithCredentials("/auth/login/oauth2/authorization/github");
 }

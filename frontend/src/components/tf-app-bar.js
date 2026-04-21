@@ -24,28 +24,12 @@ class TfAppBar extends HTMLElement {
 
     async fetchUser() {
         try {
-            const jwt = this.getCookie("jwt");
-
-            if (!jwt) throw new Error();
-
-            const userRes = await fetch(`${this.API_URL}/auth/me`, {
-                headers: new Headers({
-                    Authorization: "Bearer " + jwt,
-                }),
-            });
-
-            if (userRes.status !== 200) throw new Error();
-
-            const user = await userRes.json();
-
-            const res = await fetch(`${this.API_URL}/users/id/${user.id}`, {
-                headers: new Headers({
-                    Authorization: "Bearer " + jwt,
-                }),
-            });
-            return await res.json();
-        } catch {
-            window.location.href = "/";
+            const currentUserRes = await fetchApiWithCredentials("/auth/me");
+            if (currentUserRes.status !== 200) throw new Error();
+            return currentUserRes.json();
+        } catch (e) {
+            // window.location.href = "/";
+            console.error(e);
             return null;
         }
     }
@@ -53,19 +37,11 @@ class TfAppBar extends HTMLElement {
     async logout() {
         const jwt = this.getCookie("jwt");
 
-        let res = await fetch(`${this.API_URL}/auth/logout`, {
-            method: "POST",
-            credentials: "include",
-            redirect: "manual",
-            headers: new Headers({
-                Authorization: "Bearer " + jwt,
-            }),
-        });
-        console.log("Logout response:", res);
-        if (res.ok || res.status === 0) {
-            // Status = 0 when Spring redirects to /login?logout
-            window.location.href = "/";
-        }
+        let res = await fetchApiWithCredentials("/auth/logout", "POST");
+        // if (res.ok || res.status === 0) {
+        //     // Status = 0 when Spring redirects to /login?logout
+        //     window.location.href = "/";
+        // }
     }
 
     showHibernateDialog() {
@@ -74,13 +50,10 @@ class TfAppBar extends HTMLElement {
     }
 
     async hibernate() {
-        await fetch(`${this.API_URL}/users/hibernate/id/${this.user.id}`, {
-            method: "PATCH",
-            credentials: "include",
-            headers: new Headers({
-                Authorization: "Bearer " + this.getCookie("jwt"),
-            }),
-        });
+        await fetchApiWithCredentials(
+            `/users/hibernate/id/${this.user.id}`,
+            "PATCH",
+        );
         this.logout();
     }
 
@@ -266,7 +239,13 @@ class TfAppBar extends HTMLElement {
 
         let script = document.createElement("script");
         script.src = "/components/tf-dialog.js";
-        document.getElementsByTagName("head")[0].appendChild(script);
+        document
+            .getElementsByTagName("head")[0]
+            .appendChild(script.cloneNode());
+        script.src = "/utils/fetch.js";
+        document
+            .getElementsByTagName("head")[0]
+            .appendChild(script.cloneNode());
 
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(template.content.cloneNode(true));
