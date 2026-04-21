@@ -3,6 +3,7 @@ package com.api.tinyfarm.service;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -32,7 +33,7 @@ public class CooperativeService {
 
     public Integer getMediumPriceForProduct(String description) {
         List<Product> products = new ArrayList<>();
-        
+
         for (Cooperative coop : cooperativeRepository.findAll()) {
             for (Product product : productRepository.findByDescription(description)) {
                 if (product.getId().equals(coop.getProductId())) {
@@ -93,7 +94,7 @@ public class CooperativeService {
 
         for (Cooperative coop : cooperatives) {
             for (Product product : products) {
-                if (!product.getId().equals(coop.getProductId())) 
+                if (!product.getId().equals(coop.getProductId()))
                     continue;
                 if (!product.getDescription().equals(description))
                     continue;
@@ -101,26 +102,25 @@ public class CooperativeService {
                 if (uid == null || pid == null) {
                     uid = coop.getUserId();
                     pid = coop.getProductId();
-                }                
+                }
             }
         }
-        
+
         if (uid == null || pid == null)
             return;
 
         User sellerUser = userRepository.findById(uid).orElse(null);
         User buyerUser = userRepository.findById(idBuyer).orElse(null);
-        if (sellerUser == null || buyerUser == null) return;
+        if (sellerUser == null || buyerUser == null)
+            return;
 
         sellerUser.setEcus(
-            sellerUser.getEcus() + 
-            getMediumPriceForProduct(description)
-        );
+                sellerUser.getEcus() +
+                        getMediumPriceForProduct(description));
 
         buyerUser.setEcus(
-            buyerUser.getEcus() - 
-            getMediumPriceForProduct(description)
-        );
+                buyerUser.getEcus() -
+                        getMediumPriceForProduct(description));
 
         userRepository.save(sellerUser);
         userRepository.save(buyerUser);
@@ -128,9 +128,8 @@ public class CooperativeService {
         cooperativeRepository.deleteByUserIdAndProductId(uid, pid);
     }
 
-    // handling open or closen hours
-    private static final ZoneId ZONE = ZoneId.of("Europe/Paris");
-
+    // handling open or closen hours in AoE (UTC-12)
+    private static final ZoneId ZONE = ZoneOffset.ofHours(-12);
 
     private boolean isBetween(LocalTime t, LocalTime start, LocalTime end) {
         if (start.isBefore(end)) {
@@ -145,13 +144,13 @@ public class CooperativeService {
     }
 
     private boolean isOpenWeekday(LocalTime t) {
-        return isBetween(t, LocalTime.of(5, 0),  LocalTime.of(14, 0))
+        return isBetween(t, LocalTime.of(5, 0), LocalTime.of(14, 0))
                 || isBetween(t, LocalTime.of(17, 0), LocalTime.of(20, 0))
                 || isBetween(t, LocalTime.of(22, 0), LocalTime.of(3, 0));
     }
 
     private boolean isOpenWeekend(LocalTime t) {
-        return isBetween(t, LocalTime.of(9, 0),  LocalTime.of(14, 0))
+        return isBetween(t, LocalTime.of(9, 0), LocalTime.of(14, 0))
                 || isBetween(t, LocalTime.of(19, 0), LocalTime.of(3, 0));
     }
 
@@ -162,11 +161,4 @@ public class CooperativeService {
 
         return isWeekend(day) ? isOpenWeekend(time) : isOpenWeekday(time);
     }
-
-
-    public String getTime(){
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
-        return now.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
-    }
 }
-
