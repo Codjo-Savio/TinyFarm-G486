@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "`user`")
 @Data
@@ -48,6 +50,9 @@ public class User {
 
     @Column(name = "hibernation")
     private Boolean hibernation;
+
+    @Column(name = "hibernationDate")
+    private LocalDateTime hibernationDate;
 
     @Column(name = "level")
     private Integer level;
