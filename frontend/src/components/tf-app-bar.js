@@ -68,6 +68,22 @@ class TfAppBar extends HTMLElement {
         }
     }
 
+    showHibernateDialog() {
+        this.accountMenu.classList.remove("open");
+        this.dialogElement.setAttribute("show", "");
+    }
+
+    async hibernate() {
+        await fetch(`${this.API_URL}/users/hibernate/id/${this.user.id}`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: new Headers({
+                Authorization: "Bearer " + this.getCookie("jwt"),
+            }),
+        });
+        this.logout();
+    }
+
     render() {
         if (this.rendered) {
             return;
@@ -205,6 +221,12 @@ class TfAppBar extends HTMLElement {
         const template = document.createElement("template");
         template.innerHTML = `
             <div class="appbar">
+                <tf-dialog title="Mettre la ferme en hibernation" title-icon="person" modal>
+                    Vous retrouverez votre ferme et vos animaux dans le même état qu'à votre départ lors de votre prochaine connexion.
+                    Si votre compte hiberne pendant plus de 50 jours, il sera automatiquement supprimé.
+                    <tf-button class="cancel" slot="cancel-button" variant="secondary">Annuler</tf-button>
+                    <tf-button class="confirm" slot="confirm-button">Confirmer et me déconnecter</tf-button>
+                </tf-dialog>
                 <div class="infos-left">
                     <div>
                         <span class="material-symbols-rounded">leaderboard</span>
@@ -229,10 +251,10 @@ class TfAppBar extends HTMLElement {
                             <span class="material-symbols-rounded">book</span>
                             <span>Règles du jeu</span>
                         </a>
-                        <a href="#">
+                        <button id="hibernate">
                             <span class="material-symbols-rounded">pause_circle</span>
                             <span>Hiberner</span>
-                        </a>
+                        </button>
                         <button id="logout">
                             <span class="material-symbols-rounded">logout</span>
                             <span>Déconnexion</span>
@@ -241,6 +263,10 @@ class TfAppBar extends HTMLElement {
                 </div>
             </div>
         `;
+
+        let script = document.createElement("script");
+        script.src = "/components/tf-dialog.js";
+        document.getElementsByTagName("head")[0].appendChild(script);
 
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(template.content.cloneNode(true));
@@ -253,6 +279,10 @@ class TfAppBar extends HTMLElement {
         this.accountButton = this.appbarElement.querySelector("#account");
         this.accountMenu = this.appbarElement.querySelector("#account-menu");
         this.logoutButton = this.accountMenu.querySelector("#logout");
+        this.hibernateButton = this.accountMenu.querySelector("#hibernate");
+        this.dialogElement = this.shadowRoot.querySelector("tf-dialog");
+        this.dialogCancelButton = this.dialogElement.querySelector(".cancel");
+        this.dialogConfirmButton = this.dialogElement.querySelector(".confirm");
         this.rendered = true;
     }
 
@@ -261,14 +291,14 @@ class TfAppBar extends HTMLElement {
             return;
         }
 
-        const user = await this.fetchUser();
-        if (!user) {
+        this.user = await this.fetchUser();
+        if (!this.user) {
             return;
         }
 
-        this.levelElement.textContent = `Niveau ${user.level}`;
-        this.usernameElement.textContent = user.name;
-        this.moneyLevelElement.textContent = user.ecus;
+        this.levelElement.textContent = `Niveau ${this.user.level}`;
+        this.usernameElement.textContent = this.user.name;
+        this.moneyLevelElement.textContent = this.user.ecus;
         this.appbarElement.classList.add("ready");
         this.userLoaded = true;
     }
@@ -278,7 +308,10 @@ class TfAppBar extends HTMLElement {
             this.listenersAttached ||
             !this.accountButton ||
             !this.accountMenu ||
-            !this.logoutButton
+            !this.logoutButton ||
+            !this.hibernateButton ||
+            !this.dialogCancelButton ||
+            !this.dialogConfirmButton
         ) {
             return;
         }
@@ -289,6 +322,18 @@ class TfAppBar extends HTMLElement {
 
         this.logoutButton.addEventListener("click", () => {
             this.logout();
+        });
+
+        this.hibernateButton.addEventListener("click", () => {
+            this.showHibernateDialog();
+        });
+
+        this.dialogCancelButton.addEventListener("click", () => {
+            this.dialogElement.removeAttribute("show");
+        });
+
+        this.dialogConfirmButton.addEventListener("click", () => {
+            this.hibernate();
         });
 
         // Close menu if outside click

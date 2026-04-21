@@ -44,10 +44,13 @@ class TfDialog extends HTMLElement {
 
             :host {
                 position: fixed;
+                z-index: 10;
             }
 
             .dialog {
                 pointer-events: none;
+                color: var(--color-primary);
+                font-weight: normal;
             }
 
             .dialog.show {
@@ -146,6 +149,10 @@ class TfDialog extends HTMLElement {
                 </div>
             </div>
         `;
+
+        const script = document.createElement("script");
+        script.src = "/components/tf-button.js";
+        document.getElementsByTagName("head")[0].appendChild(script);
 
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(template.content.cloneNode(true));
