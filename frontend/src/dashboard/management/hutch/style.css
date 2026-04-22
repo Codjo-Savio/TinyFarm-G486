@@ -109,14 +109,25 @@ body {
     color: var(--color-primary);
 }
 
+.hutch-status {
+    margin: 0 0 16px;
+    min-height: 24px;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.hutch-status.success {
+    color: #2e7d32;
+}
+
+.hutch-status.error {
+    color: #b3261e;
+}
+
 .game-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 20px;
-}
-
-.grid-container {
-    display: grid;
 }
 
 .grid-item {
@@ -210,6 +221,11 @@ body {
 .animal-actions button[disabled] {
     cursor: default;
     opacity: 0.45;
+}
+
+.sell-button[disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
 }
 
 .empty-state,

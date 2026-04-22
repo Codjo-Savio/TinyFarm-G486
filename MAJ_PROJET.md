@@ -16,6 +16,28 @@ Objectif:
 
 ## Historique des MAJ
 
+### 2026-04-23 - Branch `front-chicken-coop`
+
+Contexte:
+- Amelioration fonctionnelle et UX du clapier avant prochaine PR.
+
+Changements principaux:
+- `hutch/script.js`:
+- API base utilise maintenant `window.apiUrl` (plus de hardcode local).
+- filtrage des lapins par `currentUserId` pour n'afficher que les donnees du joueur.
+- correction de la structure de rendu des cards (plus de wrapper grille inutile par carte).
+- ajout d'un feedback utilisateur (`hutch-status`) pour les actions et erreurs.
+- bouton `Vendre` explicitement desactive tant que le flux n'est pas branche.
+- `hutch/index.html`: ajout de la zone de statut (`#hutch-status`).
+- `hutch/style.css`: styles associes au statut + ajustements visuels.
+
+Tests executes:
+- Frontend: `npm test` execute apres les changements, resultat `PASS` sur tous les scenarios.
+
+Etat obtenu:
+- clapier plus fidele, plus robuste et plus explicite pour l'utilisateur.
+- base prete pour commit/push apres validation finale.
+
 ### 2026-04-22 - Branch `front-chicken-coop`
 
 Contexte:
