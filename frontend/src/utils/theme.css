@@ -58,7 +58,7 @@ html {
     overflow: hidden;
 }
 
-span.material-symbols-rounded {
+.material-symbols-rounded {
     font-family: "Material Symbols Rounded";
     font-weight: normal;
     font-style: normal;
