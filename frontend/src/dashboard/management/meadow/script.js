@@ -69,7 +69,7 @@ async function initializeMeadow() {
                             <div class="animal-content">
                                 <div class="food-state">
                                     <span class="material-symbols-rounded">
-                                        nutrition
+                                        wheat
                                     </span>
                                     <tf-progress-bar value="${cow.fedToday ? 100 : 0}"></tf-progress-bar>
                                 </div>
@@ -129,16 +129,6 @@ async function initializeMeadow() {
     }
 }
 
-function toggleActionsMenu() {
-    const menu = document.getElementById("actions-menu");
-
-    if (!menu) {
-        return;
-    }
-
-    menu.classList.toggle("open");
-}
-
 function updateActionMenuCosts() {
     const feedBtn = document.getElementById("feed-btn");
     const waterBtn = document.getElementById("water-btn");
@@ -154,10 +144,10 @@ function updateActionMenuCosts() {
     const hungryCows = cows.filter((cow) => !cow.fedToday).length;
     const thirstyCows = cows.filter((cow) => !cow.wateredToday).length;
 
-    feedBtn.innerHTML = `Nourrir : <span class="material-symbols-rounded coin-icon">paid</span> ${hungryCows * 5}`;
-    waterBtn.innerHTML = `Abreuver : <span class="material-symbols-rounded coin-icon">paid</span> ${thirstyCows * 2}`;
-    healBtn.innerHTML = `Soigner : <span class="material-symbols-rounded coin-icon">paid</span> ${unhealthyCows * 6}`;
-    cleanBtn.innerHTML = `Nettoyer : <span class="material-symbols-rounded coin-icon">paid</span> ${dirtyCows * 3}`;
+    feedBtn.textContent = `$${hungryCows * 5} Nourrir`;
+    waterBtn.textContent = `$${thirstyCows * 2} Abreuver`;
+    healBtn.textContent = `$${unhealthyCows * 6} Soigner`;
+    cleanBtn.textContent = `$${dirtyCows * 3} Nettoyer`;
 }
 
 function feedAll() {
@@ -206,19 +196,7 @@ function cleanAll() {
 
 initializeMeadow();
 
-document.addEventListener("click", (event) => {
-    const wrapper = document.querySelector(".actions-wrapper");
-    const menu = document.getElementById("actions-menu");
-
-    if (!wrapper || !menu) {
-        return;
-    }
-
-    if (!wrapper.contains(event.target)) {
-        menu.classList.remove("open");
-    }
-});
-
-document
-    .querySelector("button.menu-actions")
-    .addEventListener("click", toggleActionsMenu);
+document.querySelector("#feed-btn").addEventListener("click", feedAll);
+document.querySelector("#water-btn").addEventListener("click", waterAll);
+document.querySelector("#heal-btn").addEventListener("click", healAll);
+document.querySelector("#clean-btn").addEventListener("click", cleanAll);

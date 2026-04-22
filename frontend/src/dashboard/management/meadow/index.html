@@ -15,6 +15,7 @@
         <script type="module" src="/components/tf-pill.js"></script>
         <script type="module" src="/components/tf-button.js"></script>
         <script type="module" src="/components/tf-progress-bar.js"></script>
+        <script type="module" src="/components/tf-menu.js"></script>
         <!-- Theme -->
         <link rel="stylesheet" href="/utils/theme.css" />
         <!-- Font -->
@@ -46,10 +47,10 @@
                     >
                     <div class="cows-stats">
                         <tf-pill icon="heart_broken"
-                            >Malade : <span id="sick-count"></span
+                            >Malades : <span id="sick-count"></span
                         ></tf-pill>
-                        <tf-pill icon="heart_broken"
-                            >Sale : <span id="dirty-count"></span
+                        <tf-pill icon="mop"
+                            >Sales : <span id="dirty-count"></span
                         ></tf-pill>
                         <span
                             ><span class="material-symbols-rounded">pets</span>
@@ -64,39 +65,47 @@
                         <tf-button icon="sell" variant="secondary"
                             >Vendre</tf-button
                         >
-                        <div class="actions-wrapper">
-                            <button class="menu-actions">...</button>
-                            <div class="actions-menu" id="actions-menu">
-                                <button
-                                    onclick="feedAll()"
-                                    class="action-button"
+                        <tf-menu id="actions-menu" offset-x="-233" offset-y="8">
+                            <tf-button
+                                slot="menu-target"
+                                variant="secondary"
+                                icon="more_vert"
+                                icon-only
+                            ></tf-button>
+                            <tf-menu-group
+                                slot="group"
+                                legend="Actions collectives"
+                            >
+                                <tf-menu-entry
                                     id="feed-btn"
+                                    slot="entry"
+                                    icon="wheat"
                                 >
                                     Nourrir
-                                </button>
-                                <button
-                                    onclick="waterAll()"
-                                    class="action-button"
+                                </tf-menu-entry>
+                                <tf-menu-entry
                                     id="water-btn"
+                                    slot="entry"
+                                    icon="water_drop"
                                 >
                                     Abreuver
-                                </button>
-                                <button
-                                    onclick="healAll()"
-                                    class="action-button"
+                                </tf-menu-entry>
+                                <tf-menu-entry
                                     id="heal-btn"
+                                    slot="entry"
+                                    icon="healing"
                                 >
                                     Soigner
-                                </button>
-                                <button
-                                    onclick="cleanAll()"
-                                    class="action-button"
+                                </tf-menu-entry>
+                                <tf-menu-entry
                                     id="clean-btn"
+                                    slot="entry"
+                                    icon="mop"
                                 >
                                     Nettoyer
-                                </button>
-                            </div>
-                        </div>
+                                </tf-menu-entry>
+                            </tf-menu-group>
+                        </tf-menu>
                     </div>
                 </div>
 
