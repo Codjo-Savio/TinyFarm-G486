@@ -38,7 +38,7 @@ class TfAppBar extends HTMLElement {
     }
 
     showHibernateDialog() {
-        this.accountMenu.classList.remove("open");
+        this.accountMenu.closeMenu();
         this.dialogElement.setAttribute("show", "");
     }
 
@@ -115,60 +115,17 @@ class TfAppBar extends HTMLElement {
                 position: relative;
             }
 
-            .appbar > .infos-right > #account {
+            .appbar > .infos-right > tf-menu#account-menu > #account {
                 display: flex;
                 gap: 12px;
                 align-items: center;
                 cursor: pointer;
             }
 
-            .appbar > .infos-right > #account > img {
+            .appbar > .infos-right > tf-menu#account-menu > #account > img {
                 height: 40px;
                 width: auto;
                 border-radius: 100px;
-            }
-
-            .appbar > .infos-right > #account-menu {
-                background-color: var(--color-surface-dark);
-                position: absolute;
-                top: 64px;
-                right: -16px;
-                margin-top: 8px;
-                border-radius: var(--radius);
-                box-shadow: var(--shadow);
-                display: flex;
-                flex-direction: column;
-                font-weight: normal;
-                min-width: 264px;
-                max-height: 0px;
-                padding: 0px 6px;
-                overflow: hidden;
-                transition-duration: 0.3s;
-                transform: translateY(-8px);
-            }
-
-            .appbar > .infos-right > #account-menu.open {
-                max-height: 156px;
-                padding: 6px;
-                transform: translateY(0px);
-            }
-
-            .appbar > .infos-right > #account-menu > * {
-                display: flex;
-                gap: 16px;
-                padding: 12px;
-                border-radius: calc(var(--radius) - 6px);
-                color: var(--color-primary);
-                text-decoration: none;
-                border: none;
-                cursor: pointer;
-                background-color: transparent;
-                font: inherit;
-                font-size: inherit;
-            }
-
-            .appbar > .infos-right > #account-menu > *:hover {
-                background-color: var(--color-secondary);
             }
 
             .appbar > .infos-right > #money {
@@ -181,6 +138,10 @@ class TfAppBar extends HTMLElement {
                 background-color: var(--color-gold);
                 color: var(--color-gold-dark);
                 line-height: 1;
+            }
+
+            .appbar > .infos-right > tf-menu#account-menu {
+                z-index: 2;
             }
         `;
 
@@ -208,28 +169,65 @@ class TfAppBar extends HTMLElement {
                         <span class="material-symbols-rounded">paid</span>
                         <span id="money-level">-</span>
                     </div>
-                    <div id="account">
-                        <span id="username">-</span>
-                        <img src="/assets/farmer-icon.png" alt="Avatar" />
-                    </div>
-                    <div id="account-menu">
-                        <a href="/doc/rules?from=/dashboard">
-                            <span class="material-symbols-rounded">book</span>
-                            <span>Règles du jeu</span>
-                        </a>
-                        <button id="hibernate">
-                            <span class="material-symbols-rounded">pause_circle</span>
-                            <span>Hiberner</span>
-                        </button>
-                        <button id="logout">
-                            <span class="material-symbols-rounded">logout</span>
-                            <span>Déconnexion</span>
-                        </button>
-                    </div>
+                    <tf-menu id="account-menu" offset-x="-151" offset-y="32">
+                        <div id="account" slot="menu-target">
+                            <span id="username">-</span>
+                            <img src="/assets/farmer-icon.png" alt="Avatar" />
+                        </div>
+                        <tf-menu-group slot="group" legend="Compte">
+                            <tf-menu-entry
+                                id="rules"
+                                slot="entry"
+                                icon="book"
+                                href="/doc/rules?from=/dashboard"
+                            >
+                                Règles du jeu
+                            </tf-menu-entry>
+                            <tf-menu-entry
+                                id="hibernate"
+                                slot="entry"
+                                icon="pause_circle"
+                            >
+                                Hiberner
+                            </tf-menu-entry>
+                            <tf-menu-entry
+                                id="logout"
+                                slot="entry"
+                                icon="logout"
+                            >
+                                Déconnexion
+                            </tf-menu-entry>
+                        </tf-menu-group>
+                        <tf-menu-group slot="group" legend="Compte">
+                            <tf-menu-entry
+                                id="rules"
+                                slot="entry"
+                                icon="book"
+                                href="/doc/rules?from=/dashboard"
+                            >
+                                Règles du jeu
+                            </tf-menu-entry>
+                            <tf-menu-entry
+                                id="hibernate"
+                                slot="entry"
+                                icon="pause_circle"
+                            >
+                                Hiberner
+                            </tf-menu-entry>
+                            <tf-menu-entry
+                                id="logout"
+                                slot="entry"
+                                icon="logout"
+                            >
+                                Déconnexion
+                            </tf-menu-entry>
+                        </tf-menu-group>
+                    </tf-menu>
                 </div>
             </div>
         `;
 
+        loadScriptIfNeeded("/components/tf-menu.js");
         loadScriptIfNeeded("/components/tf-dialog.js");
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(template.content.cloneNode(true));
@@ -239,7 +237,6 @@ class TfAppBar extends HTMLElement {
         this.usernameElement = this.appbarElement.querySelector("#username");
         this.moneyLevelElement =
             this.appbarElement.querySelector("#money-level");
-        this.accountButton = this.appbarElement.querySelector("#account");
         this.accountMenu = this.appbarElement.querySelector("#account-menu");
         this.logoutButton = this.accountMenu.querySelector("#logout");
         this.hibernateButton = this.accountMenu.querySelector("#hibernate");
@@ -269,7 +266,6 @@ class TfAppBar extends HTMLElement {
     setupEventListeners() {
         if (
             this.listenersAttached ||
-            !this.accountButton ||
             !this.accountMenu ||
             !this.logoutButton ||
             !this.hibernateButton ||
@@ -278,10 +274,6 @@ class TfAppBar extends HTMLElement {
         ) {
             return;
         }
-
-        this.accountButton.addEventListener("click", () => {
-            this.accountMenu.classList.toggle("open");
-        });
 
         this.logoutButton.addEventListener("click", () => {
             this.logout();
@@ -297,17 +289,6 @@ class TfAppBar extends HTMLElement {
 
         this.dialogConfirmButton.addEventListener("click", () => {
             this.hibernate();
-        });
-
-        // Close menu if outside click
-        document.addEventListener("click", (e) => {
-            const path = e.composedPath();
-            const clickedAccount = path.includes(this.accountButton);
-            const clickedMenu = path.includes(this.accountMenu);
-
-            if (!clickedAccount && !clickedMenu) {
-                this.accountMenu.classList.remove("open");
-            }
         });
 
         this.listenersAttached = true;
