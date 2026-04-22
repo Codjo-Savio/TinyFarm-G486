@@ -135,6 +135,13 @@ app-layout {
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+.purchase-info,
+.stock-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 h1.page-title {
     font-family: "Amaranth", sans-serif;
     font-size: var(--font-size-title);

@@ -104,7 +104,7 @@ function renderEmptyMarket(container) {
         <div class="empty-market-state">
             <span class="material-symbols-rounded empty-market-icon">storefront</span>
             <h2>Aucun article disponible</h2>
-            <p>Le marché est vide pour le moment. Reviens un peu plus tard.</p>
+            <p>Le marché est vide pour le moment. Revenez un peu plus tard.</p>
         </div>
     `;
 }
@@ -275,7 +275,125 @@ function retirerDuPanier(itemKey) {
     displayPanier();
 }
 
-function payerPanier() {
-    // Logique pour payer le panier
-    alert("Fonction de paiement non implémentée.");
+async function payerPanier() {
+    // Récupérer l'ID de l'utilisateur courant (acheteur)
+    const buyerId = localStorage.getItem("tinyfarm-user-id");
+    const payButton = document.querySelector(
+        ".cart-actions tf-button[icon='payment']",
+    );
+    
+    if (!buyerId) {
+        alert("Utilisateur non identifié. Impossible de procéder.");
+        return;
+    }
+
+    if (Object.keys(panier).length === 0) {
+        alert("Votre panier est vide.");
+        return;
+    }
+
+    // Active le mode loading du composant tf-button
+    payButton?.setAttribute("loading", "");
+
+    try {
+        let totalTransactions = 0;
+        let successCount = 0;
+        const transactionIds = [];
+
+        // 1. Créer une transaction pour chaque article du panier
+        for (const [key, item] of Object.entries(panier)) {
+            const transaction = {
+                seller: item.userId,
+                buyer: Number(buyerId),
+                product: item.productId,
+                quantity: item.quantity,
+                totalPrice: item.price * item.quantity,
+            };
+
+            try {
+                const createResponse = await fetch(
+                    apiUrl("/api/transaction"),
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(transaction),
+                    }
+                );
+
+                if (!createResponse.ok) {
+                    throw new Error(
+                        `Erreur création transaction: ${createResponse.status}`
+                    );
+                }
+
+                const createdTransaction = await createResponse.json();
+                transactionIds.push(createdTransaction.id);
+                totalTransactions++;
+            } catch (err) {
+                console.error(
+                    `Erreur transaction produit ${item.productId}:`,
+                    err
+                );
+                alert(
+                    `Erreur lors de la création de la transaction pour le produit ${item.productId}`
+                );
+                continue;
+            }
+        }
+
+        // 2. Exécuter les transferts de stock (sell + buy)
+        for (const tid of transactionIds) {
+            try {
+                // Appel sell: le vendeur perd le stock
+                const sellResponse = await fetch(
+                    apiUrl(`/api/stocks/sell/${tid}`),
+                    { method: "POST" }
+                );
+
+                if (!sellResponse.ok) {
+                    throw new Error(`Erreur sell: ${sellResponse.status}`);
+                }
+
+                // Appel buy: l'acheteur reçoit le stock
+                const buyResponse = await fetch(
+                    apiUrl(`/api/stocks/buy/${tid}`),
+                    { method: "POST" }
+                );
+
+                if (!buyResponse.ok) {
+                    throw new Error(`Erreur buy: ${buyResponse.status}`);
+                }
+
+                successCount++;
+            } catch (err) {
+                console.error(`Erreur transfert stock pour transaction ${tid}:`, err);
+                alert(
+                    `Erreur lors du transfert de stock pour la transaction ${tid}`
+                );
+                continue;
+            }
+        }
+
+        // 3. Afficher le résultat et vider le panier si succès
+        if (successCount === totalTransactions && totalTransactions > 0) {
+            alert(
+                `✓ Paiement réussi! ${successCount} transaction(s) complétée(s).`
+            );
+            Object.keys(panier).forEach((key) => delete panier[key]);
+            displayPanier();
+            await initialiserBoutique(); // Actualiser la liste des produits
+        } else if (successCount > 0) {
+            alert(
+                `⚠ Paiement partiel: ${successCount}/${totalTransactions} transaction(s) complétée(s).`
+            );
+        } else {
+            alert("✗ Aucune transaction n'a pu être complétée.");
+        }
+    } catch (err) {
+        console.error("Erreur paiement:", err);
+        alert("Erreur lors du paiement. Veuillez réessayer.");
+    } finally {
+        // Désactive le mode loading du composant tf-button
+        payButton?.removeAttribute("loading");
+    }
 }

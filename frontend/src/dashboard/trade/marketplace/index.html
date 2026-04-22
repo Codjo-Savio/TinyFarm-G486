@@ -11,6 +11,7 @@
         <script src="/components/tf-app-bar.js"></script>
         <script src="/components/tf-bottom-actions.js"></script>
         <script src="/components/tf-layout.js"></script>
+        <script type="module" src="/components/tf-button.js"></script>
         <!-- Theme -->
         <link rel="stylesheet" href="/styles/theme.css" />
         <!-- Font -->
@@ -30,20 +31,15 @@
             <tf-app-bar></tf-app-bar>
             <main class="container">
                 <div class="sub-header">
-                    <a
-                        onclick="
-                            window.location.href = window.location.search
-                                ? window.location.search.replace('?from=', '')
-                                : '/dashboard'
-                        "
-                        class="btn-back"
-                        ><span class="material-symbols-rounded">
-                            keyboard_backspace
-                        </span>
-                        Retour</a
+                    <tf-button
+                        icon="keyboard_backspace"
+                        variant="secondary"
+                        onclick="window.history.back()"
                     >
+                        Retour
+                    </tf-button>
                     <div class="market-stats">
-                        <span
+                        <span class="purchase-info"
                             ><span class="material-symbols-rounded"
                                 >shopping_cart</span
                             >
@@ -53,18 +49,16 @@
                             ><span class="material-symbols-rounded">store</span>
                             En stock :
                         </span>
-                        <a
+
+                        <tf-button
+                            icon="sell"
+                            variant="secondary"
                             onclick="
-                                window.location.href =
-                                    '/dashboard/management/assets' +
-                                    '?from=/dashboard/trade/marketplace'
+                                window.location.href = '/dashboard/trade/sell'
                             "
-                            class="btn-back"
-                            ><span class="material-symbols-rounded">
-                                sell
-                            </span>
-                            Vendre</a
                         >
+                            Vendre
+                        </tf-button>
                     </div>
                 </div>
 
@@ -85,12 +79,13 @@
                                         class="total-price"
                                         id="totalPrice"
                                     ></span>
-                                    <button
-                                        class="btn-pay"
+                                    <tf-button
+                                        icon="payment"
+                                        variant="primary"
                                         onclick="payerPanier()"
                                     >
                                         Payer
-                                    </button>
+                                    </tf-button>
                                 </div>
                             </div>
 
