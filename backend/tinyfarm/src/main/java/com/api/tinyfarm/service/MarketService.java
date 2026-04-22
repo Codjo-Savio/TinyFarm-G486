@@ -5,7 +5,6 @@ import com.api.tinyfarm.model.MarketID;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.MarketRepository;
 import java.util.List;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -44,10 +43,22 @@ public class MarketService {
             );
     }
 
+    public Market findByQuantity(int quantity) {
+        return marketRepository
+            .findByQuantity(quantity)
+            .orElseThrow(() ->
+                new RuntimeException("Marché introuvable : " + quantity)
+            );
+    }
+
     public Market create(Market market) {
         syncMarketId(market);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
+        Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
+        if (
+            authentication != null &&
+            authentication.getPrincipal() instanceof User currentUser
+        ) {
             market.setUserId(currentUser.getId());
         }
         return marketRepository.save(market);

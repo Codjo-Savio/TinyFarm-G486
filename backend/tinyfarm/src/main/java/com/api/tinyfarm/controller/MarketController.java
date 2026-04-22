@@ -53,6 +53,15 @@ public class MarketController {
         }
     }
 
+    @GetMapping("/quantity/{quantity}")
+    public ResponseEntity<Market> getByQuantity(@PathVariable int quantity) {
+        try {
+            return ResponseEntity.ok(marketService.findByQuantity(quantity));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping("")
     public ResponseEntity<Market> create(@RequestBody Market market) {
         try {

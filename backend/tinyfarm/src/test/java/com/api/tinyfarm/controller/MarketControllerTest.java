@@ -39,6 +39,7 @@ public class MarketControllerTest extends AuthenticatedControllerTestSupport {
         market.setUserId(1L);
         market.setProductId(10L);
         market.setPrice(13.0f);
+        market.setQuantity(100);
         marketService.create(market);
     }
 
@@ -48,6 +49,7 @@ public class MarketControllerTest extends AuthenticatedControllerTestSupport {
         market.setUserId(2L);
         market.setProductId(20L);
         market.setPrice(25.0f);
+        market.setQuantity(50);
 
         mockMvc
             .perform(
@@ -77,6 +79,13 @@ public class MarketControllerTest extends AuthenticatedControllerTestSupport {
     void shouldReturnMarketByPrice() throws Exception {
         mockMvc
             .perform(get("/api/market/price/13.0").with(authenticated()))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturnMarketByQuantity() throws Exception {
+        mockMvc
+            .perform(get("/api/market/quantity/100").with(authenticated()))
             .andExpect(status().isOk());
     }
 
