@@ -8,4 +8,19 @@ async function fetchApiWithCredentials(endpoint, method = "GET") {
     });
 }
 
-export { fetchApiWithCredentials, API_URL };
+function loadScriptIfNeeded(scriptPath) {
+    const normalizedScriptPath = scriptPath.trim().replaceAll("/", "");
+    const headNode = document.querySelector("head");
+    const headChildScripts = headNode.querySelectorAll("script");
+    for (const node of headChildScripts) {
+        if (node.src.trim().replaceAll("/", "") === normalizedScriptPath) {
+            return;
+        }
+    }
+    const script = document.createElement("script");
+    script.src = scriptPath;
+    script.type = "module";
+    headNode.appendChild(script);
+}
+
+export { fetchApiWithCredentials, API_URL, loadScriptIfNeeded };

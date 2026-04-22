@@ -1,4 +1,4 @@
-const API_URL = window.apiUrl || "http://localhost:8080/api";
+import { fetchApiWithCredentials } from "/utils/fetch.js";
 
 // Variables globales pour stocker les données des vaches et le lait
 let cows = [];
@@ -7,28 +7,12 @@ let healthyCount = 0;
 let cleanCount = 0;
 let milkFallback = 0;
 
-// Fonction pour récupérer la valeur d'un cookie par son nom
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-}
-
 // Fonction d'initialisation du pré et de chargement des données des vaches depuis l'API
 async function initializeMeadow() {
     const container = document.getElementById("game-grid");
 
     try {
-        const jwt = getCookie("jwt");
-
-        if (!jwt) throw new Error();
-
-        const response = await fetch(`${API_URL}/cows`, {
-            headers: new Headers({
-                Authorization: "Bearer " + jwt,
-            }),
-        });
-        // const response = await fetch("../../../fakeapi//meadow.json");
+        const response = await fetchApiWithCredentials("/cows");
 
         if (!response.ok) {
             throw new Error(`Erreur HTTP : ${response.status}`);
@@ -145,21 +129,6 @@ async function initializeMeadow() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", initializeMeadow);
-
-document.addEventListener("click", (event) => {
-    const wrapper = document.querySelector(".actions-wrapper");
-    const menu = document.getElementById("actions-menu");
-
-    if (!wrapper || !menu) {
-        return;
-    }
-
-    if (!wrapper.contains(event.target)) {
-        menu.classList.remove("open");
-    }
-});
-
 function toggleActionsMenu() {
     const menu = document.getElementById("actions-menu");
 
@@ -195,11 +164,7 @@ function feedAll() {
     for (const cow of cows) {
         if (!cow.fedToday) {
             // Appel à l'API pour nourrir la vache
-            fetch(`${API_URL}/cows/${cow.id}/feed`, {
-                headers: new Headers({
-                    Authorization: "Bearer " + jwt,
-                }),
-            });
+            fetchApiWithCredentials(`/cows/${cow.id}/feed`);
             cow.fedToday = true;
         }
     }
@@ -210,11 +175,7 @@ function waterAll() {
     for (const cow of cows) {
         if (!cow.wateredToday) {
             // Appel à l'API pour abreuver la vache
-            fetch(`${API_URL}/cows/${cow.id}/water`, {
-                headers: new Headers({
-                    Authorization: "Bearer " + jwt,
-                }),
-            });
+            fetchApiWithCredentials(`/cows/${cow.id}/water`);
             cow.wateredToday = true;
         }
     }
@@ -225,11 +186,7 @@ function healAll() {
     for (const cow of cows) {
         if (!cow.healthy) {
             // Appel à l'API pour soigner la vache
-            fetch(`${API_URL}/cows/${cow.id}/heal`, {
-                headers: new Headers({
-                    Authorization: "Bearer " + jwt,
-                }),
-            });
+            fetchApiWithCredentials(`/cows/${cow.id}/heal`);
             cow.healthy = true;
         }
     }
@@ -240,13 +197,28 @@ function cleanAll() {
     for (const cow of cows) {
         if (!cow.clean) {
             // Appel à l'API pour nettoyer la vache
-            fetch(`${API_URL}/cows/${cow.id}/clean`, {
-                headers: new Headers({
-                    Authorization: "Bearer " + jwt,
-                }),
-            });
+            fetchApiWithCredentials(`/cows/${cow.id}/clean`);
             cow.clean = true;
         }
     }
     updateActionMenuCosts();
 }
+
+initializeMeadow();
+
+document.addEventListener("click", (event) => {
+    const wrapper = document.querySelector(".actions-wrapper");
+    const menu = document.getElementById("actions-menu");
+
+    if (!wrapper || !menu) {
+        return;
+    }
+
+    if (!wrapper.contains(event.target)) {
+        menu.classList.remove("open");
+    }
+});
+
+document
+    .querySelector("button.menu-actions")
+    .addEventListener("click", toggleActionsMenu);

@@ -1,3 +1,5 @@
+import { loadScriptIfNeeded } from "/utils/fetch.js";
+
 class TfDialog extends HTMLElement {
     static get observedAttributes() {
         return ["modal", "title", "title-icon", "show"];
@@ -150,10 +152,7 @@ class TfDialog extends HTMLElement {
             </div>
         `;
 
-        const script = document.createElement("script");
-        script.src = "/components/tf-button.js";
-        document.getElementsByTagName("head")[0].appendChild(script);
-
+        loadScriptIfNeeded("/components/tf-button.js");
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(template.content.cloneNode(true));
         this.dialogElement = this.shadowRoot.querySelector(".dialog");

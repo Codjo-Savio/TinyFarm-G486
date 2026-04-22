@@ -1,8 +1,6 @@
-import { fetchApiWithCredentials } from "/utils/fetch.js";
+import { fetchApiWithCredentials, loadScriptIfNeeded } from "/utils/fetch.js";
 
 class TfAppBar extends HTMLElement {
-    API_URL = window.apiUrl || "http://localhost:8080/api";
-
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
@@ -18,20 +16,13 @@ class TfAppBar extends HTMLElement {
         this.update();
     }
 
-    getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(";").shift();
-    }
-
     async fetchUser() {
         try {
             const currentUserRes = await fetchApiWithCredentials("/auth/me");
             if (currentUserRes.status !== 200) throw new Error();
             return currentUserRes.json();
         } catch (e) {
-            // window.location.href = "/";
-            console.error(e);
+            window.location.href = "/";
             return null;
         }
     }
@@ -239,10 +230,7 @@ class TfAppBar extends HTMLElement {
             </div>
         `;
 
-        const script = document.createElement("script");
-        script.src = "/components/tf-dialog.js";
-        document.getElementsByTagName("head")[0].appendChild(script);
-
+        loadScriptIfNeeded("/components/tf-dialog.js");
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(template.content.cloneNode(true));
         this.appbarElement = this.shadowRoot.querySelector(".appbar");
