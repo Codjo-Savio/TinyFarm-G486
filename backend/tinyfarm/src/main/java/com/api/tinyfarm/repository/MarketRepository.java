@@ -11,6 +11,7 @@ public interface MarketRepository extends JpaRepository<Market, MarketID> {
     Optional<Market> findByUserId(Long userId);
     Optional<Market> findByProductId(Long productId);
     Optional<Market> findByPrice(float price);
+    Optional<Market> findByQuantity(int quantity);
     void deleteByUserIdAndProductId(Long userId, Long productId);
     void deleteByUserId(Long userId);
 }
