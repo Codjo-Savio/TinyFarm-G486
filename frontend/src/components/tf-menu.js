@@ -9,22 +9,22 @@ class TfMenu extends HTMLElement {
         super();
         this.attachShadow({ mode: "open" });
         this.rendered = false;
-        this.targetListeners = new Map();
-        this.targetElements = [];
+        this.targetElement = null;
+        this.targetClickListener = null;
         this.documentClickHandler = this.handleDocumentClick.bind(this);
         this.resizeHandler = this.updateMenuPosition.bind(this);
     }
 
     connectedCallback() {
         this.render();
-        this.bindTargetElements();
+        this.bindTargetElement();
         document.addEventListener("click", this.documentClickHandler);
         window.addEventListener("resize", this.resizeHandler);
         window.addEventListener("scroll", this.resizeHandler, true);
     }
 
     disconnectedCallback() {
-        this.unbindTargetElements();
+        this.unbindTargetElement();
         document.removeEventListener("click", this.documentClickHandler);
         window.removeEventListener("resize", this.resizeHandler);
         window.removeEventListener("scroll", this.resizeHandler, true);
@@ -91,57 +91,46 @@ class TfMenu extends HTMLElement {
         this.style.setProperty("--menu-open-max-height", `${finalHeight}px`);
     }
 
-    getPrimaryTargetElement() {
-        if (this.targetElements.length > 0) {
-            return this.targetElements[0];
-        }
-
-        return this;
-    }
-
     updateMenuPosition() {
-        if (!this.menuElement) {
+        if (!this.menuElement || !this.targetElement) {
             return;
         }
 
-        const targetElement = this.getPrimaryTargetElement();
-        if (!targetElement) {
-            return;
-        }
-
-        const targetRect = targetElement.getBoundingClientRect();
+        const targetRect = this.targetElement.getBoundingClientRect();
         this.menuElement.style.left = `${targetRect.left + this.offsetX}px`;
         this.menuElement.style.top = `${targetRect.bottom + this.offsetY}px`;
     }
 
-    bindTargetElements() {
-        this.unbindTargetElements();
+    bindTargetElement() {
+        this.unbindTargetElement();
 
-        if (!this.targetSlotElement) {
+        if (!this.targetSlotElements) {
             return;
         }
 
-        this.targetElements = this.targetSlotElement
-            .assignedElements({ flatten: true })
-            .filter((element) => element !== this);
+        const targets = this.targetSlotElements.assignedElements({
+            flatten: true,
+        });
+        this.targetElement = targets?.[0];
 
-        for (const element of this.targetElements) {
-            const listener = (event) => {
-                event.stopPropagation();
-                this.toggleMenu();
-            };
-            element.addEventListener("click", listener);
-            this.targetListeners.set(element, listener);
+        if (!this.targetElement) {
+            return;
         }
+
+        this.targetClickListener = () => this.toggleMenu();
+        this.targetElement.addEventListener("click", this.targetClickListener);
     }
 
-    unbindTargetElements() {
-        for (const [element, listener] of this.targetListeners.entries()) {
-            element.removeEventListener("click", listener);
+    unbindTargetElement() {
+        if (this.targetElement && this.targetClickListener) {
+            this.targetElement.removeEventListener(
+                "click",
+                this.targetClickListener,
+            );
         }
 
-        this.targetListeners.clear();
-        this.targetElements = [];
+        this.targetElement = null;
+        this.targetClickListener = null;
     }
 
     handleDocumentClick(event) {
@@ -221,15 +210,15 @@ class TfMenu extends HTMLElement {
         this.shadowRoot.appendChild(template.content.cloneNode(true));
         this.menuElement = this.shadowRoot.querySelector(".menu");
         this.groupsElement = this.shadowRoot.querySelector(".groups");
-        this.targetSlotElement = this.shadowRoot.querySelector(
+        this.targetSlotElements = this.shadowRoot.querySelector(
             'slot[name="menu-target"]',
         );
         this.groupSlotElement =
             this.shadowRoot.querySelector('slot[name="group"]');
         this.defaultSlotElement =
             this.shadowRoot.querySelector("slot:not([name])");
-        this.targetSlotElement.addEventListener("slotchange", () => {
-            this.bindTargetElements();
+        this.targetSlotElements.addEventListener("slotchange", () => {
+            this.bindTargetElement();
             this.updateMenuPosition();
         });
         this.groupSlotElement.addEventListener("slotchange", () => {

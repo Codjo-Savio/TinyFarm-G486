@@ -140,8 +140,8 @@ class TfAppBar extends HTMLElement {
                 line-height: 1;
             }
 
-            .appbar > .infos-right > tf-menu#account-menu {
-                z-index: 2;
+            .appbar {
+                z-index: 99;
             }
         `;
 
@@ -174,7 +174,7 @@ class TfAppBar extends HTMLElement {
                             <span id="username">-</span>
                             <img src="/assets/farmer-icon.png" alt="Avatar" />
                         </div>
-                        <tf-menu-group slot="group" legend="Compte">
+                        <tf-menu-group slot="group">
                             <tf-menu-entry
                                 id="rules"
                                 slot="entry"
@@ -182,31 +182,9 @@ class TfAppBar extends HTMLElement {
                                 href="/doc/rules?from=/dashboard"
                             >
                                 Règles du jeu
-                            </tf-menu-entry>
-                            <tf-menu-entry
-                                id="hibernate"
-                                slot="entry"
-                                icon="pause_circle"
-                            >
-                                Hiberner
-                            </tf-menu-entry>
-                            <tf-menu-entry
-                                id="logout"
-                                slot="entry"
-                                icon="logout"
-                            >
-                                Déconnexion
                             </tf-menu-entry>
                         </tf-menu-group>
                         <tf-menu-group slot="group" legend="Compte">
-                            <tf-menu-entry
-                                id="rules"
-                                slot="entry"
-                                icon="book"
-                                href="/doc/rules?from=/dashboard"
-                            >
-                                Règles du jeu
-                            </tf-menu-entry>
                             <tf-menu-entry
                                 id="hibernate"
                                 slot="entry"

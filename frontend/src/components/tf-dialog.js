@@ -46,7 +46,7 @@ class TfDialog extends HTMLElement {
 
             :host {
                 position: fixed;
-                z-index: 10;
+                z-index: 999;
             }
 
             .dialog {
