@@ -42,6 +42,7 @@ public class ChickenServiceTest {
             User.Gender.M,
             2000F,
             false,
+            null,
             1
         );
 
@@ -74,6 +75,7 @@ public class ChickenServiceTest {
             User.Gender.M,
             2000F,
             false,
+            null,
             1
         );
 
@@ -227,6 +229,7 @@ public class ChickenServiceTest {
             User.Gender.M,
             2000F,
             false,
+            null,
             1
         );
 

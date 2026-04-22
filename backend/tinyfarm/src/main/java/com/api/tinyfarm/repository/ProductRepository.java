@@ -12,4 +12,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCollectible(Boolean collectible);
 
     List<Product> findByCoefficient(Integer coefficient);
+
+    List<Product> findByDescription(String description);
 }

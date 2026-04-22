@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Cow extends Animal {
-
     public enum CowType {
         D("Dairy"),
         B("Beef"),

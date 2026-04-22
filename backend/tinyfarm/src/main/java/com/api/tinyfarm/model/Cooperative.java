@@ -6,22 +6,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "market")
+@Table(name = "Cooperative")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Market {
+public class Cooperative {
     @EmbeddedId
     @AttributeOverrides({
-            @AttributeOverride(name = "userId", column = @Column(name = "uid")),
-            @AttributeOverride(name = "productID", column = @Column(name = "product_id"))
+        @AttributeOverride(name = "userId", column = @Column(name = "uid")),
+        @AttributeOverride(name = "productID", column = @Column(name = "productID"))
     })
-    private MarketID marketId;
+    private CooperativeID cooperativeId;
 
     @Column(name = "uid", insertable = false, updatable = false)
     private Long userId;
 
-    @Column(name = "product_id", insertable = false, updatable = false)
+    @Column(name = "productID", insertable = false, updatable = false)
     private Long productId;
 
     @Column(name = "price")

@@ -48,64 +48,53 @@ async function initializeMeadow() {
         container.innerHTML = "";
 
         for (const cow of cows) {
+            let frenchCowType;
+            switch (cow.cowType) {
+                case "D":
+                    frenchCowType = "Vache laitière";
+                    break;
+                case "B":
+                    frenchCowType = "Bœuf";
+                    break;
+                case "C":
+                    frenchCowType = "Veau";
+                    break;
+                default:
+                    frenchCowType = "Inconnu";
+                    break;
+            }
+
             // Cartes individuelles pour chaque vache avec leurs états et actions
-            const animalCardHTML = `<div class="grid-container">
+            const animalCardHTML = `<tf-card>
                     <div class="grid-item">
                         <div class="animal-title">
                             ${cow.name}
-                            ${
-                                !cow.healthy && !cow.clean
-                                    ? `
-                                <div class="animal-state">
-                                    <span class="material-symbols-rounded">
-                                        heart_broken
-                                    </span>
-                                    <p> Malade</p>
-                                </div>
-                                <div class="animal-state">
-                                    <span class="material-symbols-rounded">
-                                        mop
-                                    </span>
-                                    <p> Sale</p>
-                                </div> `
-                                    : ""
-                            }${
-                                !cow.healthy && cow.clean
-                                    ? `
-                                <div class="animal-state">
-                                    <span class="material-symbols-rounded">
-                                        heart_broken
-                                    </span>
-                                    <p> Malade</p>
-                                </div>`
-                                    : ""
-                            }${
-                                cow.healthy && !cow.clean
-                                    ? `
-                                <div class="animal-state">
-                                    <span class="material-symbols-rounded">
-                                        mop
-                                    </span>
-                                    <p> Sale</p>
-                                </div>`
-                                    : ""
-                            }
+                            <div class="badges">
+                                ${
+                                    !cow.healthy
+                                        ? `<tf-pill icon="heart_broken">Malade</tf-pill>`
+                                        : ""
+                                }
+                                ${
+                                    !cow.clean
+                                        ? `<tf-pill icon="mop">Sale</tf-pill>`
+                                        : ""
+                                }
+                            </div>
                         </div>
                             <div class="animal-content">
                                 <div class="food-state">
                                     <span class="material-symbols-rounded">
                                         nutrition
                                     </span>
-                                    <div class="food-state-line-place-holder">
-                                        <div class="food-state-line" style="width: ${cow.fedToday ? 100 : 0}%;"></div>
-                                    </div>
+                                    <tf-progress-bar value="${cow.fedToday ? 100 : 0}"></tf-progress-bar>
                                 </div>
                                 <div class="animal-type">
                                     <span class="material-symbols-rounded">
                                         info
                                     </span>
                                     <div class="animal-type-text">
-                                        <p>${cow.cowType === null ? "Inconnu" : cow.cowType}</p>
+                                        <p>${frenchCowType}</p>
                                     </div>
                                 </div>
                                 <div class="animal-weight">
@@ -126,13 +115,13 @@ async function initializeMeadow() {
                                 </div>
                                 </div>
                             <div class="animal-actions">
-                                    <button class="action-button" active="${!cow.fedToday}">Nourrir : <span class="material-symbols-rounded coin-icon">paid</span> 5</button>
-                                    <button class="action-button" active="${!cow.wateredToday}">Abreuver : <span class="material-symbols-rounded coin-icon">paid</span> 2</button>
-                                <button class="action-button" active="${!cow.healthy}">Soigner : <span class="material-symbols-rounded coin-icon">paid</span> 6</button>
-                                <button class="action-button" active="${!cow.clean}">Nettoyer : <span class="material-symbols-rounded coin-icon">paid</span> 3</button>
+                                ${!cow.fedToday ? "<tf-button>$5 Nourrir</tf-button>" : ""}
+                                ${!cow.wateredToday ? "<tf-button>$2 Abreuver</tf-button>" : ""}
+                                ${!cow.healthy ? "<tf-button>$6 Soigner</tf-button>" : ""}
+                                ${!cow.clean ? "<tf-button>$3 Nettoyer</tf-button>" : ""}
                             </div>
                         </div>
-                    </div>`;
+                    </tf-card>`;
             container.insertAdjacentHTML("beforeend", animalCardHTML);
             if (cow.healthy) {
                 healthyCount++;

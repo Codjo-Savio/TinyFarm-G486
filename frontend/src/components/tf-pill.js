@@ -6,9 +6,25 @@ class TfPill extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
+        this.rendered = false;
+    }
 
-        this.shadowRoot.innerHTML = `
-        <style>
+    connectedCallback() {
+        this.render();
+        this.update();
+    }
+
+    attributeChangedCallback() {
+        this.update();
+    }
+
+    render() {
+        if (this.rendered) {
+            return;
+        }
+
+        const style = document.createElement("style");
+        style.textContent = `
             .material-symbols-rounded {
                 font-family: "Material Symbols Rounded";
                 font-weight: normal;
@@ -30,7 +46,7 @@ class TfPill extends HTMLElement {
                 display: inline-block;
             }
 
-            .tf-pill {
+            .pill {
                 border-radius: 100px;
                 display: flex;
                 gap: 6px;
@@ -43,25 +59,23 @@ class TfPill extends HTMLElement {
                 font-weight: bold;
             }
 
-            .tf-pill.gold {
+            .pill.gold {
                 background-color: var(--color-gold);
                 color: var(--color-gold-dark);
             }
-        </style>
-
-        <div class="tf-pill">
-            <slot></slot>
-        </div>
         `;
-        this.tfPill = this.shadowRoot.querySelector("div.tf-pill");
-    }
 
-    connectedCallback() {
-        this.update();
-    }
+        const template = document.createElement("template");
+        template.innerHTML = `
+            <div class="pill">
+                <slot></slot>
+            </div>
+        `;
 
-    attributeChangedCallback() {
-        this.update();
+        this.shadowRoot.appendChild(style);
+        this.shadowRoot.appendChild(template.content.cloneNode(true));
+        this.pillElement = this.shadowRoot.querySelector("div.pill");
+        this.rendered = true;
     }
 
     get variant() {
@@ -73,18 +87,22 @@ class TfPill extends HTMLElement {
     }
 
     update() {
-        this.tfPill.className = `tf-pill ${this.variant}`;
+        if (!this.pillElement) {
+            return;
+        }
 
-        const currentIcon = this.tfPill.querySelector(
+        this.pillElement.className = `pill ${this.variant}`;
+
+        const currentIcon = this.pillElement.querySelector(
             ".material-symbols-rounded",
         );
         if (this.icon) {
             const icon = currentIcon ?? document.createElement("span");
             icon.classList.add("material-symbols-rounded");
             icon.textContent = this.icon;
-            this.tfPill.prepend(icon);
+            this.pillElement.prepend(icon);
         } else if (currentIcon) {
-            this.tfPill.removeChild(currentIcon);
+            this.pillElement.removeChild(currentIcon);
         }
     }
 }

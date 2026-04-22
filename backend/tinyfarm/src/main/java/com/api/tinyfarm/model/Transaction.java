@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Transaction {
-
     @Id
     @Column(name = "tid")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

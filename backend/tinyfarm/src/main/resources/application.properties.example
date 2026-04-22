@@ -1,15 +1,17 @@
-spring.security.oauth2.client.registration.github.client-id=
-spring.security.oauth2.client.registration.github.client-secret=
-spring.security.oauth2.client.registration.github.scope=read:user,user:email
+# Port
+server.port=8080
 
-jwt.secret=
-jwt.expiration-ms=
+# OAuth2 GitHub
+spring.security.oauth2.client.registration.github.client-id=Ov23liHIjnb2FMYkMGGZ
+spring.security.oauth2.client.registration.github.client-secret=43875e45a7cf1fc104f0a06b312e360c18e9d962
+spring.security.oauth2.client.registration.github.scope=read:user, user:email
+jwt.secret=£*@TinyFarmAppSecret!@G486M!ThisIs@Secret&
 
+#spring.security.jwt.expiration-ms=10000
 spring.security.oauth2.client.provider.github.authorization-uri=https://github.com/login/oauth/authorize
 spring.security.oauth2.client.provider.github.token-uri=https://github.com/login/oauth/access_token
 spring.security.oauth2.client.provider.github.user-info-uri=https://api.github.com/user
-spring.security.oauth2.client.registration.github.redirect-uri={baseUrl}/api/auth/login/oauth2/code/github
-tinyfarm.frontend.url=http://localhost:3000
+tinyfarm.frontend.url=http://localhost:3000/dashboard
 
 spring.application.name=tinyfarm
 spring.datasource.url=jdbc:h2:mem:tinyfarmdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
