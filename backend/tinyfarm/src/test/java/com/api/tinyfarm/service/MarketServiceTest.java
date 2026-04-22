@@ -28,12 +28,14 @@ public class MarketServiceTest {
         market.setUserId(1L);
         market.setProductId(10L);
         market.setPrice(25.0f);
+        market.setQuantity(100);
 
         Market created = marketService.create(market);
 
         assertNotNull(created.getMarketId());
         assertEquals(1L, created.getUserId());
         assertEquals(10L, created.getProductId());
+        assertEquals(100, created.getQuantity());
     }
 
     @Test

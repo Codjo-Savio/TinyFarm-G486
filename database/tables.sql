@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS "user" (
     gender VARCHAR(20) CHECK (gender IN ('M', 'F')),
     ecus INTEGER,
     hibernation BOOLEAN DEFAULT FALSE,
+    hibernationDate TIMESTAMP,
     level INTEGER DEFAULT 1
 );
 
@@ -80,6 +81,7 @@ CREATE TABLE IF NOT EXISTS market (
     uid INTEGER NOT NULL REFERENCES "user" (uid) ON DELETE CASCADE ON UPDATE CASCADE,
     product_id INTEGER NOT NULL REFERENCES product (product_id) ON DELETE CASCADE ON UPDATE CASCADE,
     price FLOAT NOT NULL,
+    quantity INTEGER,
     PRIMARY KEY (uid, product_id)
 );
 

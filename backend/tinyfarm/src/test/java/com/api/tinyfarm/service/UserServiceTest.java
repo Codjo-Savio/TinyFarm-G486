@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -79,5 +82,67 @@ public class UserServiceTest {
 
         User updated = userService.findById(created.getId());
         assertTrue(updated.getHibernation());
+    }
+
+    @Test
+    void shouldDeleteExpiredHibernations() {
+        User expiredUser = new User();
+        expiredUser.setName("Expired");
+        expiredUser.setEmail("expired@gmail.com");
+        expiredUser.setGender(User.Gender.M);
+        expiredUser.setHibernation(true);
+        expiredUser.setHibernationDate(LocalDateTime.now().minusDays(51));
+        userService.create(expiredUser);
+
+        User recentUser = new User();
+        recentUser.setName("Recent");
+        recentUser.setEmail("recent@gmail.com");
+        recentUser.setGender(User.Gender.F);
+        recentUser.setHibernation(true);
+        recentUser.setHibernationDate(LocalDateTime.now().minusDays(10));
+        userService.create(recentUser);
+
+        User activeUser = new User();
+        activeUser.setName("Active");
+        activeUser.setEmail("active@gmail.com");
+        activeUser.setGender(User.Gender.F);
+        userService.create(activeUser);
+
+        userService.deleteExpiredHibernations();
+
+        assertEquals(2, userService.findAll().size());
+        assertThrows(RuntimeException.class, () -> userService.findByEmail("expired@gmail.com"));
+        assertNotNull(userService.findByEmail("recent@gmail.com"));
+        assertNotNull(userService.findByEmail("active@gmail.com"));
+    }
+
+    @Test
+    void shouldFindOrCreateUser() {
+        User created = userService.findOrCreateOAuthUser(
+                "oauth@gmail.com",
+                "OAuth User",
+                User.Gender.M
+        );
+
+        assertNotNull(created.getId());
+        assertEquals("OAuth User", created.getName());
+        assertEquals("oauth@gmail.com", created.getEmail());
+        assertEquals(User.Gender.M, created.getGender());
+        assertFalse(created.getHibernation());
+
+        userService.hibernate(created.getId());
+
+        User found = userService.findOrCreateOAuthUser(
+                "oauth@gmail.com",
+                "Updated OAuth User",
+                User.Gender.F
+        );
+
+        assertEquals(created.getId(), found.getId());
+        assertEquals("Updated OAuth User", found.getName());
+        assertEquals(User.Gender.F, found.getGender());
+        assertFalse(found.getHibernation());
+        assertNull(found.getHibernationDate());
+        assertEquals(1, userService.findAll().size());
     }
 }
