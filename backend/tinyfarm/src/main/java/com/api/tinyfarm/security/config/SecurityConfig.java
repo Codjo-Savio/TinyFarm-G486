@@ -5,6 +5,7 @@ import com.api.tinyfarm.security.jwt.JwtRequestFilter;
 import com.api.tinyfarm.security.oauth.CustomOAuth2UserService;
 import com.api.tinyfarm.security.oauth.OAuth2FailureHandler;
 import com.api.tinyfarm.security.oauth.OAuth2SuccessHandler;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -53,7 +54,8 @@ public class SecurityConfig {
                 new ClearSiteDataHeaderWriter(Directive.COOKIES));
         http.logout((logout) -> logout
                 .logoutUrl("/api/auth/logout")
-                .logoutSuccessUrl("/")
+                .logoutSuccessHandler(
+                        (request, response, authentication) -> response.setStatus(HttpServletResponse.SC_NO_CONTENT))
                 .deleteCookies("jwt", "JSESSIONID")
                 .invalidateHttpSession(true)
                 .addLogoutHandler(clearSiteData)

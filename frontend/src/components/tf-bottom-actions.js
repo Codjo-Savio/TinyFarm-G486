@@ -1,6 +1,5 @@
 class TfBottomActions extends HTMLElement {
     FAKE_API_URL = "/fakeapi";
-    API_URL = window.apiUrl || "http://localhost:8080/api";
     timeIntervalId;
 
     static get observedAttributes() {
