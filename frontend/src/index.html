@@ -7,8 +7,11 @@
         <link rel="icon" href="/assets/logo-128-rounded.png" />
         <!-- Config -->
         <script src="/config.js"></script>
+        <!-- Components -->
+        <script type="module" src="/components/tf-button.js"></script>
+        <script type="module" src="/components/tf-pill.js"></script>
         <!-- Theme -->
-        <link rel="stylesheet" href="/styles/theme.css" />
+        <link rel="stylesheet" href="/utils/theme.css" />
         <!-- Font -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -18,9 +21,7 @@
         />
         <!-- Custom page style and script -->
         <link rel="stylesheet" href="style.css" />
-        <script src="script.js" defer></script>
-        <script src="/components/tf-button.js"></script>
-        <script src="/components/tf-pill.js"></script>
+        <script type="module" src="script.js"></script>
     </head>
 
     <body>
@@ -256,11 +257,7 @@
                         class="cow-img"
                     />
                 </div>
-                <tf-button
-                    id="github"
-                    onclick="auth()"
-                    size="large"
-                    variant="secondary"
+                <tf-button id="github" size="large" variant="secondary"
                     >Connexion avec Github</tf-button
                 >
             </div>
