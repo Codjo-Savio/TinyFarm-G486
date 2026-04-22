@@ -23,7 +23,7 @@
         />
         <!-- Custom page style and script -->
         <link rel="stylesheet" href="style.css" />
-        <script type="module" src="script.js" defer></script>
+        <script type="module" src="script.js"></script>
     </head>
 
     <body>
@@ -54,7 +54,8 @@
                             icon="sell"
                             variant="secondary"
                             onclick="
-                                window.location.href = '/dashboard/trade/sell'
+                                window.location.href =
+                                    '/dashboard/management/assets'
                             "
                         >
                             Vendre
@@ -80,9 +81,9 @@
                                         id="totalPrice"
                                     ></span>
                                     <tf-button
+                                        id="pay-btn"
                                         icon="payment"
                                         variant="primary"
-                                        onclick="payerPanier()"
                                     >
                                         Payer
                                     </tf-button>

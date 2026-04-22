@@ -1,12 +1,9 @@
-const API_BASE_URL = window.APP_CONFIG?.API_BASE_URL ?? window.API_BASE_URL ?? "";
+import { fetchApiWithCredentials } from "/utils/fetch.js";
+
 const FAKE_MARKET_URL = "/fakeapi/trade/marketplace.json";
 
-function apiUrl(path) {
-    return `${API_BASE_URL}${path}`;
-}
-
 async function fetchAllMarkets() {
-    const response = await fetch(apiUrl("/api/market"));
+    const response = await fetchApiWithCredentials("/market");
     if (!response.ok) {
         throw new Error(`Erreur HTTP : ${response.status}`);
     }
@@ -30,7 +27,9 @@ function shouldUseFakePreview() {
 }
 
 async function fetchMarketByProductId(productId) {
-    const response = await fetch(apiUrl(`/api/market/product/${productId}`));
+    const response = await fetchApiWithCredentials(
+        `/market/product/${productId}`,
+    );
     if (!response.ok) {
         return null;
     }
@@ -43,7 +42,7 @@ async function fetchMarketsGroupedByProduct(sourceMarkets) {
         : await fetchAllMarkets();
 
     // Même produit à la suite
-    const productIds = [...new Set(allMarkets.map(m => m.productId))].sort(
+    const productIds = [...new Set(allMarkets.map((m) => m.productId))].sort(
         (a, b) => a - b,
     );
 
@@ -51,7 +50,7 @@ async function fetchMarketsGroupedByProduct(sourceMarkets) {
     // Comme l'endpoint renvoie un seul Market, on conserve /api/market pour toutes les offres.
     const referenceByProduct = new Map();
     await Promise.all(
-        productIds.map(async productId => {
+        productIds.map(async (productId) => {
             try {
                 const ref = await fetchMarketByProductId(productId);
                 if (ref) {
@@ -63,9 +62,9 @@ async function fetchMarketsGroupedByProduct(sourceMarkets) {
         }),
     );
 
-    return productIds.flatMap(productId => {
+    return productIds.flatMap((productId) => {
         const group = allMarkets
-            .filter(m => m.productId === productId)
+            .filter((m) => m.productId === productId)
             .sort((a, b) => a.userId - b.userId);
 
         // Si une référence est trouvée via /product/{id}, la mettre en tête
@@ -73,7 +72,7 @@ async function fetchMarketsGroupedByProduct(sourceMarkets) {
         if (!ref) return group;
 
         const idx = group.findIndex(
-            m =>
+            (m) =>
                 m.userId === ref.userId &&
                 m.productId === ref.productId &&
                 m.price === ref.price &&
@@ -102,7 +101,7 @@ function setTotalStock(totalStock) {
 function renderEmptyMarket(container) {
     container.innerHTML = `
         <div class="empty-market-state">
-            <span class="material-symbols-rounded empty-market-icon">storefront</span>
+            <span class="material-symbols-rounded empty-market-icon">air</span>
             <h2>Aucun article disponible</h2>
             <p>Le marché est vide pour le moment. Revenez un peu plus tard.</p>
         </div>
@@ -114,11 +113,9 @@ async function initialiserBoutique() {
 
     try {
         const forceFakePreview = shouldUseFakePreview();
-        const realMarkets = forceFakePreview ? [] : await fetchAllMarkets();
-        const fakeMarkets = await fetchFakeMarkets();
-
-        const sourceMarkets =
-            realMarkets.length > 0 ? realMarkets : fakeMarkets;
+        const sourceMarkets = forceFakePreview
+            ? await fetchFakeMarkets()
+            : await fetchAllMarkets();
 
         markets = await fetchMarketsGroupedByProduct(sourceMarkets);
 
@@ -131,7 +128,7 @@ async function initialiserBoutique() {
             return;
         }
 
-        markets.forEach(market => {
+        markets.forEach((market) => {
             const stock = Number(market.quantity);
             const nom = `Produit ${market.productId}`; // À remplacer par vraie récupération du nom si possible
             const seller = `Utilisateur ${market.userId}`;
@@ -165,7 +162,7 @@ async function initialiserBoutique() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", initialiserBoutique);
+initialiserBoutique();
 
 // Partie panier
 let markets = [];
@@ -227,7 +224,9 @@ displayPanier();
 
 function ajouterAuPanier(productId, userId) {
     const market = markets.find(
-        m => Number(m.productId) === Number(productId) && Number(m.userId) === Number(userId),
+        (m) =>
+            Number(m.productId) === Number(productId) &&
+            Number(m.userId) === Number(userId),
     );
 
     if (!market) {
@@ -281,7 +280,7 @@ async function payerPanier() {
     const payButton = document.querySelector(
         ".cart-actions tf-button[icon='payment']",
     );
-    
+
     if (!buyerId) {
         alert("Utilisateur non identifié. Impossible de procéder.");
         return;
@@ -311,18 +310,15 @@ async function payerPanier() {
             };
 
             try {
-                const createResponse = await fetch(
-                    apiUrl("/api/transaction"),
-                    {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify(transaction),
-                    }
+                const createResponse = await fetchApiWithCredentials(
+                    "/transaction",
+                    "POST",
+                    JSON.stringify(transaction),
                 );
 
                 if (!createResponse.ok) {
                     throw new Error(
-                        `Erreur création transaction: ${createResponse.status}`
+                        `Erreur création transaction: ${createResponse.status}`,
                     );
                 }
 
@@ -332,10 +328,10 @@ async function payerPanier() {
             } catch (err) {
                 console.error(
                     `Erreur transaction produit ${item.productId}:`,
-                    err
+                    err,
                 );
                 alert(
-                    `Erreur lors de la création de la transaction pour le produit ${item.productId}`
+                    `Erreur lors de la création de la transaction pour le produit ${item.productId}`,
                 );
                 continue;
             }
@@ -345,9 +341,9 @@ async function payerPanier() {
         for (const tid of transactionIds) {
             try {
                 // Appel sell: le vendeur perd le stock
-                const sellResponse = await fetch(
-                    apiUrl(`/api/stocks/sell/${tid}`),
-                    { method: "POST" }
+                const sellResponse = await fetchApiWithCredentials(
+                    `/stocks/sell/${tid}`,
+                    "POST",
                 );
 
                 if (!sellResponse.ok) {
@@ -355,9 +351,9 @@ async function payerPanier() {
                 }
 
                 // Appel buy: l'acheteur reçoit le stock
-                const buyResponse = await fetch(
-                    apiUrl(`/api/stocks/buy/${tid}`),
-                    { method: "POST" }
+                const buyResponse = await fetchApiWithCredentials(
+                    `/stocks/buy/${tid}`,
+                    "POST",
                 );
 
                 if (!buyResponse.ok) {
@@ -366,9 +362,12 @@ async function payerPanier() {
 
                 successCount++;
             } catch (err) {
-                console.error(`Erreur transfert stock pour transaction ${tid}:`, err);
+                console.error(
+                    `Erreur transfert stock pour transaction ${tid}:`,
+                    err,
+                );
                 alert(
-                    `Erreur lors du transfert de stock pour la transaction ${tid}`
+                    `Erreur lors du transfert de stock pour la transaction ${tid}`,
                 );
                 continue;
             }
@@ -377,14 +376,14 @@ async function payerPanier() {
         // 3. Afficher le résultat et vider le panier si succès
         if (successCount === totalTransactions && totalTransactions > 0) {
             alert(
-                `✓ Paiement réussi! ${successCount} transaction(s) complétée(s).`
+                `✓ Paiement réussi! ${successCount} transaction(s) complétée(s).`,
             );
             Object.keys(panier).forEach((key) => delete panier[key]);
             displayPanier();
             await initialiserBoutique(); // Actualiser la liste des produits
         } else if (successCount > 0) {
             alert(
-                `⚠ Paiement partiel: ${successCount}/${totalTransactions} transaction(s) complétée(s).`
+                `⚠ Paiement partiel: ${successCount}/${totalTransactions} transaction(s) complétée(s).`,
             );
         } else {
             alert("✗ Aucune transaction n'a pu être complétée.");
@@ -397,3 +396,5 @@ async function payerPanier() {
         payButton?.removeAttribute("loading");
     }
 }
+
+document.querySelector("#pay-btn").addEventListener("click", payerPanier);
