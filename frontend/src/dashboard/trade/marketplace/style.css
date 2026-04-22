@@ -154,7 +154,7 @@ h1.page-title {
     height: 100%;
     min-height: 0;
     padding-top: 5px;
-    padding-bottom: 20px;
+    padding-bottom: 0;
     overflow: hidden;
 }
 
@@ -163,7 +163,7 @@ h1.page-title {
     flex-direction: column;
     height: 100%;
     padding-top: 0;
-    padding-bottom: 20px;
+    padding-bottom: 0;
     min-width: 0;
 }
 
@@ -171,11 +171,12 @@ h1.page-title {
     background-color: var(--color-surface-dark);
     border-radius: var(--border-radius);
     padding: 20px;
-    padding-bottom: 30px;
+    padding-bottom: 20px;
     display: flex;
     flex-direction: column;
     gap: 25px;
-    flex: 0;
+    flex: 1;
+    height: 100%;
 }
 
 .cart-total-box {
@@ -223,20 +224,11 @@ h1.page-title {
     flex-direction: column;
     gap: 12px;
     padding: 0 5px;
-    height: 155px;
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 10px;
-    -webkit-mask-image: linear-gradient(
-        to bottom,
-        black calc(100% - 30px),
-        transparent 100%
-    );
-    mask-image: linear-gradient(
-        to bottom,
-        black calc(100% - 30px),
-        transparent 100%
-    );
 }
 
 .cart-item {
@@ -313,7 +305,7 @@ h1.page-title {
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 15px;
-    padding-bottom: 120px;
+    padding-bottom: 15px;
     min-width: 0;
 }
 
@@ -327,6 +319,37 @@ h1.page-title {
     justify-content: space-between;
     align-items: center;
     flex-shrink: 0;
+}
+
+.empty-market-state {
+    background-color: var(--color-surface-dark);
+    border-radius: var(--border-radius);
+    min-height: 280px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 35px 25px;
+    text-align: center;
+    color: var(--color-primary);
+}
+
+.empty-market-icon {
+    font-size: 54px;
+    color: var(--color-gold-dark);
+}
+
+.empty-market-state h2 {
+    font-size: 32px;
+    margin: 0;
+}
+
+.empty-market-state p {
+    font-size: 20px;
+    opacity: 0.85;
+    margin: 0;
 }
 
 .prod-info {

@@ -55,12 +55,9 @@
                         </span>
                         <a
                             onclick="
-                                window.location.href = window.location.search
-                                    ? window.location.search.replace(
-                                          '?from=',
-                                          '',
-                                      )
-                                    : '/dashboard/management/assets'
+                                window.location.href =
+                                    '/dashboard/management/assets' +
+                                    '?from=/dashboard/trade/marketplace'
                             "
                             class="btn-back"
                             ><span class="material-symbols-rounded">
@@ -88,7 +85,12 @@
                                         class="total-price"
                                         id="totalPrice"
                                     ></span>
-                                    <button class="btn-pay">Payer</button>
+                                    <button
+                                        class="btn-pay"
+                                        onclick="payerPanier()"
+                                    >
+                                        Payer
+                                    </button>
                                 </div>
                             </div>
 
