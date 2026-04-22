@@ -7,10 +7,11 @@ function getCookie(name) {
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(";").shift();
 }
+
 const MAX_RABBITS = 50;
 
 async function initializeHutch() {
-    const jwt = getCookie("jwt"); // ← manquait cette ligne !
+    const jwt = getCookie("jwt");
     if (!jwt) {
         console.error("JWT introuvable : pas connecté");
         return;
@@ -20,196 +21,162 @@ async function initializeHutch() {
         const response = await fetch(`${API_URL}/rabbits`, {
             headers: { Authorization: "Bearer " + jwt },
         });
-       
+
         if (!response.ok) throw new Error(`Erreur API : ${response.status}`);
 
-        const rabbits = await response.json();
+        rabbits = await response.json();
         console.log("Lapins reçus :", rabbits);
-        // verification de la structure des données
+
         if (!Array.isArray(rabbits)) {
-            throw new Error("Format API invalide: tableau de lapins attendu");
-        }
-        // --- Compteurs dans taskbar-right ---
-        const lapins = rabbits.filter((r) => r.rabbitType === "lapin");
-        const lapereaux = rabbits.filter((r) => r.rabbitType === "lapereau");
-        // document.getElementById("rabbit-count").textContent = lapins.length;
-        // document.getElementById("baby-rabbit-count").textContent = lapereaux.length;
-        const taskbarRight = document.querySelector(".taskbar-right");
-        taskbarRight.innerHTML = `
-            <div>
-                <span class="material-symbols-rounded">cruelty_free</span>
-                <p id="rabbit-count">${lapins.length}/${MAX_RABBITS}</p>
-                <p>Lapins</p>
-            </div>
-            <div>
-                <span class="material-symbols-rounded">cruelty_free</span>
-                <p id="baby-rabbit-count">${lapereaux.length}/${MAX_RABBITS}</p>
-                <p>Lapereaux</p>
-            </div>
-            <button class="sell-button">
-                <span class="material-symbols-rounded">sell</span>Vendre
-            </button>
-            <div class="dropdown">
-                <button id="more-actions-btn" class="more-actions-button">
-                    <span class="material-symbols-rounded">more_horiz</span>
-                </button>
-                <div id="more-actions-content" class="dropdown-content">
-                    <button id="feed-all-btn">Nourrir</button>
-                    <button id="water-all-btn">Abreuver</button>
-                    <button id="heal-all-btn">Soigner</button>
-                    <button id="clean-all-btn">Nettoyer</button>
-                </div>
-            </div>
-        `;
-
-        //Affiche le menu déroulant
-        initDropdown();
-        const container = document.querySelector(".grid-container");
-        if (!container) {
-            return;
+            throw new Error("Format API invalide");
         }
 
-        container.innerHTML = rabbits
-            .map(
-                (rabbit) => `
-            <div class="grid-item">
+        // --- Calcul des stats ---
+        const lapinCards = rabbits.filter((r) => r.rabbitType === "lapin");
+        const lapereauCards = rabbits.filter((r) => r.rabbitType === "lapereau");
+        const healthyCount = rabbits.filter((r) => r.healthy).length;
+        const cleanCount = rabbits.filter((r) => r.clean).length;
+        const sickPercent = Math.round(((rabbits.length - healthyCount) / rabbits.length) * 100) || 0;
+        const dirtyPercent = Math.round(((rabbits.length - cleanCount) / rabbits.length) * 100) || 0;
+
+        // --- Mise à jour des stats ---
+        document.getElementById("sick-count").textContent = sickPercent + "%";
+        document.getElementById("dirty-count").textContent = dirtyPercent + "%";
+        document.getElementById("total-count").textContent = rabbits.length;
+
+        // --- Cartes lapins ---
+        const container = document.getElementById("game-grid");
+        if (!container) return;
+
+        const renderGroup = (group) => group.map((rabbit) => `
+            <tf-card>
                 <div class="animal-title">
-                    <h2>${rabbit.name}</h2>
-                    <div class="animal-state-bar">
-                        ${
-                            !rabbit.healthy
-                                ? `
-                            <div class="animal-state">
-                                <span class="material-symbols-rounded">heart_broken</span>
-                                <p>Malade</p>
-                            </div>`
-                                : ""
-                        }
-                        ${
-                            !rabbit.fedToday
-                                ? `
-                            <div class="animal-state">
-                                <span class="material-symbols-rounded">no_meals</span>
-                                <p>Affamé</p>
-                            </div>`
-                                : ""
-                        }
-                        ${
-                            !rabbit.wateredToday
-                                ? `
-                            <div class="animal-state">
-                                <span class="material-symbols-rounded">water_off</span>
-                                <p>Assoiffé</p>
-                            </div>`
-                                : ""
-                        }
-                        ${
-                            !rabbit.clean
-                                ? `
-                            <div class="animal-state">
-                                <span class="material-symbols-rounded">cleaning_bucket</span>
-                                <p>Sale</p>
-                            </div>`
-                                : ""
-                        }
+                    ${rabbit.name}
+                    <div class="badges">
+                        ${!rabbit.healthy ? `<tf-pill icon="heart_broken">Malade</tf-pill>` : ""}
+                        ${!rabbit.clean ? `<tf-pill icon="mop">Sale</tf-pill>` : ""}
                     </div>
                 </div>
                 <div class="animal-content">
                     <div class="food-state">
                         <span class="material-symbols-rounded">nutrition</span>
-                        <div class="food-state-line-place-holder">
-                            <div class="food-state-line" style="width: ${rabbit.fedToday ? 100 : 20}%;"></div>
-                        </div>
+                        <tf-progress-bar progress="${rabbit.fedToday ? 100 : 20}"></tf-progress-bar>
                     </div>
-                    <div class="animal-type">
+                    <div>
                         <span class="material-symbols-rounded">info</span>
-                        <div class="animal-type-text">
-                            <p>${rabbit.rabbitType === "lapin" ? "Lapin" : "Lapereau"}</p>
-                        </div>
+                        <p>${rabbit.rabbitType === "lapin" ? "Lapin" : "Lapereau"}</p>
                     </div>
-                    <div class="animal-sex">
-                        <span class="material-symbols-rounded">
-                            ${rabbit.gender === "F" ? "female" : "male"}
-                        </span>
-                        <div class="animal-sex-text">
-                            <p>${rabbit.gender === "F" ? "Femelle" : "Mâle"}</p>
-                        </div>
+                    <div>
+                        <span class="material-symbols-rounded">${rabbit.gender === "F" ? "female" : "male"}</span>
+                        <p>${rabbit.gender === "F" ? "Femelle" : "Mâle"}</p>
                     </div>
                 </div>
                 <div class="animal-actions">
-                    <button class="action-button" onclick="feedRabbit(${rabbit.id})">Nourrir</button>
-                    <button class="action-button" onclick="waterRabbit(${rabbit.id})">Abreuver</button>
-                    <button class="action-button" onclick="healRabbit(${rabbit.id})">Soigner</button>
-                    <button class="action-button" onclick="cleanRabbit(${rabbit.id})">Nettoyer</button>
+                    ${!rabbit.fedToday ? `<tf-button onclick="feedRabbit(${rabbit.id})">Nourrir</tf-button>` : ""}
+                    ${!rabbit.wateredToday ? `<tf-button onclick="waterRabbit(${rabbit.id})">Abreuver</tf-button>` : ""}
+                    ${!rabbit.healthy ? `<tf-button onclick="healRabbit(${rabbit.id})">Soigner</tf-button>` : ""}
+                    ${!rabbit.clean ? `<tf-button onclick="cleanRabbit(${rabbit.id})">Nettoyer</tf-button>` : ""}
                 </div>
-            </div>
-        `,
-            )
-            .join("");
+            </tf-card>
+        `).join("");
 
+        const lapinSick = Math.round((lapinCards.filter((r) => !r.healthy).length / lapinCards.length) * 100) || 0;
+        const lapinDirty = Math.round((lapinCards.filter((r) => !r.clean).length / lapinCards.length) * 100) || 0;
+        const lapereauSick = Math.round((lapereauCards.filter((r) => !r.healthy).length / lapereauCards.length) * 100) || 0;
+        const lapereauDirty = Math.round((lapereauCards.filter((r) => !r.clean).length / lapereauCards.length) * 100) || 0;
+
+        container.innerHTML = `
+            ${lapereauCards.length > 0 ? `
+                <div class="group-header">
+                    <h2>Lapereaux</h2>
+                    <tf-pill icon="cruelty_free">${lapereauCards.length}/${MAX_RABBITS}</tf-pill>
+                    <tf-pill icon="heart_broken">Malade : ${lapereauSick}%</tf-pill>
+                    <tf-pill icon="mop">Sale : ${lapereauDirty}%</tf-pill>
+                </div>
+                <div class="game-grid-group">
+                    ${renderGroup(lapereauCards)}
+                </div>
+            ` : ""}
+            ${lapinCards.length > 0 ? `
+                <div class="group-header">
+                    <h2>Lapins</h2>
+                    <tf-pill icon="cruelty_free">${lapinCards.length}/${MAX_RABBITS}</tf-pill>
+                    <tf-pill icon="heart_broken">Malade : ${lapinSick}%</tf-pill>
+                    <tf-pill icon="mop">Sale : ${lapinDirty}%</tf-pill>
+                </div>
+                <div class="game-grid-group">
+                    ${renderGroup(lapinCards)}
+                </div>
+            ` : ""}
+        `;
+
+        updateActionMenuCosts();
         console.log("Lapins affichés !");
+
     } catch (error) {
-        console.error("Erreur lors de l'initialisation du clapier :", error);
+        console.error("Erreur :", error);
     }
 }
 
-// Dropdown menu
-function initDropdown() {
-    const button = document.getElementById("more-actions-btn");
-    const menu = document.getElementById("more-actions-content");
+function updateActionMenuCosts() {
+    const feedBtn = document.getElementById("feed-btn");
+    const waterBtn = document.getElementById("water-btn");
+    const healBtn = document.getElementById("heal-btn");
+    const cleanBtn = document.getElementById("clean-btn");
 
-    button.addEventListener("click", (event) => {
-        event.stopPropagation();
-        menu.classList.toggle("grid");
-    });
+    if (!feedBtn || !waterBtn || !healBtn || !cleanBtn) return;
 
-    menu.addEventListener("click", (event) => {
-        event.stopPropagation();
-    });
+    const hungryCount = rabbits.filter(r => !r.fedToday).length;
+    const thirstyCount = rabbits.filter(r => !r.wateredToday).length;
+    const sickCount = rabbits.filter(r => !r.healthy).length;
+    const dirtyCount = rabbits.filter(r => !r.clean).length;
 
-    document.addEventListener("click", () => {
-        menu.classList.remove("grid");
-    });
+    feedBtn.textContent = `Nourrir : ${hungryCount * 5} $`;
+    waterBtn.textContent = `Abreuver : ${thirstyCount * 2} $`;
+    healBtn.textContent = `Soigner : ${sickCount * 6} $`;
+    cleanBtn.textContent = `Nettoyer : ${dirtyCount * 3} $`;
 }
 
 document.addEventListener("DOMContentLoaded", initializeHutch);
 
-
+async function fetchCurrentUserId() {
+    const jwt = getCookie("jwt");
+    const response = await fetch(`${API_URL}/auth/me`, {
+        headers: { Authorization: "Bearer " + jwt },
+    });
+    if (!response.ok) throw new Error(`Échec : ${response.status}`);
+    const user = await response.json();
+    return user.id;
+}
 
 async function feedRabbit(rabbitId) {
-    const userId = await fetchCurrentUserId();
-    const jwt = getCookie("jwt");
-    const response = await fetch(
-        `${API_URL}/rabbits/${rabbitId}/feed?userId=${userId}`,
-        {
+    try {
+        const userId = await fetchCurrentUserId();
+        const jwt = getCookie("jwt");
+        const response = await fetch(`${API_URL}/rabbits/${rabbitId}/feed?userId=${userId}`, {
             method: "POST",
             headers: { Authorization: "Bearer " + jwt },
+        });
+        if (!response.ok) {
+            alert(response.status === 400 ? "Impossible de nourrir ce lapin (pas assez d'écus ?)." : `Erreur ${response.status}`);
+            return;
         }
-    );
-    if (!response.ok) {
-        alert(response.status === 400 
-            ? "Impossible de nourrir ce lapin (pas assez d'écus ?)" 
-            : `Erreur ${response.status}`);
-        return;
+        await initializeHutch();
+    } catch (error) {
+        console.error("Erreur feedRabbit :", error);
     }
-    await initializeHutch();
 }
 
 async function waterRabbit(rabbitId) {
     try {
         const userId = await fetchCurrentUserId();
         const jwt = getCookie("jwt");
-        const response = await fetch(
-            `${API_URL}/rabbits/${rabbitId}/water?userId=${userId}`,
-            {
-                method: "POST",
-                headers: { Authorization: "Bearer " + jwt },
-            }
-        );
+        const response = await fetch(`${API_URL}/rabbits/${rabbitId}/water?userId=${userId}`, {
+            method: "POST",
+            headers: { Authorization: "Bearer " + jwt },
+        });
         if (!response.ok) {
-            alert(response.status === 400
-                ? "Impossible d'abreuver ce lapin (pas assez d'écus ?)."
-                : `Erreur ${response.status}`);
+            alert(response.status === 400 ? "Impossible d'abreuver ce lapin (pas assez d'écus ?)." : `Erreur ${response.status}`);
             return;
         }
         await initializeHutch();
@@ -222,17 +189,12 @@ async function healRabbit(rabbitId) {
     try {
         const userId = await fetchCurrentUserId();
         const jwt = getCookie("jwt");
-        const response = await fetch(
-            `${API_URL}/rabbits/${rabbitId}/heal?userId=${userId}`,
-            {
-                method: "POST",
-                headers: { Authorization: "Bearer " + jwt },
-            }
-        );
+        const response = await fetch(`${API_URL}/rabbits/${rabbitId}/heal?userId=${userId}`, {
+            method: "POST",
+            headers: { Authorization: "Bearer " + jwt },
+        });
         if (!response.ok) {
-            alert(response.status === 400
-                ? "Impossible de soigner ce lapin (pas assez d'écus ?)."
-                : `Erreur ${response.status}`);
+            alert(response.status === 400 ? "Impossible de soigner ce lapin (pas assez d'écus ?)." : `Erreur ${response.status}`);
             return;
         }
         await initializeHutch();
@@ -245,17 +207,12 @@ async function cleanRabbit(rabbitId) {
     try {
         const userId = await fetchCurrentUserId();
         const jwt = getCookie("jwt");
-        const response = await fetch(
-            `${API_URL}/rabbits/${rabbitId}/clean?userId=${userId}`,
-            {
-                method: "POST",
-                headers: { Authorization: "Bearer " + jwt },
-            }
-        );
+        const response = await fetch(`${API_URL}/rabbits/${rabbitId}/clean?userId=${userId}`, {
+            method: "POST",
+            headers: { Authorization: "Bearer " + jwt },
+        });
         if (!response.ok) {
-            alert(response.status === 400
-                ? "Impossible de nettoyer ce lapin (pas assez d'écus ?)."
-                : `Erreur ${response.status}`);
+            alert(response.status === 400 ? "Impossible de nettoyer ce lapin (pas assez d'écus ?)." : `Erreur ${response.status}`);
             return;
         }
         await initializeHutch();
@@ -264,12 +221,73 @@ async function cleanRabbit(rabbitId) {
     }
 }
 
-async function fetchCurrentUserId() {
+function toggleActionsMenu() {
+    const menu = document.getElementById("actions-menu");
+    if (!menu) return;
+    menu.classList.toggle("open");
+}
+
+document.addEventListener("click", (event) => {
+    const wrapper = document.querySelector(".actions-wrapper");
+    const menu = document.getElementById("actions-menu");
+    if (!wrapper || !menu) return;
+    if (!wrapper.contains(event.target)) {
+        menu.classList.remove("open");
+    }
+});
+
+async function feedAll() {
     const jwt = getCookie("jwt");
-    const response = await fetch(`${API_URL}/auth/me`, {
-        headers: { Authorization: "Bearer " + jwt },
-    });
-    if (!response.ok) throw new Error(`Échec : ${response.status}`);
-    const user = await response.json();
-    return user.id;
+    const userId = await fetchCurrentUserId();
+    await Promise.all(
+        rabbits.filter((r) => !r.fedToday).map((r) =>
+            fetch(`${API_URL}/rabbits/${r.id}/feed?userId=${userId}`, {
+                method: "POST",
+                headers: { Authorization: "Bearer " + jwt },
+            })
+        )
+    );
+    await initializeHutch();
+}
+
+async function waterAll() {
+    const jwt = getCookie("jwt");
+    const userId = await fetchCurrentUserId();
+    await Promise.all(
+        rabbits.filter((r) => !r.wateredToday).map((r) =>
+            fetch(`${API_URL}/rabbits/${r.id}/water?userId=${userId}`, {
+                method: "POST",
+                headers: { Authorization: "Bearer " + jwt },
+            })
+        )
+    );
+    await initializeHutch();
+}
+
+async function healAll() {
+    const jwt = getCookie("jwt");
+    const userId = await fetchCurrentUserId();
+    await Promise.all(
+        rabbits.filter((r) => !r.healthy).map((r) =>
+            fetch(`${API_URL}/rabbits/${r.id}/heal?userId=${userId}`, {
+                method: "POST",
+                headers: { Authorization: "Bearer " + jwt },
+            })
+        )
+    );
+    await initializeHutch();
+}
+
+async function cleanAll() {
+    const jwt = getCookie("jwt");
+    const userId = await fetchCurrentUserId();
+    await Promise.all(
+        rabbits.filter((r) => !r.clean).map((r) =>
+            fetch(`${API_URL}/rabbits/${r.id}/clean?userId=${userId}`, {
+                method: "POST",
+                headers: { Authorization: "Bearer " + jwt },
+            })
+        )
+    );
+    await initializeHutch();
 }
