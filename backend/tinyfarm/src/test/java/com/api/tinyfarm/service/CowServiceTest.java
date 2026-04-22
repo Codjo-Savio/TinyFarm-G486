@@ -68,7 +68,7 @@ public class CowServiceTest {
 
     @Test
     void shouldHayCow() {
-        User usr = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000, false, 1);
+        User usr = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000f, false, null , 1);
 
         usr = userRepository.save(usr);
 
@@ -97,7 +97,7 @@ public class CowServiceTest {
 
     @Test
     void shouldWaterCow() {
-        User usr = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000, false, 1);
+        User usr = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000f, false, null, 1);
 
         usr = userRepository.save(usr);
 
@@ -115,7 +115,7 @@ public class CowServiceTest {
 
     @Test
     void shouldCleanCow() {
-        User usr = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000, false, 1);
+        User usr = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000f, false, null,  1);
 
         usr = userRepository.save(usr);
 
@@ -133,7 +133,7 @@ public class CowServiceTest {
 
     @Test
     void shouldHealCow() {
-        User usr = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000, false, 1);
+        User usr = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000f, false, null, 1);
 
         usr = userRepository.save(usr);
 
@@ -241,7 +241,7 @@ public class CowServiceTest {
     @Test
     void shouldDie() {
 
-        User usr = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000, false, 1);
+        User usr = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000f, false, null, 1);
 
         usr = userRepository.save(usr);
 
