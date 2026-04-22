@@ -2,7 +2,8 @@ async function initialiserBoutique() {
     const container = document.getElementById("shop-container");
 
     try {
-        const response = await fetch("/api/market");
+        // const response = await fetch("/api/market");
+        const response = await fetch("../../../fakeapi/trade/marketplace.json");
 
         if (!response.ok) {
             throw new Error(`Erreur HTTP : ${response.status}`);
