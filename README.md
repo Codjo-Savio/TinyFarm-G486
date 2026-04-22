@@ -54,6 +54,9 @@ cd frontend
 # Install packages
 npm i
 
+# Run tests
+npm test
+
 # Run
 npm run start
 # Or run with hot reload
@@ -63,6 +66,11 @@ npm run dev
 Access the frontend at `http://localhost:3000`.
 
 ## About
+
+## Suivi des mises a jour
+
+Le suivi des evolutions projet est centralise ici:
+- [MAJ_PROJET.md](./MAJ_PROJET.md)
 
 ### Technologies & frameworks
 
