@@ -45,6 +45,7 @@ class JwtRequestFilterTest {
             User.Gender.M,
             1500F,
             false,
+            null,
             1
         );
         Jwt jwt = new Jwt(

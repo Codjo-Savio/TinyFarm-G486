@@ -19,7 +19,8 @@
         <!-- Custom page style and script -->
         <link rel="stylesheet" href="style.css" />
         <script src="script.js" defer></script>
-        <script src="/components/custom-button.js"></script>
+        <script src="/components/tf-button.js"></script>
+        <script src="/components/tf-pill.js"></script>
     </head>
 
     <body>
@@ -236,12 +237,11 @@
                     </div>
                 </div>
                 <div class="button-group">
-                    <a href="/doc/about">
-                        <button id="about">À propos</button>
+                    <a id="release" target="_blank">
+                        <tf-pill icon="commit"></tf-pill>
                     </a>
-                    <a href="/doc/rules">
-                        <button id="rules">Règles du jeu</button>
-                    </a>
+                    <a href="/doc/about">À propos </a>
+                    <a href="/doc/rules">Règles du jeu </a>
                 </div>
             </div>
 
@@ -256,12 +256,12 @@
                         class="cow-img"
                     />
                 </div>
-                <custom-button
+                <tf-button
                     id="github"
                     onclick="auth()"
                     size="large"
                     variant="secondary"
-                    >Connexion avec Github</custom-button
+                    >Connexion avec Github</tf-button
                 >
             </div>
         </div>

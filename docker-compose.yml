@@ -20,7 +20,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/tinyfarm
-      SPRING_DATASOURCE_USERNAME: tinyfarm
+      SPRING_DATASOURCE_USERNAME: tinyfarm486
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
@@ -39,8 +39,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: frontend/Dockerfile
     environment:
       API_URL: ${API_URL}
     ports:

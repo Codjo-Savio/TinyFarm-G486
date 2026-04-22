@@ -129,6 +129,23 @@ function sortTable(column, order) {
     displayUsers(usersData);
 }
 
+function setRelease() {
+    const releaseDate = new Date(window.release.date);
+    const prettyReleaseDate =
+        releaseDate.getDate().toString().padStart(2, "0") +
+        "/" +
+        (releaseDate.getMonth() + 1).toString().padStart(2, "0") +
+        " " +
+        releaseDate.getHours().toString().padStart(2, "0") +
+        ":" +
+        releaseDate.getMinutes().toString().padStart(2, "0");
+    const releaseElmt = document.querySelector("#release>tf-pill");
+    releaseElmt.textContent = `${window.release.name} • ${prettyReleaseDate}`;
+    releaseElmt.parentElement.href = window.release.url;
+}
+
+setRelease();
+
 // Au chargement de la page, récupérer les données des utilisateurs depuis l'API et les afficher dans le tableau de classement
 setLoadingState(true);
 fetch(`${API_URL}/classement`)
@@ -167,5 +184,6 @@ fetch(`${API_URL}/classement`)
 
 // Section de code pour la connexion avec Github
 async function auth() {
+    document.querySelector("#github")?.setAttribute("loading", "");
     window.location.href = `${API_URL}/auth/login/oauth2/authorization/github`;
 }
