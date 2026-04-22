@@ -3,11 +3,14 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Dashboard</title>
+        <title>Tableau de bord - TinyFarm</title>
+        <link rel="icon" href="/assets/logo-128-rounded.png" />
+        <!-- Config -->
+        <script src="/config.js"></script>
         <!-- Components -->
-        <script src="/components/appbar.js"></script>
-        <script src="/components/bottom-actions.js"></script>
-        <script src="/components/layout.js"></script>
+        <script src="/components/tf-app-bar.js"></script>
+        <script src="/components/tf-bottom-actions.js"></script>
+        <script src="/components/tf-layout.js"></script>
         <!-- Theme -->
         <link rel="stylesheet" href="/styles/theme.css" />
         <!-- Font -->
@@ -23,8 +26,8 @@
     </head>
 
     <body>
-        <app-layout>
-            <app-bar></app-bar>
+        <tf-layout>
+            <tf-app-bar></tf-app-bar>
             <main>
                 <svg
                     width="100%"
@@ -74,7 +77,7 @@
                     />
                 </svg>
             </main>
-            <bottom-actions></bottom-actions>
-        </app-layout>
+            <tf-bottom-actions></tf-bottom-actions>
+        </tf-layout>
     </body>
 </html>

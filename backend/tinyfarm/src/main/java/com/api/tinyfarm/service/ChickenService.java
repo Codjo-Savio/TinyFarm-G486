@@ -5,10 +5,13 @@ import com.api.tinyfarm.model.Chicken;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.ChickenRepository;
 import java.util.List;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ChickenService {
+public class ChickenService{
 
     private final ChickenRepository chickenRepository;
     private final UserService userService;
@@ -47,6 +50,10 @@ public class ChickenService {
         }
         if (chicken.getAge() == null) {
             chicken.setAge(0);
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
+            chicken.setUserId(currentUser.getId());
         }
         return chickenRepository.save(chicken);
     }
@@ -154,85 +161,76 @@ public class ChickenService {
     // --- Fin de journée ---
 
     public void processEndOfDay(Long userId) {
-        List<Chicken> userChickens = chickenRepository.findByUserId(userId);
+        User user = userService.findById(userId);
+        if(user.getHibernation() == false) {
+            List<Chicken> userChickens = chickenRepository.findByUserId(userId);
 
-        long activeRoosters = 0;
-        long activeHens = 0;
+            long activeRoosters = 0;
+            long activeHens = 0;
 
-        for (Chicken chicken : userChickens) {
-            // 1. Santé
-            if (!handleHealth(chicken)){
-                continue;
-            }
-
-            // 2. Faim, Soif et Poids
-            if (!handleFood(chicken)){
-                continue;
-            }
-
-            // Poids max
-            if (chicken.getWeight() > 3.5f) {
-                chicken.setWeight(3.5f);
-            }
-
-            // Mort par maigreur
-            if (chicken.getWeight() <= 0f) {
-                chickenRepository.delete(chicken);
-                continue;
-            }
-
-            // 3. Âge et Évolution
-            chicken.setAge(
-                (chicken.getAge() == null ? 0 : chicken.getAge()) + 1
-            );
-
-            // 4. Changement de type de poulet
-            handleType(chicken);
-            
-            // 5. Saleté
-            if (!chicken.getClean()){
-                if (chicken.getChickenType() == Chicken.ChickenType.L) {
-                    chicken.setChickenType(Chicken.ChickenType.H);
-                } else if (chicken.getChickenType() == Chicken.ChickenType.B) {
-                    chicken.setChickenType(Chicken.ChickenType.R);
+            for (Chicken chicken : userChickens) {
+                // 1. Santé
+                if (handleHealth(chicken) != 0) {
+                    continue;
                 }
-            }
 
-            // Comptage pour la ponte (doit être adulte, propre, sain, et nourri)
-            if (chicken.getChickenType() == Chicken.ChickenType.B) {
-                activeRoosters++;
-            } else if (chicken.getChickenType() == Chicken.ChickenType.L) {
-                activeHens++;
-            }
-
-            // Réinitialisation journalière
-            chicken.setFedToday(false);
-            chicken.setWateredToday(false);
-            chicken.setClean(false); // Le poulailler devient sale tous les jours
-
-            // 1 chance sur 10 de tomber malade
-            if (Math.random() < 0.1){ 
-                chicken.setHealthy(false);
-
-                // si il est malade il ne peu pas se reproduire
-                if (chicken.getChickenType() == Chicken.ChickenType.L) {
-                    chicken.setChickenType(Chicken.ChickenType.H);
-                } else if (chicken.getChickenType() == Chicken.ChickenType.B) {
-                    chicken.setChickenType(Chicken.ChickenType.R);
+                // 2. Faim, Soif et Poids
+                if (handleFood(chicken) != 0) {
+                    continue;
                 }
+
+                // Poids max
+                if (chicken.getWeight() > 3.5f) {
+                    chicken.setWeight(3.5f);
+                }
+
+                // Mort par maigreur
+                if (chicken.getWeight() <= 0f) {
+                    chickenRepository.delete(chicken);
+                    continue;
+                }
+
+                // 3. Âge et Évolution
+                chicken.setAge(
+                        (chicken.getAge() == null ? 0 : chicken.getAge()) + 1
+                );
+
+                // 4. Changement de type de poulet
+                handleType(chicken);
+
+                // 5. Saleté
+                if (!chicken.getClean()) {
+                    if (chicken.getChickenType() == Chicken.ChickenType.L) {
+                        chicken.setChickenType(Chicken.ChickenType.H);
+                    } else if (chicken.getChickenType() == Chicken.ChickenType.B) {
+                        chicken.setChickenType(Chicken.ChickenType.R);
+                    }
+                }
+
+                // Comptage pour la ponte (doit être adulte, propre, sain, et nourri)
+                if (chicken.getChickenType() == Chicken.ChickenType.B) {
+                    activeRoosters++;
+                } else if (chicken.getChickenType() == Chicken.ChickenType.L) {
+                    activeHens++;
+                }
+
+                // Réinitialisation journalière
+                chicken.setFedToday(false);
+                chicken.setWateredToday(false);
+                chicken.setClean(false); // Le poulailler devient sale tous les jours
+
+                chickenRepository.save(chicken);
             }
 
-            chickenRepository.save(chicken);
+            // 4. Ponte et Vente automatique des œufs (vendus le jour même)
+            handleEggs(userId, activeRoosters, activeHens);
         }
-
-        // 4. Ponte et Vente automatique des œufs (vendus le jour même)
-        handleEggs(userId, activeRoosters, activeHens);
     }
 
-    // renvoi faux si le poulet meurt
-    private Boolean handleHealth(Chicken chicken){
+    // renvoi un code 1 si le poulet meurt
+    private int handleHealth(Chicken chicken){
 
-        Boolean out = true;
+        int out = 0;
 
         if (chicken.getHealthy() != null && !chicken.getHealthy()) {
             chicken.setSickDays(
@@ -241,27 +239,27 @@ public class ChickenService {
                         : chicken.getSickDays()) + 1
                 );
 
+            // si il est malade il ne peu pas se reproduire
+            if (chicken.getChickenType() == Chicken.ChickenType.L) {
+                chicken.setChickenType(Chicken.ChickenType.H);
+            } else if (chicken.getChickenType() == Chicken.ChickenType.B) {
+                chicken.setChickenType(Chicken.ChickenType.R);
+            }
+
             if (chicken.getSickDays() >= 4) {
                 chickenRepository.delete(chicken);
-                return false; // le poulet meurt
+                return 1; // le poulet meurt
             }
         } else {
             chicken.setSickDays(0);
-
-            if (chicken.getChickenType() == Chicken.ChickenType.H) {
-                chicken.setChickenType(Chicken.ChickenType.L);
-            } else if (chicken.getChickenType() == Chicken.ChickenType.R) {
-                chicken.setChickenType(Chicken.ChickenType.B);
-            }
         }
 
         return out;
     }
 
-    // renvoi faux si le poulet meurt
-    private Boolean handleFood(Chicken chicken){
+    private int handleFood(Chicken chicken){
 
-        Boolean out = true;
+        int out = 0;
 
         if (chicken.getFedToday() != null && !chicken.getFedToday()) {
             chicken.setFastingDays(
@@ -283,7 +281,7 @@ public class ChickenService {
             else if (chicken.getFastingDays() == 3) weightLoss = 1.0f;
             else if (chicken.getFastingDays() >= 4) {
                 chickenRepository.delete(chicken);
-                return false; // le poulet meurt
+                return 1; // le poulet meurt
             }
             chicken.setWeight(chicken.getWeight() - weightLoss);
         } else {

@@ -10,6 +10,7 @@
 // - ecus: number
 let usersData = [];
 const rankingTable = document.querySelector(".rankingTableContent");
+const API_URL = window.apiUrl || "http://localhost:8080/api";
 
 /**
  * Met à jour l'état de chargement du tableau de classement
@@ -128,9 +129,26 @@ function sortTable(column, order) {
     displayUsers(usersData);
 }
 
+function setRelease() {
+    const releaseDate = new Date(window.release.date);
+    const prettyReleaseDate =
+        releaseDate.getDate().toString().padStart(2, "0") +
+        "/" +
+        (releaseDate.getMonth() + 1).toString().padStart(2, "0") +
+        " " +
+        releaseDate.getHours().toString().padStart(2, "0") +
+        ":" +
+        releaseDate.getMinutes().toString().padStart(2, "0");
+    const releaseElmt = document.querySelector("#release>tf-pill");
+    releaseElmt.textContent = `${window.release.name} • ${prettyReleaseDate}`;
+    releaseElmt.parentElement.href = window.release.url;
+}
+
+setRelease();
+
 // Au chargement de la page, récupérer les données des utilisateurs depuis l'API et les afficher dans le tableau de classement
 setLoadingState(true);
-fetch("http://localhost:8080/api/classement")
+fetch(`${API_URL}/classement`)
     .then((response) => {
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
@@ -164,8 +182,8 @@ fetch("http://localhost:8080/api/classement")
         setLoadingState(false);
     });
 
-// Section de code pour la connexion avec Github (à implémenter)
-// Fake pour l'instant, à remplacer par une vraie fonction d'authentification avec Github
+// Section de code pour la connexion avec Github
 async function auth() {
-    window.location.href = "http://localhost:8080/oauth2/authorization/github";
+    document.querySelector("#github")?.setAttribute("loading", "");
+    window.location.href = `${API_URL}/auth/login/oauth2/authorization/github`;
 }

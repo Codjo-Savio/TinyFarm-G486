@@ -2,12 +2,16 @@ package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.UserRepository;
+
+import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
-
     private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
@@ -22,44 +26,53 @@ public class UserService {
         userRepository.deleteAll();
     }
 
-    public User findOrCreateOAuthUser(String email, String name, User.Gender gender) {
-        return userRepository.findByEmail(email)
+    public User findOrCreateOAuthUser(
+            String email,
+            String name,
+            User.Gender gender) {
+        return userRepository
+                .findByEmail(email)
                 .map(existing -> {
                     existing.setName(name);
                     existing.setGender(gender);
+
+                    // handle hibernation
+                    if(Boolean.TRUE.equals(existing.getHibernation())){
+                        existing.setHibernation(false);
+                        existing.setHibernationDate(null);
+                    }
+
                     return userRepository.save(existing);
                 })
-                .orElseGet(() -> userRepository.save(
-                        User.builder()
-                                .email(email)
-                                .name(name)
-                                .gender(gender)
-                                .build()
-                ));
+                .orElseGet(() -> {
+                    return userRepository.save(User.builder()
+                            .email(email)
+                            .name(name)
+                            .gender(gender)
+                            .build());
+                });
     }
 
     public User findById(Long id) {
         return userRepository
-            .findById(id)
-            .orElseThrow(() ->
-                new RuntimeException("Utilisateur introuvable : " + id)
-            );
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + id));
     }
 
     public User findByName(String name) {
         return userRepository
                 .findByName(name)
-                .orElseThrow(() ->
-                        new RuntimeException("Utilisateur introuvable : " + name)
-                );
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + name));
     }
 
     public User findByEmail(String email) {
         return userRepository
                 .findByEmail(email)
-                .orElseThrow(() ->
-                        new RuntimeException("Utilisateur introuvable : " + email)
-                );
+                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + email));
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.findByEmail(email).isPresent();
     }
 
     public User create(User user) {
@@ -80,19 +93,34 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public User addEcus(Long id, Integer amount) {
+    public User addEcus(Long id, Float amount) {
         User user = findById(id);
         user.setEcus(user.getEcus() + amount);
         return userRepository.save(user);
     }
 
-    public User withdrawEcus(Long id, Integer amount) {
+    public User withdrawEcus(Long id, Float amount) {
         User user = findById(id);
         if (user.getEcus() < amount) {
             throw new RuntimeException("Pas assez d'écus !");
         }
         user.setEcus(user.getEcus() - amount);
         return userRepository.save(user);
+    }
+
+    public void hibernate(Long id) {
+        User user = findById(id);
+        user.setHibernation(true);
+        user.setHibernationDate(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    // deleting users that have hibernated for more than 50 day every day at midnight
+    @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
+    public void deleteExpiredHibernations() {
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(50);
+        userRepository.deleteByHibernationTrueAndHibernationDateBefore(cutoff);
     }
 
     public boolean canBuy(Long id, Integer purchaseNumberForToday) {

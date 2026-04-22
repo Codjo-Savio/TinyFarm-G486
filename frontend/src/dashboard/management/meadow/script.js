@@ -1,5 +1,4 @@
-const API_URL = "http://localhost:8080/api";
-
+const API_URL = window.apiUrl || "http://localhost:8080/api";
 
 // Variables globales pour stocker les données des vaches et le lait
 let cows = [];
@@ -8,14 +7,12 @@ let healthyCount = 0;
 let cleanCount = 0;
 let milkFallback = 0;
 
-
 // Fonction pour récupérer la valeur d'un cookie par son nom
 function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(";").shift();
 }
-
 
 // Fonction d'initialisation du pré et de chargement des données des vaches depuis l'API
 async function initializeMeadow() {
@@ -51,64 +48,53 @@ async function initializeMeadow() {
         container.innerHTML = "";
 
         for (const cow of cows) {
+            let frenchCowType;
+            switch (cow.cowType) {
+                case "D":
+                    frenchCowType = "Vache laitière";
+                    break;
+                case "B":
+                    frenchCowType = "Bœuf";
+                    break;
+                case "C":
+                    frenchCowType = "Veau";
+                    break;
+                default:
+                    frenchCowType = "Inconnu";
+                    break;
+            }
+
             // Cartes individuelles pour chaque vache avec leurs états et actions
-            const animalCardHTML = `<div class="grid-container">
+            const animalCardHTML = `<tf-card>
                     <div class="grid-item">
                         <div class="animal-title">
                             ${cow.name}
-                            ${
-                                !cow.healthy && !cow.clean
-                                    ? `
-                                <div class="animal-state">
-                                    <span class="material-symbols-rounded">
-                                        heart_broken
-                                    </span>
-                                    <p> Malade</p>
-                                </div>
-                                <div class="animal-state">
-                                    <span class="material-symbols-rounded">
-                                        mop
-                                    </span>
-                                    <p> Sale</p>
-                                </div> `
-                                    : ""
-                            }${
-                                !cow.healthy && cow.clean
-                                    ? `
-                                <div class="animal-state">
-                                    <span class="material-symbols-rounded">
-                                        heart_broken
-                                    </span>
-                                    <p> Malade</p>
-                                </div>`
-                                    : ""
-                            }${
-                                cow.healthy && !cow.clean
-                                    ? `
-                                <div class="animal-state">
-                                    <span class="material-symbols-rounded">
-                                        mop
-                                    </span>
-                                    <p> Sale</p>
-                                </div>`
-                                    : ""
-                            }
+                            <div class="badges">
+                                ${
+                                    !cow.healthy
+                                        ? `<tf-pill icon="heart_broken">Malade</tf-pill>`
+                                        : ""
+                                }
+                                ${
+                                    !cow.clean
+                                        ? `<tf-pill icon="mop">Sale</tf-pill>`
+                                        : ""
+                                }
+                            </div>
                         </div>
                             <div class="animal-content">
                                 <div class="food-state">
                                     <span class="material-symbols-rounded">
                                         nutrition
                                     </span>
-                                    <div class="food-state-line-place-holder">
-                                        <div class="food-state-line" style="width: ${cow.fedToday ? 100 : 0}%;"></div>
-                                    </div>
+                                    <tf-progress-bar value="${cow.fedToday ? 100 : 0}"></tf-progress-bar>
                                 </div>
                                 <div class="animal-type">
                                     <span class="material-symbols-rounded">
                                         info
                                     </span>
                                     <div class="animal-type-text">
-                                        <p>${cow.cowType === null ? "Inconnu" : cow.cowType}</p>
+                                        <p>${frenchCowType}</p>
                                     </div>
                                 </div>
                                 <div class="animal-weight">
@@ -129,13 +115,13 @@ async function initializeMeadow() {
                                 </div>
                                 </div>
                             <div class="animal-actions">
-                                    <button class="action-button" active="${!cow.fedToday}">Nourrir : <span class="material-symbols-rounded coin-icon">paid</span> 5</button>
-                                    <button class="action-button" active="${!cow.wateredToday}">Abreuver : <span class="material-symbols-rounded coin-icon">paid</span> 2</button>
-                                <button class="action-button" active="${!cow.healthy}">Soigner : <span class="material-symbols-rounded coin-icon">paid</span> 6</button>
-                                <button class="action-button" active="${!cow.clean}">Nettoyer : <span class="material-symbols-rounded coin-icon">paid</span> 3</button>
+                                ${!cow.fedToday ? "<tf-button>$5 Nourrir</tf-button>" : ""}
+                                ${!cow.wateredToday ? "<tf-button>$2 Abreuver</tf-button>" : ""}
+                                ${!cow.healthy ? "<tf-button>$6 Soigner</tf-button>" : ""}
+                                ${!cow.clean ? "<tf-button>$3 Nettoyer</tf-button>" : ""}
                             </div>
                         </div>
-                    </div>`;
+                    </tf-card>`;
             container.insertAdjacentHTML("beforeend", animalCardHTML);
             if (cow.healthy) {
                 healthyCount++;
@@ -147,14 +133,11 @@ async function initializeMeadow() {
         document.getElementById("cow-count").textContent = cows.length;
         document.getElementById("milk-count").textContent = milkFallback;
         document.getElementById("sick-count").textContent =
-            (Math.round(
-                ((cows.length - healthyCount) / cows.length) *
-                    100,
-            ) || 0) + "%";
+            (Math.round(((cows.length - healthyCount) / cows.length) * 100) ||
+                0) + "%";
         document.getElementById("dirty-count").textContent =
-            (Math.round(
-                ((cows.length - cleanCount) / cows.length) * 100,
-            ) || 0) + "%";
+            (Math.round(((cows.length - cleanCount) / cows.length) * 100) ||
+                0) + "%";
         updateActionMenuCosts();
     } catch (error) {
         console.error("Impossible de charger le pré :", error);
@@ -211,28 +194,27 @@ function updateActionMenuCosts() {
 function feedAll() {
     for (const cow of cows) {
         if (!cow.fedToday) {
-            // Appel à l'API pour nourrir la vache 
+            // Appel à l'API pour nourrir la vache
             fetch(`${API_URL}/cows/${cow.id}/feed`, {
-            headers: new Headers({
-                Authorization: "Bearer " + jwt,
-            }),
-        });
+                headers: new Headers({
+                    Authorization: "Bearer " + jwt,
+                }),
+            });
             cow.fedToday = true;
         }
     }
     updateActionMenuCosts();
-
 }
 
 function waterAll() {
     for (const cow of cows) {
         if (!cow.wateredToday) {
-            // Appel à l'API pour abreuver la vache 
+            // Appel à l'API pour abreuver la vache
             fetch(`${API_URL}/cows/${cow.id}/water`, {
-            headers: new Headers({
-                Authorization: "Bearer " + jwt,
-            }),
-        });
+                headers: new Headers({
+                    Authorization: "Bearer " + jwt,
+                }),
+            });
             cow.wateredToday = true;
         }
     }
@@ -242,12 +224,12 @@ function waterAll() {
 function healAll() {
     for (const cow of cows) {
         if (!cow.healthy) {
-            // Appel à l'API pour soigner la vache 
+            // Appel à l'API pour soigner la vache
             fetch(`${API_URL}/cows/${cow.id}/heal`, {
-            headers: new Headers({
-                Authorization: "Bearer " + jwt,
-            }),
-        });
+                headers: new Headers({
+                    Authorization: "Bearer " + jwt,
+                }),
+            });
             cow.healthy = true;
         }
     }
@@ -257,12 +239,12 @@ function healAll() {
 function cleanAll() {
     for (const cow of cows) {
         if (!cow.clean) {
-            // Appel à l'API pour nettoyer la vache 
+            // Appel à l'API pour nettoyer la vache
             fetch(`${API_URL}/cows/${cow.id}/clean`, {
-            headers: new Headers({
-                Authorization: "Bearer " + jwt,
-            }),
-        });
+                headers: new Headers({
+                    Authorization: "Bearer " + jwt,
+                }),
+            });
             cow.clean = true;
         }
     }
