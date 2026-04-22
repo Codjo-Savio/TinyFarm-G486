@@ -46,7 +46,7 @@ public class CowServiceTest {
     @Test
     void shouldReturnAllCows() {
         Cow cow = new Cow();
-        cow.setCowType(Cow.CowType.B);
+        cow.setCowType(Cow.CowType.C);
         cow.setName("Bovino");
 
         cowService.create(cow);
