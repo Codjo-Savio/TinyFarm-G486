@@ -76,7 +76,7 @@ class TfProgressBar extends HTMLElement {
             return;
         }
 
-        this.progressBarElement.className = `tf-progress-bar ${this.variant}`;
+        this.progressBarElement.className = `progress-bar ${this.variant}`;
         this.lineElement.style.width = `${this.progress}%`;
     }
 }
