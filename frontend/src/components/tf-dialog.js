@@ -103,8 +103,8 @@ class TfDialog extends HTMLElement {
             }
 
             .header > .material-symbols-rounded {
-                font-size: var(--font-size-icon-large);
-                font-variation-settings: var(--font-var-icon-large);
+                font-size: 36px;
+                font-variation-settings: "FILL" 0, "wght" 700, "GRAD" 2, "opsz" 36;
             }
 
             .window > .body {

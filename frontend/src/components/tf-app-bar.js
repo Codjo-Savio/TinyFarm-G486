@@ -187,7 +187,7 @@ class TfAppBar extends HTMLElement {
         const template = document.createElement("template");
         template.innerHTML = `
             <div class="appbar">
-                <tf-dialog title="Mettre la ferme en hibernation" title-icon="person" modal>
+                <tf-dialog title="Mettre la ferme en hibernation" title-icon="pause_circle" modal>
                     Vous retrouverez votre ferme et vos animaux dans le même état qu'à votre départ lors de votre prochaine connexion.
                     Si votre compte hiberne pendant plus de 50 jours, il sera automatiquement supprimé.
                     <tf-button class="cancel" slot="cancel-button" variant="secondary">Annuler</tf-button>
