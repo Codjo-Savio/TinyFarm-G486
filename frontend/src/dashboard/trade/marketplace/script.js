@@ -413,7 +413,7 @@ async function payerPanier() {
         );
     } finally {
         // Met à jour les écus de l'appbar et désactive le mode loading du composant tf-button
-        appbarElement.update();
+        await appbarElement.update();
         payButton?.removeAttribute("loading");
     }
 }
