@@ -1,52 +1,27 @@
-{
-  "Seau d'eau": {
-    "stock": 10,
-    "price": 100,
-    "seller": "Micheline"
-  },
-  "Pelle en fer": {
-    "stock": 5,
-    "price": 250,
-    "seller": "Micheline"
-  },
-  "Sac de terreau (50L)": {
-    "stock": 25,
-    "price": 45,
-    "seller": "Micheline"
-  },
-  "Graines de tournesol (x50)": {
-    "stock": 100,
-    "price": 20,
-    "seller": "Micheline"
-  },
-  "Bottes en caoutchouc": {
-    "stock": 8,
-    "price": 150,
-    "seller": "Micheline"
-  },
-  "Fourche de curage": {
-    "stock": 4,
-    "price": 180,
-    "seller": "Micheline"
-  },
-  "Ballot de paille": {
-    "stock": 40,
-    "price": 15,
-    "seller": "Micheline"
-  },
-  "Pierre à lécher (sel)": {
-    "stock": 12,
-    "price": 35,
-    "seller": "Micheline"
-  },
-  "Lanterne à huile": {
-    "stock": 6,
-    "price": 75,
-    "seller": "Micheline"
-  },
-  "Clôture électrique (rouleau 50m)": {
-    "stock": 15,
-    "price": 450,
-    "seller": "Micheline"
-  }
-}
+[
+    { "userId": 1, "productId": 101, "price": 100.0, "quantity": 10 },
+    { "userId": 2, "productId": 101, "price": 95.0, "quantity": 7 },
+    { "userId": 3, "productId": 101, "price": 102.0, "quantity": 12 },
+
+    { "userId": 1, "productId": 102, "price": 250.0, "quantity": 5 },
+    { "userId": 4, "productId": 102, "price": 235.0, "quantity": 4 },
+
+    { "userId": 2, "productId": 103, "price": 45.0, "quantity": 25 },
+    { "userId": 5, "productId": 103, "price": 42.5, "quantity": 18 },
+
+    { "userId": 2, "productId": 104, "price": 20.0, "quantity": 100 },
+    { "userId": 6, "productId": 104, "price": 18.5, "quantity": 60 },
+
+    { "userId": 3, "productId": 105, "price": 150.0, "quantity": 8 },
+    { "userId": 7, "productId": 105, "price": 148.0, "quantity": 6 },
+
+    { "userId": 4, "productId": 106, "price": 180.0, "quantity": 4 },
+    { "userId": 4, "productId": 107, "price": 15.0, "quantity": 40 },
+    { "userId": 8, "productId": 107, "price": 13.5, "quantity": 22 },
+
+    { "userId": 9, "productId": 108, "price": 35.0, "quantity": 12 },
+    { "userId": 10, "productId": 108, "price": 20.0, "quantity": 15 },
+
+    { "userId": 1, "productId": 109, "price": 75.0, "quantity": 6 },
+    { "userId": 1, "productId": 110, "price": 450.0, "quantity": 15 }
+]

@@ -1,5 +1,5 @@
 function handleClick(item) {
-    window.location.href = `/dashboard/management/${item}?from=/dashboard`;
+    window.location.href = `/dashboard/management/${item}`;
 }
 
 document

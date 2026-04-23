@@ -38,11 +38,7 @@
                     <tf-button
                         icon="keyboard_backspace"
                         variant="secondary"
-                        onclick="
-                            window.location.href = window.location.search
-                                ? window.location.search.replace('?from=', '')
-                                : '/dashboard'
-                        "
+                        onclick="window.history.back()"
                         >Retour</tf-button
                     >
                     <div class="cows-stats">
