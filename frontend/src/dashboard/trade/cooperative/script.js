@@ -63,7 +63,6 @@ async function initialiserBoutique() {
 document.addEventListener("DOMContentLoaded", initialiserBoutique);
 
 // Partie panier
-let inventaire = {};
 const panier = {};
 
 function displayPanier() {
