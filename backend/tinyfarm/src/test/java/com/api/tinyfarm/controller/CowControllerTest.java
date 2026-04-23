@@ -14,10 +14,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 public class CowControllerTest extends AuthenticatedControllerTestSupport {
+
     @Autowired
     MockMvc mockMvc;
     @Autowired
     CowService cowService;
+
     @BeforeEach
     void setup() throws Exception {
         cowService.deleteAll();
@@ -36,12 +38,13 @@ public class CowControllerTest extends AuthenticatedControllerTestSupport {
                         .content(json)
         ).andExpect(status().isOk());
     }
+
     @Test
     void shouldCreateCow() throws Exception {
         String json = """
                 {
                     "id" : 1,
-                    "cowType" : "B",
+                    "cowType" : "C",
                     "name" : "Bovino",
                     "milking" : false
                 }
@@ -54,21 +57,25 @@ public class CowControllerTest extends AuthenticatedControllerTestSupport {
                 )
                 .andExpect(status().isOk());
     }
+
     @Test
     void shouldReturnAllCows() throws Exception {
         mockMvc.perform(get("/api/cows").with(authenticated()))
                 .andExpect(status().isOk());
     }
+
     @Test
     void shouldReturnCowByName() throws Exception {
         mockMvc.perform(get("/api/cows/name/Marguerite").with(authenticated()))
                 .andExpect(status().isOk());
     }
+
     @Test
     void cowShouldNotBeFoundByName() throws Exception {
         mockMvc.perform(get("/api/cows/name/unknown").with(authenticated()))
                 .andExpect(status().isNotFound());
     }
+
     @Test
     void shouldDeleteCowById() throws Exception {
         Long id = cowService.getByName("Marguerite").getId();
