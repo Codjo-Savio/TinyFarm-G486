@@ -1,50 +1,185 @@
+import { fetchApiWithCredentials } from "/utils/fetch.js";
+
+const FAKE_ASSETS_URL = "/fakeapi/assets.json";
+const PRICE_DECIMALS = 2;
+
+let inventaire = {};
+const panier = {};
+const previousPrices = new Map();
+
+function escapeForOnclick(value) {
+    return String(value).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+}
+
+function getPriceElementId(productName) {
+    return `price-${productName}`;
+}
+
+function getEditButtonId(productName) {
+    return `edit-${productName}`;
+}
+
+function getPriceInputId(productName) {
+    return `new-price-${productName}`;
+}
+
+function getCartListElement() {
+    return document.querySelector(".cart-list");
+}
+
+function formatPrice(price) {
+    return `$${Number(price).toFixed(PRICE_DECIMALS)}`;
+}
+
+function renderEmptyInventoryState(container) {
+    container.innerHTML = `
+        <div class="empty-state">
+            <span class="material-symbols-rounded empty-state-icon">warehouse</span>
+            <h2 class="empty-state-title">Aucun article disponible</h2>
+            <p class="empty-state-text">La remise est vide pour le moment. Ajoute des produits pour commencer la vente.</p>
+        </div>
+    `;
+}
+
+function normalizePrice(rawValue) {
+    const parsed = Number.parseFloat(rawValue);
+    if (!Number.isFinite(parsed) || parsed < 0) {
+        return null;
+    }
+    return Math.round(parsed * 100) / 100;
+}
+
+function shouldUseFakePreview() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("fake") === "1";
+}
+
+async function fetchCurrentUserId() {
+    const response = await fetchApiWithCredentials("/auth/me");
+    if (!response.ok) {
+        throw new Error(`Impossible de recuperer l'utilisateur: ${response.status}`);
+    }
+
+    const user = await response.json();
+    if (!user || user.id == null) {
+        throw new Error("Reponse /auth/me invalide");
+    }
+
+    return Number(user.id);
+}
+
+function getProductDisplayName(product) {
+    if (typeof product.description === "string") {
+        return product.description.trim();
+    }
+
+    return `Produit ${product.id}`;
+}
+
+function normalizeApiDataToInventory(stocks, products) {
+    const productById = new Map(
+        products.map((product) => [Number(product.id), product]),
+    );
+
+    return stocks.reduce((acc, stock) => {
+        const product = productById.get(Number(stock.productId));
+        if (!product) {
+            return acc;
+        }
+
+        const productName = getProductDisplayName(product);
+
+        acc[productName] = {
+            quantity: Number(stock.quantity) || 0,
+            price: Number(product.price) || 0,
+        };
+
+        return acc;
+    }, {});
+}
+
+async function fetchRealInventoryData() {
+    const userId = await fetchCurrentUserId();
+
+    const [productsResponse, stocksResponse] = await Promise.all([
+        fetchApiWithCredentials("/products"),
+        fetchApiWithCredentials(`/stocks/user/${userId}`),
+    ]);
+
+    if (!productsResponse.ok) {
+        throw new Error(`Erreur produits: ${productsResponse.status}`);
+    }
+
+    if (!stocksResponse.ok) {
+        throw new Error(`Erreur stocks: ${stocksResponse.status}`);
+    }
+
+    const [products, stocks] = await Promise.all([
+        productsResponse.json(),
+        stocksResponse.json(),
+    ]);
+
+    return normalizeApiDataToInventory(
+        Array.isArray(stocks) ? stocks : [],
+        Array.isArray(products) ? products : [],
+    );
+}
+
+async function fetchFakeInventoryData() {
+    const response = await fetch(FAKE_ASSETS_URL);
+
+    if (!response.ok) {
+        throw new Error(`Erreur fake API: ${response.status}`);
+    }
+
+    const fakePayload = await response.json();
+    const products = Array.isArray(fakePayload.products)
+        ? fakePayload.products
+        : [];
+    const stocks = Array.isArray(fakePayload.stocks) ? fakePayload.stocks : [];
+
+    return normalizeApiDataToInventory(stocks, products);
+}
+
 async function initialiserBoutique() {
     const container = document.getElementById("shop-container");
 
     try {
-        const response = await fetch("../../../fakeapi/assets.json");
-
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP : ${response.status}`);
-        }
-
-        inventaire = await response.json();
+        const forceFakePreview = shouldUseFakePreview();
+        inventaire = forceFakePreview
+            ? await fetchFakeInventoryData()
+            : await fetchRealInventoryData();
 
         container.innerHTML = "";
 
-        for (const [nom, details] of Object.entries(inventaire)) {
-            const productHTML = `
-                <div class="category-row">
-                    <h2 class="category-title">${nom}</h2>
-                    <div class="products-container">
-                        `;
+        if (Object.keys(inventaire).length === 0) {
+            renderEmptyInventoryState(container);
+            return;
+        }
 
-            container.insertAdjacentHTML("beforeend", productHTML);
-            for (const [key, values] of Object.entries(details)) {
-                const productHTML = `
+        for (const [nom, values] of Object.entries(inventaire)) {
+            const escapedNom = escapeForOnclick(nom);
+            const productHTML = `
                 <div class="product-row">
                     <div class="prod-info">
                         <span class="stock-badge">
                             x
                             ${values.quantity}
                         </span>
-                        <span class="prod-name">${key}</span>
+                        <span class="prod-name">${nom}</span>
                     </div>
                     <div class="prod-action">
-                        <button class="edit-price-btn" id="edit-${key.replace(/'/g, "\\'")}" onclick="modifierPrix('${key.replace(/'/g, "\\'")}')">
+                        <button class="edit-price-btn" id="${getEditButtonId(nom)}" onclick="modifierPrix('${escapedNom}')">
                             <span class="material-symbols-rounded">
                                 edit
                             </span>
                         </button>
-                        <span class="price" id="price-${key.replace(/'/g, "\\'")}">$${values.price}</span>
-                        <button class="btn-add" onclick="ajouterAuPanier('${key.replace(/'/g, "\\'")}')">Ajouter</button>
+                        <span class="price" id="${getPriceElementId(nom)}">${formatPrice(values.price)}</span>
+                        <button class="btn-add" onclick="ajouterAuPanier('${escapedNom}')">Ajouter</button>
                     </div>
                 </div>
             `;
-                container.insertAdjacentHTML("beforeend", productHTML);
-            }
-            const productHTML2 = `</div> </div>`;
-            container.insertAdjacentHTML("beforeend", productHTML2);
+            container.insertAdjacentHTML("beforeend", productHTML);
         }
     } catch (erreur) {
         console.error("Impossible de charger l'inventaire :", erreur);
@@ -54,38 +189,33 @@ async function initialiserBoutique() {
 
 document.addEventListener("DOMContentLoaded", initialiserBoutique);
 
-// Partie panier
-let inventaire = {};
-const panier = {};
-
 function displayPanier() {
-    // Logique pour afficher le contenu du panier
     let total = 0;
 
     for (const [nom, quantite] of Object.entries(panier)) {
-        // Supposons qu'on ait un tableau des produits avec leurs prix
-        // Cela devrait être remplacé par la vraie logique de récupération des prix
-        for (const category of Object.values(inventaire)) {
-            if (category[nom]) {
-                const produit = category[nom];
-                total += produit.price * quantite;
-                break; // Sortir de la boucle une fois le produit trouvé
-            }
+        const produit = inventaire[nom];
+        if (produit) {
+            total += produit.price * quantite;
         }
     }
 
-    // Arrondir à 2 décimales pour éviter les erreurs de précision des flottants
     const totalArrondi = Math.round(total * 100) / 100;
-    document.getElementById("totalPrice").textContent = `$${totalArrondi.toFixed(2)}`;
+    document.getElementById("totalPrice").textContent = formatPrice(totalArrondi);
 
-    document.querySelector(".cart-list").innerHTML = "";
+    const cartListElement = getCartListElement();
+    cartListElement.innerHTML = "";
+
+    if (Object.keys(panier).length === 0) {
+        return;
+    }
 
     for (const [nom, quantite] of Object.entries(panier)) {
+        const escapedNom = escapeForOnclick(nom);
         const productHTML = `
                             <div class="cart-item">
                                     <span>${nom}</span>
                                     <div class="qty-control">
-                                        <button class="btn-qty" onclick="retirerDuPanier('${nom.replace(/'/g, "\\'")}')">
+                                        <button class="btn-qty" onclick="retirerDuPanier('${escapedNom}')">
                                             <span
                                                 class="material-symbols-rounded"
                                             >
@@ -93,7 +223,7 @@ function displayPanier() {
                                             </span>
                                         </button>
                                         <span>${quantite}</span>
-                                        <button class="btn-qty" onclick="ajouterAuPanier('${nom.replace(/'/g, "\\'")}')">
+                                        <button class="btn-qty" onclick="ajouterAuPanier('${escapedNom}')">
                                             <span
                                                 class="material-symbols-rounded"
                                             >
@@ -103,88 +233,147 @@ function displayPanier() {
                                     </div>
                                 </div>
                                 `;
-        document
-            .querySelector(".cart-list")
-            .insertAdjacentHTML("beforeend", productHTML);
+        cartListElement.insertAdjacentHTML("beforeend", productHTML);
     }
 }
 
 displayPanier();
 
 function ajouterAuPanier(nomProduit) {
-    // Logique pour ajouter le produit au panier
+    if (!inventaire[nomProduit]) {
+        return;
+    }
+
     if (panier[nomProduit]) {
         panier[nomProduit]++;
     } else {
         panier[nomProduit] = 1;
     }
-    console.log(panier);
+
     displayPanier();
 }
 
 function retirerDuPanier(nomProduit) {
-    // Logique pour retirer le produit du panier
     if (panier[nomProduit]) {
         panier[nomProduit]--;
         if (panier[nomProduit] <= 0) {
             delete panier[nomProduit];
         }
     }
-    console.log(panier);
+
+    displayPanier();
+}
+
+function applyPriceChange(nomProduit, rawValue, updateDisplay = true) {
+    const prix = normalizePrice(rawValue);
+    if (prix === null || !inventaire[nomProduit]) {
+        return false;
+    }
+
+    inventaire[nomProduit].price = prix;
+
+    if (updateDisplay) {
+        const priceSpan = document.getElementById(getPriceElementId(nomProduit));
+        if (priceSpan) {
+            priceSpan.textContent = formatPrice(prix);
+        }
+    }
+
+    displayPanier();
+    return true;
+}
+
+function restoreEditButton(nomProduit) {
+    const editButton = document.getElementById(getEditButtonId(nomProduit));
+    if (!editButton) {
+        return;
+    }
+
+    editButton.innerHTML = `<span class="material-symbols-rounded">
+                                edit
+                            </span>`;
+    editButton.setAttribute("onclick", `modifierPrix('${escapeForOnclick(nomProduit)}')`);
+}
+
+function annulerPrix(nomProduit) {
+    const previousPrice = previousPrices.get(nomProduit);
+    if (previousPrice != null && inventaire[nomProduit]) {
+        inventaire[nomProduit].price = previousPrice;
+    }
+
+    const priceSpan = document.getElementById(getPriceElementId(nomProduit));
+    if (priceSpan && inventaire[nomProduit]) {
+        priceSpan.textContent = formatPrice(inventaire[nomProduit].price);
+    }
+
+    previousPrices.delete(nomProduit);
+    restoreEditButton(nomProduit);
     displayPanier();
 }
 
 function modifierPrix(nomProduit) {
-    // Il faut enlever le boutons d'édition du prix le span du prix et le remplacer par un champ de saisie
-    const priceSpan = document.getElementById(
-        `price-${nomProduit.replace(/'/g, "\\'")}`,
-    );
+    const priceSpan = document.getElementById(getPriceElementId(nomProduit));
+    if (!priceSpan) {
+        return;
+    }
+
+    if (inventaire[nomProduit]) {
+        previousPrices.set(nomProduit, inventaire[nomProduit].price);
+    }
+
     const currentPrice = parseFloat(priceSpan.textContent.replace("$", ""));
     const inputHTML = `
-        <input type="number" id="new-price-${nomProduit.replace(/'/g, "\\'")}" value="${currentPrice.toFixed(2)}" min="0" step="0.01">
+        <input type="number" id="${getPriceInputId(nomProduit)}" value="${currentPrice.toFixed(2)}" min="0" step="0.01">
     `;
     priceSpan.innerHTML = inputHTML;
-    document.getElementById(
-        "edit-" + nomProduit.replace(/'/g, "\\'"),
-    ).innerHTML = `<span class="material-symbols-rounded">
+
+    const input = document.getElementById(getPriceInputId(nomProduit));
+    input?.addEventListener("input", () => {
+        applyPriceChange(nomProduit, input.value, false);
+    });
+    input?.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            confirmerPrix(nomProduit);
+        }
+        if (event.key === "Escape") {
+            event.preventDefault();
+            annulerPrix(nomProduit);
+        }
+    });
+    input?.focus();
+    input?.select();
+
+    const editButton = document.getElementById(getEditButtonId(nomProduit));
+    if (!editButton) {
+        return;
+    }
+
+    editButton.innerHTML = `<span class="material-symbols-rounded">
                                 check
-                            </span>`; // Changer l'icône du bouton pour indiquer la confirmation
-    document
-        .getElementById("edit-" + nomProduit.replace(/'/g, "\\'"))
-        .setAttribute(
-            "onclick",
-            `confirmerPrix('${nomProduit.replace(/'/g, "\\'")}')`,
-        ); // Changer la fonction onclick pour confirmer le nouveau prix
+                            </span>`;
+    editButton.setAttribute("onclick", `confirmerPrix('${escapeForOnclick(nomProduit)}')`);
 }
 
 function confirmerPrix(nomProduit) {
-    const input = document.getElementById(
-        `new-price-${nomProduit.replace(/'/g, "\\'")}`,
-    );
-    const nouveauPrix = input.value;
-    if (nouveauPrix !== null) {
-        for (const category of Object.values(inventaire)) {
-            if (category[nomProduit]) {
-                // Arrondir à 2 décimales pour éviter les erreurs de précision
-                const prixArrondi = Math.round(parseFloat(nouveauPrix) * 100) / 100;
-                category[nomProduit].price = prixArrondi;
-                document.getElementById(
-                    `price-${nomProduit.replace(/'/g, "\\'")}`,
-                ).textContent = `$${prixArrondi.toFixed(2)}`;
-                break; // Sortir de la boucle une fois le produit trouvé
-            }
+    const input = document.getElementById(getPriceInputId(nomProduit));
+    if (!input) {
+        return;
+    }
+
+    const hasUpdatedPrice = applyPriceChange(nomProduit, input.value, true);
+    if (!hasUpdatedPrice && inventaire[nomProduit]) {
+        const priceSpan = document.getElementById(getPriceElementId(nomProduit));
+        if (priceSpan) {
+            priceSpan.textContent = formatPrice(inventaire[nomProduit].price);
         }
     }
-    document.getElementById(
-        "edit-" + nomProduit.replace(/'/g, "\\'"),
-    ).innerHTML = `<span class="material-symbols-rounded">
-                                edit
-                            </span>`; // Changer l'icône du bouton pour indiquer la confirmation
-    document
-        .getElementById("edit-" + nomProduit.replace(/'/g, "\\'"))
-        .setAttribute(
-            "onclick",
-            `modifierPrix('${nomProduit.replace(/'/g, "\\'")}')`,
-        ); // Changer la fonction onclick pour confirmer le nouveau prix
-    displayPanier(); // Mettre à jour le panier pour refléter les changements de prix
+
+    previousPrices.delete(nomProduit);
+    restoreEditButton(nomProduit);
 }
+
+window.ajouterAuPanier = ajouterAuPanier;
+window.retirerDuPanier = retirerDuPanier;
+window.modifierPrix = modifierPrix;
+window.confirmerPrix = confirmerPrix;

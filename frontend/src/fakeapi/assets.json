@@ -1,64 +1,227 @@
 {
-    "poulailler": {
-        "oeufs": {
+    "products": [
+        {
+            "id": 1,
+            "description": "oeufs",
+            "collectible": false,
+            "price": 3,
+            "coefficient": 1
+        },
+        {
+            "id": 2,
+            "description": "poulets",
+            "collectible": false,
+            "price": 10,
+            "coefficient": 1
+        },
+        {
+            "id": 3,
+            "description": "vaches",
+            "collectible": false,
+            "price": 50,
+            "coefficient": 1
+        },
+        {
+            "id": 4,
+            "description": "lait",
+            "collectible": false,
+            "price": 2,
+            "coefficient": 1
+        },
+        {
+            "id": 5,
+            "description": "lapins",
+            "collectible": false,
+            "price": 15,
+            "coefficient": 1
+        },
+        {
+            "id": 6,
+            "description": "seringues",
+            "collectible": false,
+            "price": 5,
+            "coefficient": 1
+        },
+        {
+            "id": 7,
+            "description": "bottes de paille",
+            "collectible": false,
+            "price": 8,
+            "coefficient": 1
+        },
+        {
+            "id": 8,
+            "description": "sac de nourriture",
+            "collectible": false,
+            "price": 12,
+            "coefficient": 1
+        },
+        {
+            "id": 9,
+            "description": "sceau d'eau",
+            "collectible": false,
+            "price": 3,
+            "coefficient": 1
+        },
+        {
+            "id": 10,
+            "description": "savon",
+            "collectible": false,
+            "price": 2,
+            "coefficient": 1
+        },
+        {
+            "id": 11,
+            "description": "pierre a lecher (sel)",
+            "collectible": false,
+            "price": 1,
+            "coefficient": 1
+        },
+        {
+            "id": 12,
+            "description": "lanterne a huile",
+            "collectible": false,
+            "price": 5,
+            "coefficient": 1
+        },
+        {
+            "id": 13,
+            "description": "cloture electrique (rouleau 50m)",
+            "collectible": false,
+            "price": 100,
+            "coefficient": 1
+        }
+    ],
+    "stocks": [
+        {
+            "id": {
+                "uid": 1,
+                "productID": 1
+            },
+            "userId": 1,
+            "productId": 1,
             "quantity": 12,
-            "price": 3
+            "collectible": false
         },
-        "poulets": {
+        {
+            "id": {
+                "uid": 1,
+                "productID": 2
+            },
+            "userId": 1,
+            "productId": 2,
             "quantity": 5,
-            "price": 10
-        }
-    },
-    "prés": {
-        "vaches": {
-            "quantity": 3,
-            "price": 50
+            "collectible": false
         },
-        "lait": {
+        {
+            "id": {
+                "uid": 1,
+                "productID": 3
+            },
+            "userId": 1,
+            "productId": 3,
+            "quantity": 3,
+            "collectible": false
+        },
+        {
+            "id": {
+                "uid": 1,
+                "productID": 4
+            },
+            "userId": 1,
+            "productId": 4,
             "quantity": 150,
-            "price": 2
-        }
-    },
-    "clapier": {
-        "lapins": {
+            "collectible": false
+        },
+        {
+            "id": {
+                "uid": 1,
+                "productID": 5
+            },
+            "userId": 1,
+            "productId": 5,
             "quantity": 4,
-            "price": 15
-        }
-    },
-    "remise": {
-        "seringues": {
+            "collectible": false
+        },
+        {
+            "id": {
+                "uid": 1,
+                "productID": 6
+            },
+            "userId": 1,
+            "productId": 6,
             "quantity": 10,
-            "price": 5
+            "collectible": false
         },
-        "bottes de paille": {
+        {
+            "id": {
+                "uid": 1,
+                "productID": 7
+            },
+            "userId": 1,
+            "productId": 7,
             "quantity": 5,
-            "price": 8
+            "collectible": false
         },
-        "sac de nourriture": {
+        {
+            "id": {
+                "uid": 1,
+                "productID": 8
+            },
+            "userId": 1,
+            "productId": 8,
             "quantity": 20,
-            "price": 12
+            "collectible": false
         },
-        "sceau d'eau": {
+        {
+            "id": {
+                "uid": 1,
+                "productID": 9
+            },
+            "userId": 1,
+            "productId": 9,
             "quantity": 2,
-            "price": 3
+            "collectible": false
         },
-        "savon": {
+        {
+            "id": {
+                "uid": 1,
+                "productID": 10
+            },
+            "userId": 1,
+            "productId": 10,
             "quantity": 3,
-            "price": 2
-        }
-    },
-    "bureau": {
-        "Pierre à lécher (sel)": {
+            "collectible": false
+        },
+        {
+            "id": {
+                "uid": 1,
+                "productID": 11
+            },
+            "userId": 1,
+            "productId": 11,
             "quantity": 2,
-            "price": 1
+            "collectible": false
         },
-        "Lanterne à huile": {
+        {
+            "id": {
+                "uid": 1,
+                "productID": 12
+            },
+            "userId": 1,
+            "productId": 12,
             "quantity": 1,
-            "price": 5
+            "collectible": false
         },
-        "Clôture électrique (rouleau 50m)": {
+        {
+            "id": {
+                "uid": 1,
+                "productID": 13
+            },
+            "userId": 1,
+            "productId": 13,
             "quantity": 1,
-            "price": 100
+            "collectible": false
         }
-    }
+    ]
 }
