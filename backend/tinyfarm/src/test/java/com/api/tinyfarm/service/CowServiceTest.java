@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -47,6 +48,7 @@ public class CowServiceTest {
     void shouldReturnAllCows() {
         Cow cow = new Cow();
         cow.setCowType(Cow.CowType.C);
+        cow.setCowType(Cow.CowType.C);
         cow.setName("Bovino");
 
         cowService.create(cow);
@@ -68,7 +70,16 @@ public class CowServiceTest {
 
     @Test
     void shouldHayCow() {
-        User usr = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000f, false, null , 1);
+        User usr = new User(
+            2L, 
+            "Brad", 
+            "usertest@gmail.com", 
+            User.Gender.M, 
+            2000F, 
+            false,
+            null, 
+            1
+        );
 
         usr = userRepository.save(usr);
 
@@ -97,7 +108,16 @@ public class CowServiceTest {
 
     @Test
     void shouldWaterCow() {
-        User usr = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000f, false, null, 1);
+        User usr = new User(
+            2L, 
+            "Brad", 
+            "usertest@gmail.com", 
+            User.Gender.M, 
+            2000F, 
+            false,
+            null, 
+            1
+        );
 
         usr = userRepository.save(usr);
 
@@ -115,7 +135,16 @@ public class CowServiceTest {
 
     @Test
     void shouldCleanCow() {
-        User usr = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000f, false, null,  1);
+        User usr = new User(
+            2L, 
+            "Brad", 
+            "usertest@gmail.com", 
+            User.Gender.M, 
+            2000F, 
+            false,
+            null, 
+            1
+        );
 
         usr = userRepository.save(usr);
 
@@ -133,7 +162,16 @@ public class CowServiceTest {
 
     @Test
     void shouldHealCow() {
-        User usr = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000f, false, null, 1);
+        User usr = new User(
+            2L, 
+            "Brad", 
+            "usertest@gmail.com", 
+            User.Gender.M, 
+            2000F, 
+            false,
+            null, 
+            1
+        );
 
         usr = userRepository.save(usr);
 
@@ -154,6 +192,7 @@ public class CowServiceTest {
         Cow cow = new Cow();
         cow.setCowType(Cow.CowType.D);
         cow.setName("Marguerite");
+        cow.setMilking(true);
 
         Cow created = cowService.create(cow);
 
@@ -166,6 +205,7 @@ public class CowServiceTest {
         Cow cow = new Cow();
         cow.setCowType(Cow.CowType.D);
         cow.setName("Marguerite");
+        cow.setMilking(true);
         cow.setMilk(12);
 
         Cow created = cowService.create(cow);
@@ -179,6 +219,7 @@ public class CowServiceTest {
         Cow cow = new Cow();
         cow.setCowType(Cow.CowType.D);
         cow.setName("Marguerite");
+        cow.setMilking(true);
         cow.setMilk(12);
 
         Cow created = cowService.create(cow);
@@ -192,6 +233,10 @@ public class CowServiceTest {
         Cow cow = new Cow();
         cow.setCowType(Cow.CowType.D);
         cow.setName("Marguerite");
+        cow.setWeight(1f);
+        cow.setFedToday(true);
+        cow.setHayToday(true);
+        cow.setWateredToday(true);
 
         Cow created = cowService.create(cow);
 
@@ -204,7 +249,10 @@ public class CowServiceTest {
         Cow cow = new Cow();
         cow.setCowType(Cow.CowType.D);
         cow.setName("Marguerite");
+        cow.setWeight(1f);
+        cow.setFedToday(true);
         cow.setHayToday(false);
+        cow.setWateredToday(true);
 
         Cow created = cowService.create(cow);
 
@@ -217,6 +265,9 @@ public class CowServiceTest {
         Cow cow = new Cow();
         cow.setCowType(Cow.CowType.D);
         cow.setName("Marguerite");
+        cow.setWeight(1f);
+        cow.setFedToday(true);
+        cow.setHayToday(true);
         cow.setWateredToday(false);
 
         Cow created = cowService.create(cow);
@@ -230,6 +281,9 @@ public class CowServiceTest {
         Cow cow = new Cow();
         cow.setCowType(Cow.CowType.D);
         cow.setName("Marguerite");
+        cow.setWeight(1f);
+        cow.setFedToday(true);
+        cow.setHayToday(false);
         cow.setWateredToday(false);
 
         Cow created = cowService.create(cow);
@@ -241,19 +295,29 @@ public class CowServiceTest {
     @Test
     void shouldDie() {
 
-        User usr = new User(2L, "Brad", "usertest@gmail.com", User.Gender.M, 2000f, false, null, 1);
-
+        User usr = new User(
+            2L, 
+            "Brad", 
+            "usertest@gmail.com", 
+            User.Gender.M, 
+            2000F, 
+            false,
+            null, 
+            1
+        );
+        
         usr = userRepository.save(usr);
 
         Cow cow = new Cow();
         cow.setCowType(Cow.CowType.D);
         cow.setName("Marguerite");
+        cow.setHealthy(false);
         cow.setSickDays(3);
         cow.setUserId(usr.getId());
 
         Cow created = cowService.create(cow);
 
         cowService.processEndOfDay(usr.getId());
-        assertNull(cowService.findAll());
+        assertTrue(cowService.findAll().isEmpty());
     }
 }

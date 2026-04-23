@@ -14,12 +14,17 @@ import java.util.List;
 @Service
 public class CowService {
 
-    @Autowired
     private CowRepository cowRepository;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private AnimalService animalService;
+    
+    private final UserService userService;
+
+    public CowService(
+        CowRepository cowRepository,
+        UserService userService
+    ) {
+        this.cowRepository = cowRepository;
+        this.userService = userService;
+    }
 
     public List<Cow> findAll() {
         return cowRepository.findAll();
