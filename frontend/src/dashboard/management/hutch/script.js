@@ -120,7 +120,7 @@ function renderRabbitCard(rabbit) {
 
                 <div>
                     <span class="material-symbols-rounded">calendar_today</span>
-                    <p>${rabbit.age} ans</p>
+                    <p>${rabbit.age} jours</p>
                 </div>
             </div>
 
