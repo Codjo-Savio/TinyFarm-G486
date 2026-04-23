@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === "development") {
     });
     liveReloadServer.watch("src");
 
-    //app.use(connectLiveReload());
+    app.use(connectLiveReload());
 
     console.log("Development mode enabled, using hot reload");
 }
