@@ -2,6 +2,24 @@ const API_URL = window.apiUrl || "http://localhost:8080/api";
 let currentUser = null;
 let chickens = [];
 
+function showInfo(title, message, icon = "info") {
+    const dialog = document.getElementById("info-dialog");
+    const messageEl = document.getElementById("info-dialog-message");
+    const okBtn = document.getElementById("info-dialog-ok");
+
+    if (!dialog || !messageEl || !okBtn) return;
+
+    dialog.setAttribute("title", title);
+    dialog.setAttribute("title-icon", icon);
+    messageEl.textContent = message;
+    dialog.setAttribute("show", "");
+
+    okBtn.onclick = () => {
+        console.log("Ok button clicked");
+        dialog.removeAttribute("show");
+    };
+}
+
 const ACTION_COSTS = {
     feed: 3,
     water: 1,
@@ -162,7 +180,7 @@ async function performAction(chickenId, action) {
         await fetchInitialData();
         window.dispatchEvent(new CustomEvent("refresh-user-data"));
     } catch (error) {
-        alert("Erreur lors de l'action : " + error.message);
+        showInfo("Erreur", "Erreur lors de l'action : " + error.message, "error");
     }
 }
 
@@ -177,7 +195,7 @@ async function performAll(action) {
     });
 
     if (eligibleChickens.length === 0) {
-        alert("Aucun animal n'a besoin de cette action !");
+        showInfo("Action inutile", `Toutes vos volailles sont déjà ${action === 'feed' ? 'nourries' : action === 'water' ? 'abreuvées' : action === 'clean' ? 'propres' : 'en bonne santé'} !`, "info");
         return;
     }
 
@@ -195,7 +213,7 @@ async function performAll(action) {
         await fetchInitialData();
         window.dispatchEvent(new CustomEvent("refresh-user-data"));
     } catch (error) {
-        alert("Erreur lors des actions groupées : " + error.message);
+        showInfo("Erreur", "Une erreur est survenue lors des actions groupées : " + error.message, "error");
     } finally {
         btn.textContent = originalText;
         btn.disabled = false;

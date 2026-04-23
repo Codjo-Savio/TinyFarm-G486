@@ -12,6 +12,7 @@
         <script type="module" src="/components/tf-bottom-actions.js"></script>
         <script type="module" src="/components/tf-layout.js"></script>
         <script type="module" src="/components/tf-pill.js"></script>
+        <script type="module" src="/components/tf-dialog.js"></script>
         <!-- Theme -->
         <link rel="stylesheet" href="/utils/theme.css" />
         <!-- Font -->
@@ -79,5 +80,11 @@
             </main>
             <tf-bottom-actions size="small"></tf-bottom-actions>
         </tf-layout>
+
+        <tf-dialog id="info-dialog" title="Action impossible" title-icon="warning" modal>
+            <p id="info-dialog-message"></p>
+            <div slot="cancel-button"></div>
+            <tf-button slot="confirm-button" id="info-dialog-ok">D'accord</tf-button>
+        </tf-dialog>
     </body>
 </html>
