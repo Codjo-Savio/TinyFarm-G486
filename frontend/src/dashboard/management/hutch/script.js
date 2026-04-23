@@ -1,31 +1,10 @@
+import { fetchApiWithCredentials } from "/utils/fetch.js";
+
 const API_URL = window.apiUrl || "http://localhost:8080/api";
 
 let rabbits = [];
 let currentUserId = null;
 let statusTimeout = null;
-
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-}
-
-function getJwtOrThrow() {
-    const jwt = getCookie("jwt");
-
-    if (!jwt) {
-        throw new Error("JWT manquant");
-    }
-
-    return jwt;
-}
-
-function getAuthHeaders(jwt) {
-    return {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + jwt,
-    };
-}
 
 function setStatus(message, type = "info") {
     const el = document.getElementById("hutch-status");
@@ -46,14 +25,12 @@ function setStatus(message, type = "info") {
     }, 3000);
 }
 
-async function fetchCurrentUserId(jwt) {
+async function fetchCurrentUserId() {
     if (currentUserId !== null) {
         return currentUserId;
     }
 
-    const response = await fetch(`${API_URL}/auth/me`, {
-        headers: getAuthHeaders(jwt),
-    });
+    const response = await fetchApiWithCredentials("/auth/me");
 
     if (!response.ok) {
         throw new Error("Impossible de recuperer l'utilisateur connecte");
@@ -66,14 +43,10 @@ async function fetchCurrentUserId(jwt) {
 }
 
 async function performRabbitAction(rabbitId, action) {
-    const jwt = getJwtOrThrow();
-    const userId = await fetchCurrentUserId(jwt);
-    const response = await fetch(
-        `${API_URL}/rabbits/${rabbitId}/${action}?userId=${userId}`,
-        {
-            method: "POST",
-            headers: getAuthHeaders(jwt),
-        },
+    const userId = await fetchCurrentUserId();
+    const response = await fetchApiWithCredentials(
+        `/rabbits/${rabbitId}/${action}?userId=${userId}`,
+        "POST",
     );
 
     if (!response.ok) {
@@ -205,12 +178,9 @@ async function initializeHutch() {
     const container = document.getElementById("game-grid");
 
     try {
-        const jwt = getJwtOrThrow();
-        await fetchCurrentUserId(jwt);
+        await fetchCurrentUserId();
 
-        const response = await fetch(`${API_URL}/rabbits`, {
-            headers: getAuthHeaders(jwt),
-        });
+        const response = await fetchApiWithCredentials("/rabbits");
 
         if (!response.ok) {
             throw new Error(`Erreur HTTP : ${response.status}`);
@@ -293,7 +263,10 @@ async function feedAll() {
 
 async function waterAll() {
     try {
-        await performBulkRabbitAction("water", (rabbit) => !rabbit.wateredToday);
+        await performBulkRabbitAction(
+            "water",
+            (rabbit) => !rabbit.wateredToday,
+        );
         setStatus("Tous les lapins concernes ont ete abreuves.", "success");
     } catch (error) {
         console.error("Impossible d'abreuver tous les lapins :", error);
