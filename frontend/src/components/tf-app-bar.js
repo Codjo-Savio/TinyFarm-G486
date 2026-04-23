@@ -178,7 +178,7 @@ class TfAppBar extends HTMLElement {
                                 id="rules"
                                 slot="entry"
                                 icon="book"
-                                href="/doc/rules?from=/dashboard"
+                                href="/doc/rules"
                             >
                                 Règles du jeu
                             </tf-menu-entry>
