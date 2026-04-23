@@ -1,6 +1,6 @@
-class TfPill extends HTMLElement {
+class TfMenuEntry extends HTMLElement {
     static get observedAttributes() {
-        return ["variant", "icon"];
+        return ["icon", "href", "disabled"];
     }
 
     constructor() {
@@ -43,68 +43,89 @@ class TfPill extends HTMLElement {
             }
 
             :host {
-                display: inline-block;
+                display: block;
             }
 
-            .pill {
-                border-radius: 100px;
+            button {
+                width: 100%;
                 display: flex;
-                gap: 6px;
                 align-items: center;
-                height: fit-content;
-                padding: 8px 16px 8px 8px;
-                background-color: var(--color-secondary);
+                gap: 16px;
+                padding: 12px;
+                border-radius: calc(var(--radius) - 6px);
                 color: var(--color-primary);
-                line-height: 1;
-                font-weight: bold;
+                text-decoration: none;
+                border: none;
+                cursor: pointer;
+                background-color: transparent;
+                font: inherit;
+                font-size: inherit;
+                text-align: left;
             }
 
-            .pill.gold {
-                background-color: var(--color-gold);
-                color: var(--color-gold-dark);
+            button:hover:not(:disabled) {
+                background-color: var(--color-secondary);
+            }
+
+            button:disabled {
+                cursor: not-allowed;
+                color: var(--color-secondary);
             }
         `;
 
         const template = document.createElement("template");
         template.innerHTML = `
-            <div class="pill">
+            <button type="button">
+                <span class="material-symbols-rounded"></span>
                 <slot></slot>
-            </div>
+            </button>
         `;
 
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(template.content.cloneNode(true));
-        this.pillElement = this.shadowRoot.querySelector("div.pill");
-        this.rendered = true;
-    }
+        this.buttonElement = this.shadowRoot.querySelector("button");
+        this.buttonElement.addEventListener("click", () => {
+            if (this.disabled) {
+                return;
+            }
 
-    get variant() {
-        return this.getAttribute("variant") || "normal";
+            if (this.href) {
+                window.location.href = this.href;
+            }
+        });
+        this.rendered = true;
     }
 
     get icon() {
         return this.getAttribute("icon") || null;
     }
 
+    get href() {
+        return this.getAttribute("href") || null;
+    }
+
+    get disabled() {
+        return this.hasAttribute("disabled");
+    }
+
     update() {
-        if (!this.pillElement) {
+        if (!this.buttonElement) {
             return;
         }
 
-        this.pillElement.className = `pill ${this.variant}`;
-
-        const currentIcon = this.pillElement.querySelector(
+        this.buttonElement.disabled = this.disabled;
+        const currentIcon = this.buttonElement.querySelector(
             ".material-symbols-rounded",
         );
         if (this.icon) {
             const icon = currentIcon ?? document.createElement("span");
             icon.classList.add("material-symbols-rounded");
             icon.textContent = this.icon;
-            this.pillElement.prepend(icon);
+            this.buttonElement.prepend(icon);
         } else if (currentIcon) {
-            this.pillElement.removeChild(currentIcon);
+            this.buttonElement.removeChild(currentIcon);
         }
     }
 }
 
-customElements.define("tf-pill", TfPill);
+customElements.define("tf-menu-entry", TfMenuEntry);

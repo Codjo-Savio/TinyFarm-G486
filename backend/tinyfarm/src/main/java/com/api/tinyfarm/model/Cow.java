@@ -17,9 +17,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Cow extends Animal {
     public enum CowType {
-        D("Dairy"),
-        B("Beef"),
-        C("Calf");
+        D("D"),
+        C("C");
 
         private final String wording;
 
@@ -43,6 +42,15 @@ public class Cow extends Animal {
     @Column(name = "milking")
     private Boolean milking;
 
+    @Column(name = "milk")
+    private int milk;
+
+    @Column(name = "hay_today")
+    private Boolean hayToday = false;
+
+    @Column(name = "sick_days")
+    private int sickDays;
+
     @PrePersist
     @Override
     public void prePersist() {
@@ -52,6 +60,9 @@ public class Cow extends Animal {
         }
         if (this.cowType == null) {
             this.cowType = CowType.C;
+        }
+        if (this.hayToday == null) {
+            this.hayToday = true;
         }
     }
 }

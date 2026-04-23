@@ -11,6 +11,8 @@ public interface CowRepository extends JpaRepository<Cow, Long> {
 
     Optional<Cow> findById(Long id);
     Optional<Cow> findByName(String name);
+
     void deleteByName(String name);
     void deleteAll();
+    java.util.List<Cow> findByUserId(Long userId);
 }

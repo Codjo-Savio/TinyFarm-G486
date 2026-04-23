@@ -49,7 +49,7 @@ public class CowRepositoryTest {
     void shouldFindCowById() {
         // ARRANGE
         Cow cow = new Cow();
-        cow.setCowType(Cow.CowType.B);
+        cow.setCowType(Cow.CowType.C);
         cow.setName("Marguerite");
         cow.setAge(4);
         cow.setWeight(500.0f);
@@ -72,7 +72,7 @@ public class CowRepositoryTest {
         cow1.setWeight(450.0f);
 
         Cow cow2 = new Cow();
-        cow2.setCowType(Cow.CowType.B);
+        cow2.setCowType(Cow.CowType.C);
         cow2.setName("Bovino");
         cow2.setWeight(600.0f);
 
@@ -118,4 +118,7 @@ public class CowRepositoryTest {
         Optional<Cow> found = cowRepository.findById(cow.getId());
         assertFalse(found.isPresent());
     }
+
+    // @Test
+    // void
 }

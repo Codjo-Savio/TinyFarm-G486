@@ -49,7 +49,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         String jwtValue = token.getTokenValue();
 
         Cookie cookie = new Cookie("jwt", jwtValue);
-        cookie.setHttpOnly(false);
+        cookie.setHttpOnly(true);
         cookie.setSecure(request.isSecure());
         cookie.setPath("/");
         cookie.setMaxAge(3600);

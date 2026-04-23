@@ -70,7 +70,6 @@ public class UserController {
         }
     }
 
-    // DELETE /users/1 → supprimer un user
     @DeleteMapping("/id/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {

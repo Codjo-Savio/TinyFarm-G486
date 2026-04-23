@@ -6,21 +6,37 @@ class TfProgressBar extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
+        this.rendered = false;
+    }
 
-        this.shadowRoot.innerHTML = `
-        <style>
+    connectedCallback() {
+        this.render();
+        this.update();
+    }
+
+    attributeChangedCallback() {
+        this.update();
+    }
+
+    render() {
+        if (this.rendered) {
+            return;
+        }
+
+        const style = document.createElement("style");
+        style.textContent = `
             :host {
                 display: inline-block;
             }
 
-            .tf-progress-bar {
+            .progress-bar {
                 width: 100%;
                 height: 8px;
                 background-color: var(--color-secondary);
                 border-radius: 1000px;
             }
 
-            .tf-progress-bar.light {
+            .progress-bar.light {
                 background-color: var(--color-surface-dark);
             }
 
@@ -30,23 +46,21 @@ class TfProgressBar extends HTMLElement {
                 background-color: var(--color-primary);
                 border-radius: 1000px;
             }
-        </style>
-
-        <div class="tf-progress-bar">
-            <div class="line"></div>
-        </div>
         `;
-        this.tfProgressBar = this.shadowRoot.querySelector(
-            "div.tf-progress-bar",
-        );
-    }
 
-    connectedCallback() {
-        this.update();
-    }
+        const template = document.createElement("template");
+        template.innerHTML = `
+            <div class="progress-bar">
+                <div class="line"></div>
+            </div>
+        `;
 
-    attributeChangedCallback() {
-        this.update();
+        this.shadowRoot.appendChild(style);
+        this.shadowRoot.appendChild(template.content.cloneNode(true));
+        this.progressBarElement =
+            this.shadowRoot.querySelector("div.progress-bar");
+        this.lineElement = this.progressBarElement.querySelector(".line");
+        this.rendered = true;
     }
 
     get progress() {
@@ -58,10 +72,12 @@ class TfProgressBar extends HTMLElement {
     }
 
     update() {
-        this.tfProgressBar.className = `tf-progress-bar ${this.variant}`;
+        if (!this.progressBarElement || !this.lineElement) {
+            return;
+        }
 
-        const line = this.tfProgressBar.querySelector(".line");
-        line.style.width = `${this.progress}%`;
+        this.progressBarElement.className = `progress-bar ${this.variant}`;
+        this.lineElement.style.width = `${this.progress}%`;
     }
 }
 

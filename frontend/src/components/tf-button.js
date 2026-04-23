@@ -1,14 +1,30 @@
 class TfButton extends HTMLElement {
     static get observedAttributes() {
-        return ["variant", "disabled", "icon", "size", "loading"];
+        return ["variant", "disabled", "icon", "size", "loading", "icon-only"];
     }
 
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
+        this.rendered = false;
+    }
 
-        this.shadowRoot.innerHTML = `
-        <style>
+    connectedCallback() {
+        this.render();
+        this.update();
+    }
+
+    attributeChangedCallback() {
+        this.update();
+    }
+
+    render() {
+        if (this.rendered) {
+            return;
+        }
+
+        const style = document.createElement("style");
+        style.textContent = `
             .material-symbols-rounded {
                 font-family: "Material Symbols Rounded";
                 font-weight: normal;
@@ -28,6 +44,7 @@ class TfButton extends HTMLElement {
 
             :host {
                 display: inline-block;
+                flex-shrink: 0;
             }
 
             button {
@@ -53,6 +70,10 @@ class TfButton extends HTMLElement {
 
             button:has(.material-symbols-rounded) {
                 padding-left: 12px
+            }
+
+            button.icon-only:has(.material-symbols-rounded) {
+                padding: 12px
             }
 
             button.primary {
@@ -147,21 +168,19 @@ class TfButton extends HTMLElement {
                         100% 200%;
                 }
             }
-        </style>
-
-        <button part="button">
-            <slot></slot>
-        </button>
         `;
-        this.tfButton = this.shadowRoot.querySelector("button");
-    }
 
-    connectedCallback() {
-        this.update();
-    }
+        const template = document.createElement("template");
+        template.innerHTML = `
+            <button part="button">
+                <slot></slot>
+            </button>
+        `;
 
-    attributeChangedCallback() {
-        this.update();
+        this.shadowRoot.appendChild(style);
+        this.shadowRoot.appendChild(template.content.cloneNode(true));
+        this.buttonElement = this.shadowRoot.querySelector("button");
+        this.rendered = true;
     }
 
     get variant() {
@@ -180,24 +199,33 @@ class TfButton extends HTMLElement {
         return this.getAttribute("icon") || null;
     }
 
+    get iconOnly() {
+        return this.hasAttribute("icon-only");
+    }
+
     get size() {
         return this.getAttribute("size") || "normal";
     }
 
     update() {
-        this.tfButton.disabled = this.disabled || this.loading;
-        this.tfButton.className = `${this.variant} ${this.size} ${this.loading ? "loading" : ""}`;
+        if (!this.buttonElement) {
+            return;
+        }
 
-        const currentIcon = this.tfButton.querySelector(
+        this.buttonElement.disabled = this.disabled || this.loading;
+        this.buttonElement.className =
+            `${this.variant} ${this.size} ${this.loading ? "loading" : ""} ${this.iconOnly ? "icon-only" : ""}`.trim();
+
+        const currentIcon = this.buttonElement.querySelector(
             ".material-symbols-rounded",
         );
         if (this.icon) {
             const icon = currentIcon ?? document.createElement("span");
             icon.classList.add("material-symbols-rounded");
             icon.textContent = this.icon;
-            this.tfButton.prepend(icon);
+            this.buttonElement.prepend(icon);
         } else if (currentIcon) {
-            this.tfButton.removeChild(currentIcon);
+            this.buttonElement.removeChild(currentIcon);
         }
     }
 }
