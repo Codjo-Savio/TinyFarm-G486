@@ -32,10 +32,98 @@
     <body>
         <tf-layout>
             <tf-app-bar></tf-app-bar>
-            <main>
-                <!-- Write your code here -->
-            </main>
+            <main class="container">
+                <div class="taskbar">
+                    <div class="taskbar-left">
+                        <a
+                            class="btn-back"
+                            onclick="
+                                window.location.href = window.location.search
+                                    ? window.location.search.replace(
+                                          '?from=',
+                                          '',
+                                      )
+                                    : '/dashboard'
+                            "
+                        >
+                            <span class="material-symbols-rounded"
+                                >arrow_back</span
+                            >
+                            Retour
+                        </a>
+                    </div>
 
+                    <div class="taskbar-right">
+                        <div class="taskbar-stat">
+                            <span class="material-symbols-rounded"
+                                >cruelty_free</span
+                            >
+                            <p id="rabbit-count">0/50</p>
+                            <p>Lapins</p>
+                        </div>
+
+                        <div class="taskbar-stat">
+                            <span class="material-symbols-rounded">pets</span>
+                            <p id="baby-rabbit-count">0/50</p>
+                            <p>Lapereaux</p>
+                        </div>
+
+                        <button class="sell-button" type="button">
+                            <span class="material-symbols-rounded">sell</span>
+                            Vendre
+                        </button>
+
+                        <div class="actions-wrapper">
+                            <button
+                                id="more-actions-btn"
+                                class="more-actions-button"
+                                type="button"
+                                onclick="toggleActionsMenu()"
+                            >
+                                <span class="material-symbols-rounded"
+                                    >more_horiz</span
+                                >
+                            </button>
+
+                            <div id="actions-menu" class="actions-menu">
+                                <button
+                                    id="feed-all-btn"
+                                    type="button"
+                                    onclick="feedAll()"
+                                >
+                                    Nourrir tout
+                                </button>
+                                <button
+                                    id="water-all-btn"
+                                    type="button"
+                                    onclick="waterAll()"
+                                >
+                                    Abreuver tout
+                                </button>
+                                <button
+                                    id="heal-all-btn"
+                                    type="button"
+                                    onclick="healAll()"
+                                >
+                                    Soigner tout
+                                </button>
+                                <button
+                                    id="clean-all-btn"
+                                    type="button"
+                                    onclick="cleanAll()"
+                                >
+                                    Nettoyer tout
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <section>
+                    <h1 class="page-title">Clapier</h1>
+                    <div class="game-grid" id="game-grid"></div>
+                </section>
+            </main>
             <tf-bottom-actions size="small"></tf-bottom-actions>
         </tf-layout>
     </body>

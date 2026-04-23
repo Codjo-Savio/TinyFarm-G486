@@ -39,16 +39,13 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers("/api/public/**").permitAll()
-                                .requestMatchers("/api/auth/login/oauth2/**").permitAll()
-                                .requestMatchers("/login/oauth2/**").permitAll()
-                                .requestMatchers("/auth/error").permitAll()
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated())
                 .oauth2Login(oauth -> oauth
                         .authorizationEndpoint(
                                 endpoint -> endpoint.baseUri("/api/auth/login/oauth2/authorization/"))
                         .redirectionEndpoint(
-                                endpoint -> endpoint.baseUri("/login/oauth2/code/*"))
+                                endpoint -> endpoint.baseUri("/api/auth/login/oauth2/code/*"))
                         .userInfoEndpoint(info -> info.userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
                         .failureHandler(oAuth2FailureHandler))
