@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS rabbit (
 CREATE TABLE IF NOT EXISTS cow (
     aid INTEGER PRIMARY KEY REFERENCES animal (aid) ON DELETE CASCADE ON UPDATE CASCADE,
     name VARCHAR(50),
-    cow_type VARCHAR(20) CHECK (cow_type IN ('D', 'B', 'C')),
+    cow_type VARCHAR(20) CHECK (cow_type IN ('D', 'C')),
     milking BOOLEAN DEFAULT FALSE
 );
 
