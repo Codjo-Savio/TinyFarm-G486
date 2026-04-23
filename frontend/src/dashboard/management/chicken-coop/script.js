@@ -17,17 +17,16 @@ function getCookie(name) {
 }
 
 async function apiFetch(endpoint, options = {}) {
-    const jwt = getCookie("jwt");
     const headers = {
         "Content-Type": "application/json",
         ...options.headers,
     };
 
-    if (jwt) {
-        headers["Authorization"] = `Bearer ${jwt}`;
-    }
-
-    const res = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
+    const res = await fetch(`${API_URL}${endpoint}`, { 
+        ...options, 
+        headers,
+        credentials: "include"
+    });
     if (!res.ok) {
         if (res.status === 401 || res.status === 403) {
             window.location.href = "/"; // Redirect to login if unauthorized
@@ -161,6 +160,7 @@ async function performAction(chickenId, action) {
         });
         // Refresh data after action
         await fetchInitialData();
+        window.dispatchEvent(new CustomEvent("refresh-user-data"));
     } catch (error) {
         alert("Erreur lors de l'action : " + error.message);
     }
@@ -193,6 +193,7 @@ async function performAll(action) {
             });
         }
         await fetchInitialData();
+        window.dispatchEvent(new CustomEvent("refresh-user-data"));
     } catch (error) {
         alert("Erreur lors des actions groupées : " + error.message);
     } finally {

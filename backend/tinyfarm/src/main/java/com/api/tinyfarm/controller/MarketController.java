@@ -1,5 +1,6 @@
 package com.api.tinyfarm.controller;
 
+import java.util.List;
 import com.api.tinyfarm.model.Market;
 import com.api.tinyfarm.service.MarketService;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,15 @@ public class MarketController {
 
     public MarketController(MarketService marketService) {
         this.marketService = marketService;
+    }
+
+    @GetMapping("")
+    public ResponseEntity<List<Market>> getAll() {
+        try {
+            return ResponseEntity.ok(marketService.findAll());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("/id/{id}")
@@ -38,6 +48,15 @@ public class MarketController {
     public ResponseEntity<Market> getByPrice(@PathVariable float price) {
         try {
             return ResponseEntity.ok(marketService.findByPrice(price));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/quantity/{quantity}")
+    public ResponseEntity<Market> getByQuantity(@PathVariable int quantity) {
+        try {
+            return ResponseEntity.ok(marketService.findByQuantity(quantity));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

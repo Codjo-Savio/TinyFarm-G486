@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.api.tinyfarm.model.Market;
 import com.api.tinyfarm.model.MarketID;
-import java.util.Optional;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,7 @@ public class MarketRepositoryTest {
         market.setUserId(1L);
         market.setProductId(10L);
         market.setPrice(25.0f);
+        market.setQuantity(100);
 
         Market saved = marketRepository.save(market);
 
@@ -41,6 +42,7 @@ public class MarketRepositoryTest {
         assertEquals(1L, saved.getUserId());
         assertEquals(10L, saved.getProductId());
         assertEquals(25.0f, saved.getPrice());
+        assertEquals(100, saved.getQuantity());
     }
 
     @Test
@@ -52,7 +54,9 @@ public class MarketRepositoryTest {
         market.setPrice(25.0f);
         marketRepository.save(market);
 
-        Optional<Market> found = marketRepository.findByUserId(market.getUserId());
+        Optional<Market> found = marketRepository.findByUserId(
+            market.getUserId()
+        );
 
         assertTrue(found.isPresent());
         assertEquals(10L, found.get().getProductId());
@@ -67,7 +71,9 @@ public class MarketRepositoryTest {
         market.setPrice(25.0f);
         marketRepository.save(market);
 
-        Optional<Market> found = marketRepository.findByProductId(market.getProductId());
+        Optional<Market> found = marketRepository.findByProductId(
+            market.getProductId()
+        );
 
         assertTrue(found.isPresent());
         assertEquals(1L, found.get().getUserId());
@@ -82,10 +88,30 @@ public class MarketRepositoryTest {
         market.setPrice(25.0f);
         marketRepository.save(market);
 
-        Optional<Market> found = marketRepository.findByPrice(market.getPrice());
+        Optional<Market> found = marketRepository.findByPrice(
+            market.getPrice()
+        );
 
         assertTrue(found.isPresent());
         assertEquals(10L, found.get().getProductId());
+    }
+
+    @Test
+    void shouldFindByQuantity() {
+        Market market = new Market();
+        market.setMarketId(new MarketID(1L, 10L));
+        market.setUserId(1L);
+        market.setProductId(10L);
+        market.setPrice(25.0f);
+        market.setQuantity(100);
+        marketRepository.save(market);
+
+        Optional<Market> found = marketRepository.findByQuantity(
+            market.getQuantity()
+        );
+
+        assertTrue(found.isPresent());
+        assertEquals(100, found.get().getQuantity());
     }
 
     @Test
