@@ -1,3 +1,5 @@
+import { loadScriptIfNeeded } from "/utils/fetch.js";
+
 class TfDialog extends HTMLElement {
     static get observedAttributes() {
         return ["modal", "title", "title-icon", "show"];
@@ -44,7 +46,7 @@ class TfDialog extends HTMLElement {
 
             :host {
                 position: fixed;
-                z-index: 10;
+                z-index: 999;
             }
 
             .dialog {
@@ -101,8 +103,8 @@ class TfDialog extends HTMLElement {
             }
 
             .header > .material-symbols-rounded {
-                font-size: var(--font-size-icon-large);
-                font-variation-settings: var(--font-var-icon-large);
+                font-size: 36px;
+                font-variation-settings: "FILL" 0, "wght" 700, "GRAD" 2, "opsz" 36;
             }
 
             .window > .body {
@@ -150,10 +152,7 @@ class TfDialog extends HTMLElement {
             </div>
         `;
 
-        const script = document.createElement("script");
-        script.src = "/components/tf-button.js";
-        document.getElementsByTagName("head")[0].appendChild(script);
-
+        loadScriptIfNeeded("/components/tf-button.js");
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(template.content.cloneNode(true));
         this.dialogElement = this.shadowRoot.querySelector(".dialog");
