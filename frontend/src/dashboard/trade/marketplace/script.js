@@ -1,6 +1,7 @@
 import { fetchApiWithCredentials } from "/utils/fetch.js";
 
 const FAKE_MARKET_URL = "/fakeapi/trade/marketplace.json";
+const snackbarElement = document.querySelector("tf-snackbar");
 
 async function fetchAllMarkets() {
     const response = await fetchApiWithCredentials("/market");
@@ -237,12 +238,18 @@ function ajouterAuPanier(productId, userId) {
     const stock = Number(market.quantity);
 
     if (panier[itemKey] && panier[itemKey].quantity >= stock) {
-        alert("Limite de stock atteinte pour ce produit.");
+        snackbarElement.showSnackbar(
+            "Limite de stock atteinte pour ce produit.",
+            false,
+        );
         return;
     }
 
     if (getPanierTotalQuantity() >= 10) {
-        alert("Limite de 10 achats dans le panier atteinte.");
+        snackbarElement.showSnackbar(
+            "Limite de 10 achats dans le panier atteinte.",
+            false,
+        );
         return;
     }
 
@@ -282,12 +289,15 @@ async function payerPanier() {
     );
 
     if (!buyerId) {
-        alert("Utilisateur non identifié. Impossible de procéder.");
+        snackbarElement.showSnackbar(
+            "Utilisateur non identifié. Impossible de procéder.",
+            false,
+        );
         return;
     }
 
     if (Object.keys(panier).length === 0) {
-        alert("Votre panier est vide.");
+        snackbarElement.showSnackbar("Votre panier est vide.", false);
         return;
     }
 
@@ -330,8 +340,9 @@ async function payerPanier() {
                     `Erreur transaction produit ${item.productId}:`,
                     err,
                 );
-                alert(
+                snackbarElement.showSnackbar(
                     `Erreur lors de la création de la transaction pour le produit ${item.productId}`,
+                    false,
                 );
                 continue;
             }
@@ -366,8 +377,9 @@ async function payerPanier() {
                     `Erreur transfert stock pour transaction ${tid}:`,
                     err,
                 );
-                alert(
+                snackbarElement.showSnackbar(
                     `Erreur lors du transfert de stock pour la transaction ${tid}`,
+                    false,
                 );
                 continue;
             }
@@ -375,22 +387,29 @@ async function payerPanier() {
 
         // 3. Afficher le résultat et vider le panier si succès
         if (successCount === totalTransactions && totalTransactions > 0) {
-            alert(
-                `✓ Paiement réussi! ${successCount} transaction(s) complétée(s).`,
+            snackbarElement.showSnackbar(
+                `Paiement réussi ! ${successCount} transaction(s) complétée(s).`,
             );
             Object.keys(panier).forEach((key) => delete panier[key]);
             displayPanier();
             await initialiserBoutique(); // Actualiser la liste des produits
         } else if (successCount > 0) {
-            alert(
-                `⚠ Paiement partiel: ${successCount}/${totalTransactions} transaction(s) complétée(s).`,
+            snackbarElement.showSnackbar(
+                `Paiement partiel : ${successCount}/${totalTransactions} transaction(s) complétée(s).`,
+                false,
             );
         } else {
-            alert("✗ Aucune transaction n'a pu être complétée.");
+            snackbarElement.showSnackbar(
+                "Aucune transaction n'a pu être complétée.",
+                false,
+            );
         }
     } catch (err) {
         console.error("Erreur paiement:", err);
-        alert("Erreur lors du paiement. Veuillez réessayer.");
+        snackbarElement.showSnackbar(
+            "Erreur lors du paiement. Veuillez réessayer.",
+            false,
+        );
     } finally {
         // Désactive le mode loading du composant tf-button
         payButton?.removeAttribute("loading");
