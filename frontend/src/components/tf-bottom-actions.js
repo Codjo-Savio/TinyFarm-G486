@@ -216,7 +216,7 @@ class TfBottomActions extends HTMLElement {
         template.innerHTML = `
             <div class="bottom-actions">
                 <div class="links">
-                    <a id="coop" href="/dashboard/trade/cooperative?from=/dashboard">
+                    <a id="coop" href="/dashboard/trade/cooperative">
                         <span class="material-symbols-rounded large">
                             storefront
                         </span>
@@ -226,7 +226,7 @@ class TfBottomActions extends HTMLElement {
                         </div>
                         <div class="small-legend">Coopérative</div>
                     </a>
-                    <a id="marketplace" href="/dashboard/trade/marketplace?from=/dashboard">
+                    <a id="marketplace" href="/dashboard/trade/marketplace">
                         <span class="material-symbols-rounded large">
                             groups
                         </span>

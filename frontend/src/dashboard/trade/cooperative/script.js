@@ -26,6 +26,7 @@ async function initialiserBoutique() {
         inventaire = await response.json();
 
         container.innerHTML = "";
+        let totalStock = 0;
 
         for (const [idProduit, prix] of Object.entries(inventaire)) {
             // On récupère le vrai nom du produit grâce à l'ID, ou un nom par défaut si on ne le trouve pas
@@ -49,7 +50,10 @@ async function initialiserBoutique() {
             `;
 
             container.insertAdjacentHTML("beforeend", productHTML);
+
+            totalStock += details.stock;
         }
+        document.querySelector(".stock-info").innerHTML += totalStock;
     } catch (erreur) {
         console.error("Impossible de charger l'inventaire :", erreur);
         container.innerHTML = "<p>Erreur lors du chargement des produits.</p>";
@@ -111,6 +115,10 @@ function displayPanier() {
 displayPanier();
 
 function ajouterAuPanier(nomProduit) {
+    if (panier[nomProduit] == inventaire[nomProduit].stock) {
+        alert("Limite de stock atteinte pour ce produit.");
+        return;
+    }
     // Logique pour ajouter le produit au panier
     if (panier[nomProduit]) {
         panier[nomProduit]++;
