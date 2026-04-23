@@ -34,7 +34,7 @@ function formatPrice(price) {
 function renderEmptyInventoryState(container) {
     container.innerHTML = `
         <div class="empty-state">
-            <span class="material-symbols-rounded empty-state-icon">warehouse</span>
+            <span class="material-symbols-rounded empty-state-icon">inventory_2</span>
             <h2 class="empty-state-title">Aucun article disponible</h2>
             <p class="empty-state-text">La remise est vide pour le moment. Ajoute des produits pour commencer la vente.</p>
         </div>
@@ -175,7 +175,7 @@ async function initialiserBoutique() {
                             </span>
                         </button>
                         <span class="price" id="${getPriceElementId(nom)}">${formatPrice(values.price)}</span>
-                        <button class="btn-add" onclick="ajouterAuPanier('${escapedNom}')">Ajouter</button>
+                        <tf-button variant="primary" onclick="ajouterAuPanier('${escapedNom}')">Ajouter</tf-button>
                     </div>
                 </div>
             `;
@@ -216,17 +216,13 @@ function displayPanier() {
                                     <span>${nom}</span>
                                     <div class="qty-control">
                                         <button class="btn-qty" onclick="retirerDuPanier('${escapedNom}')">
-                                            <span
-                                                class="material-symbols-rounded"
-                                            >
+                                            <span class="material-symbols-rounded">
                                                 remove_circle
                                             </span>
                                         </button>
                                         <span>${quantite}</span>
                                         <button class="btn-qty" onclick="ajouterAuPanier('${escapedNom}')">
-                                            <span
-                                                class="material-symbols-rounded"
-                                            >
+                                            <span class="material-symbols-rounded">
                                                 add_circle
                                             </span>
                                         </button>
