@@ -2,6 +2,7 @@ import { fetchApiWithCredentials } from "/utils/fetch.js";
 
 const FAKE_MARKET_URL = "/fakeapi/trade/marketplace.json";
 const snackbarElement = document.querySelector("tf-snackbar");
+const appbarElement = document.querySelector("tf-app-bar");
 
 async function fetchAllMarkets() {
     const response = await fetchApiWithCredentials("/market");
@@ -411,7 +412,8 @@ async function payerPanier() {
             false,
         );
     } finally {
-        // Désactive le mode loading du composant tf-button
+        // Met à jour les écus de l'appbar et désactive le mode loading du composant tf-button
+        appbarElement.update();
         payButton?.removeAttribute("loading");
     }
 }
