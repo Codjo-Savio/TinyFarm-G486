@@ -1,29 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap");
-
-:root {
-    --color-primary: #55361b;
-    --color-secondary: #f2d49f;
-    --color-surface: #fff4e0;
-    --color-surface-dark: #ffefce;
-    --color-gold: #db9519;
-    --color-gold-dark: #8e6317;
-
-    --font-size-title: 64px;
-    --font-size-subtitle: 32px;
-    --font-size-body-large: 22px;
-    --font-size-body: 16px;
-    --font-size-icon: 24px;
-    --font-size-icon-large: 32px;
-
-    --font-weight-title: bold;
-    --font-weight-subtitle: bold;
-    --font-weight-body-large: normal;
-    --font-weight-body: normal;
-    --font-weight-icon: bold;
-
-    --border-radius: 20px;
-}
-
 * {
     box-sizing: border-box;
     margin: 0;
@@ -184,7 +158,7 @@ h2.category-title {
 
 .cart-card {
     background-color: var(--color-surface-dark);
-    border-radius: var(--border-radius);
+    border-radius: var(--radius);
     padding: 20px;
     padding-bottom: 30px;
     display: flex;
@@ -284,7 +258,7 @@ h2.category-title {
     flex: 1;
     height: 90px;
     background-color: var(--color-secondary);
-    border-radius: var(--border-radius);
+    border-radius: var(--radius);
 
     display: flex;
     flex-direction: row;
@@ -325,7 +299,7 @@ h2.category-title {
     height: 90px;
     width: 100%;
     padding: 0 30px;
-    border-radius: var(--border-radius);
+    border-radius: var(--radius);
     display: flex;
     justify-content: space-between;
     align-items: center;

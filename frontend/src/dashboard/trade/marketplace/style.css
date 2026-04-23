@@ -87,7 +87,7 @@ h1.page-title {
 
 .cart-card {
     background-color: var(--color-surface-dark);
-    border-radius: var(--border-radius);
+    border-radius: var(--radius);
     padding: 20px;
     padding-bottom: 20px;
     display: flex;
@@ -178,7 +178,7 @@ h1.page-title {
     flex: 1;
     height: 90px;
     background-color: var(--color-secondary);
-    border-radius: var(--border-radius);
+    border-radius: var(--radius);
 
     display: flex;
     flex-direction: row;
@@ -221,7 +221,7 @@ h1.page-title {
     height: 90px;
     width: 100%;
     padding: 0 30px;
-    border-radius: var(--border-radius);
+    border-radius: var(--radius);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -230,7 +230,7 @@ h1.page-title {
 
 .empty-market-state {
     background-color: var(--color-surface-dark);
-    border-radius: var(--border-radius);
+    border-radius: var(--radius);
     min-height: 280px;
     width: 100%;
     display: flex;
