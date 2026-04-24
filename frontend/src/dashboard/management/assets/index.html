@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,11 +8,11 @@
         <!-- Config -->
         <script src="/config.js"></script>
         <!-- Components -->
-        <script src="/components/tf-app-bar.js"></script>
-        <script src="/components/tf-bottom-actions.js"></script>
-        <script src="/components/tf-layout.js"></script>
+        <script type="module" src="/components/tf-app-bar.js"></script>
+        <script type="module" src="/components/tf-bottom-actions.js"></script>
+        <script type="module" src="/components/tf-layout.js"></script>
         <!-- Theme -->
-        <link rel="stylesheet" href="/styles/theme.css" />
+        <link rel="stylesheet" href="/utils/theme.css" />
         <!-- Font -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,7 +22,7 @@
         />
         <!-- Custom page style and script -->
         <link rel="stylesheet" href="style.css" />
-        <script src="script.js" defer></script>
+        <script type="module" src="script.js" defer></script>
     </head>
 
     <body>
@@ -30,13 +30,7 @@
             <tf-app-bar></tf-app-bar>
             <main class="container">
                 <div class="sub-header">
-                    <a
-                        onclick="
-                            window.location.href = window.location.search
-                                ? window.location.search.replace('?from=', '')
-                                : '/dashboard'
-                        "
-                        class="btn-back"
+                    <a onclick="window.history.back()" class="btn-back"
                         ><span class="material-symbols-rounded">
                             keyboard_backspace
                         </span>

@@ -1,22 +1,27 @@
 package com.api.tinyfarm.controller;
 
+import com.api.tinyfarm.dto.MarketBuyRequest;
+import com.api.tinyfarm.dto.PublishProductToTradeRequest;
 import com.api.tinyfarm.model.Market;
 import com.api.tinyfarm.service.MarketService;
+import com.api.tinyfarm.service.StockService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/market")
 public class MarketController {
 
-    private final MarketService marketService;
-
-    public MarketController(MarketService marketService) {
-        this.marketService = marketService;
-    }
+    @Autowired
+    private MarketService marketService;
+    @Autowired
+    private StockService stockService;
 
     @GetMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #id)")
     public ResponseEntity<Market> getByUserId(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(marketService.findByUserId(id));
@@ -53,6 +58,7 @@ public class MarketController {
     }
 
     @PostMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Market> create(@RequestBody Market market) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -67,7 +73,45 @@ public class MarketController {
         }
     }
 
+    @PostMapping("/buy")
+    @PreAuthorize("@securityAuthorizationService.canBuyFromMarket(authentication, #request)")
+    public ResponseEntity<Void> buyFromMarket(@RequestBody MarketBuyRequest request) {
+        try {
+            marketService.buyFromMarket(
+                request.getBuyerId(),
+                request.getSellerId(),
+                request.getProductId(),
+                request.getQuantity()
+            );
+            return ResponseEntity.ok().build();
+        }catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(
+                HttpStatus.INTERNAL_SERVER_ERROR
+            ).build();
+        }
+    }
+
+    @PostMapping("/ad")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Market> publishToMarket(@RequestBody PublishProductToTradeRequest request) {
+        try {
+            Market market = stockService.publishToMarket(
+                    request.getProductId(),
+                    request.getQuantity(),
+                    request.getUnitPrice());
+            return ResponseEntity.status(HttpStatus.CREATED).body(market);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(
+                    HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @PutMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #id)")
     public ResponseEntity<Market> update(
         @PathVariable Long id,
         @RequestBody Market market
@@ -80,7 +124,8 @@ public class MarketController {
     }
 
     @DeleteMapping("/{userId}/{productId}")
-    public ResponseEntity<Void> deleteProductById(
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #userId)")
+    public ResponseEntity<Void> deleteByProductId(
         @PathVariable Long userId,
         @PathVariable Long productId
     ) {
@@ -93,6 +138,7 @@ public class MarketController {
     }
 
     @DeleteMapping("/id/{uid}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #uid)")
     public ResponseEntity<Void> deleteById(@PathVariable Long uid) {
         try {
             marketService.deleteByID(uid);

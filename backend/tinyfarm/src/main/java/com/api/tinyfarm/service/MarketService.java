@@ -5,6 +5,8 @@ import com.api.tinyfarm.model.MarketID;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.MarketRepository;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -13,23 +15,31 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class MarketService {
 
-    private final MarketRepository marketRepository;
-
-    public MarketService(MarketRepository marketRepository) {
-        this.marketRepository = marketRepository;
-    }
+    @Autowired
+    private MarketRepository marketRepository;
+    @Autowired
+    private TradeService tradeService;
 
     public Market findByUserId(Long uid) {
         return marketRepository
-            .findByUserId(uid)
+            .findByMarketIdUserId(uid)
             .orElseThrow(() ->
                 new RuntimeException("Marché introuvable : " + uid)
             );
     }
 
+    public Market findById(MarketID id) {
+        return marketRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Marché introuvable pour l'utilisateur : " + id.getUserId()
+                         + " ou pour le produit : " + id.getProductId())
+                );
+    }
+
     public Market findByProductId(Long productID) {
         return marketRepository
-            .findByProductId(productID)
+            .findByMarketIdProductId(productID)
             .orElseThrow(() ->
                 new RuntimeException("Marché introuvable : " + productID)
             );
@@ -52,7 +62,6 @@ public class MarketService {
     }
 
     public Market create(Market market) {
-        syncMarketId(market);
         Authentication authentication =
             SecurityContextHolder.getContext().getAuthentication();
         if (
@@ -61,6 +70,7 @@ public class MarketService {
         ) {
             market.setUserId(currentUser.getId());
         }
+        syncMarketId(market);
         return marketRepository.save(market);
     }
 
@@ -72,7 +82,7 @@ public class MarketService {
         Market existing = findByUserId(uid);
         existing.setUserId(modifiedMarket.getUserId());
         existing.setProductId(modifiedMarket.getProductId());
-        existing.setPrice(modifiedMarket.getPrice());
+        existing.setUnitPrice(modifiedMarket.getUnitPrice());
         syncMarketId(existing);
         return marketRepository.save(existing);
     }
@@ -80,7 +90,7 @@ public class MarketService {
     @Transactional
     public void deleteProductById(Long userId, Long productId) {
         try {
-            marketRepository.deleteByUserIdAndProductId(userId, productId);
+            marketRepository.deleteByMarketIdUserIdAndMarketIdProductId(userId, productId);
         } catch (Exception e) {
             throw new RuntimeException(
                 "Impossible de retirer le produit du marché : " + e.getMessage()
@@ -90,11 +100,7 @@ public class MarketService {
 
     @Transactional
     public void deleteByID(Long uid) {
-        marketRepository.deleteByUserId(uid);
-    }
-
-    public void deleteAll() {
-        marketRepository.deleteAll();
+        marketRepository.deleteByMarketIdUserId(uid);
     }
 
     private void syncMarketId(Market market) {
@@ -104,5 +110,27 @@ public class MarketService {
         market.setMarketId(
             new MarketID(market.getUserId(), market.getProductId())
         );
+    }
+
+    public void buyFromMarket(
+        Long buyerId,
+        Long sellerId,
+        Long productId,
+        Integer quantity
+    ) {
+        MarketID marketId = new MarketID(sellerId, productId);
+        Market market = findById(marketId);
+
+        syncMarketId(market);
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+        if (
+                authentication != null &&
+                        authentication.getPrincipal() instanceof User currentUser
+        ) {
+            buyerId = currentUser.getId(); // the buyer is the one who is connected on his application
+        }
+
+        tradeService.buy(sellerId, buyerId, productId, quantity, market.getUnitPrice());
     }
 }

@@ -46,7 +46,8 @@ class JwtRequestFilterTest {
             1500F,
             false,
             null,
-            1
+            1,
+            12
         );
         Jwt jwt = new Jwt(
             "valid-token",

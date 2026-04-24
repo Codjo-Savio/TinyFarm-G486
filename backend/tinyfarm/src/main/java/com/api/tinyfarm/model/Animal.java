@@ -1,12 +1,13 @@
 package com.api.tinyfarm.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "Animal")
+@Table(name = "animal")
 @Inheritance(strategy = InheritanceType.JOINED)
 @Data
 @NoArgsConstructor
@@ -19,6 +20,16 @@ public class Animal {
 
     @Column(name = "uid")
     private Long userId;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "uid",
+            referencedColumnName = "uid",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private User user;
 
     @Column(name = "clean")
     private Boolean clean;
@@ -64,9 +75,6 @@ public class Animal {
         }
         if (healthy == null) {
             healthy = true;
-        }
-        if (age == null) {
-            age = 0;
         }
         if (weight == null) {
             weight = 1f;

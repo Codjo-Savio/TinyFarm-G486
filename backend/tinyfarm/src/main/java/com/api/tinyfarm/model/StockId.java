@@ -2,7 +2,6 @@ package com.api.tinyfarm.model;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
-import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StockId implements Serializable {
 
-    private Long uid;
-    private Long productID;
+    private Long userId;
+    private Long productId;
 }

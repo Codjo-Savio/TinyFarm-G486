@@ -1,12 +1,11 @@
-class TfAppBar extends HTMLElement {
-    API_URL = window.apiUrl || "http://localhost:8080/api";
+import { fetchApiWithCredentials, loadScriptIfNeeded } from "/utils/fetch.js";
 
+class TfAppBar extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
         this.rendered = false;
         this.userLoadPromise = null;
-        this.userLoaded = false;
         this.listenersAttached = false;
     }
 
@@ -16,71 +15,41 @@ class TfAppBar extends HTMLElement {
         this.update();
     }
 
-    getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) return parts.pop().split(";").shift();
-    }
-
     async fetchUser() {
         try {
-            const jwt = this.getCookie("jwt");
-
-            if (!jwt) throw new Error();
-
-            const userRes = await fetch(`${this.API_URL}/auth/me`, {
-                headers: new Headers({
-                    Authorization: "Bearer " + jwt,
-                }),
-            });
-
-            if (userRes.status !== 200) throw new Error();
-
-            const user = await userRes.json();
-
-            const res = await fetch(`${this.API_URL}/users/id/${user.id}`, {
-                headers: new Headers({
-                    Authorization: "Bearer " + jwt,
-                }),
-            });
-            return await res.json();
-        } catch {
+            const currentUserRes = await fetchApiWithCredentials("/auth/me");
+            if (currentUserRes.status !== 200) throw new Error();
+            const authUser = await currentUserRes.json();
+            
+            const fullUserRes = await fetchApiWithCredentials(`/users/id/${authUser.id}`);
+            if (fullUserRes.status !== 200) throw new Error();
+            return fullUserRes.json();
+        } catch (e) {
             window.location.href = "/";
             return null;
         }
     }
 
     async logout() {
-        const jwt = this.getCookie("jwt");
-
-        let res = await fetch(`${this.API_URL}/auth/logout`, {
-            method: "POST",
-            credentials: "include",
-            redirect: "manual",
-            headers: new Headers({
-                Authorization: "Bearer " + jwt,
-            }),
-        });
-        console.log("Logout response:", res);
-        if (res.ok || res.status === 0) {
-            // Status = 0 when Spring redirects to /login?logout
+        const res = await fetchApiWithCredentials("/auth/logout", "POST");
+        if (res.ok) {
             window.location.href = "/";
+        } else {
+            console.error("Cannot logout the user");
+            console.erreur(await res.text());
         }
     }
 
     showHibernateDialog() {
-        this.accountMenu.classList.remove("open");
+        this.accountMenu.closeMenu();
         this.dialogElement.setAttribute("show", "");
     }
 
     async hibernate() {
-        await fetch(`${this.API_URL}/users/hibernate/id/${this.user.id}`, {
-            method: "PATCH",
-            credentials: "include",
-            headers: new Headers({
-                Authorization: "Bearer " + this.getCookie("jwt"),
-            }),
-        });
+        await fetchApiWithCredentials(
+            `/users/hibernate/id/${this.user.id}`,
+            "PATCH",
+        );
         this.logout();
     }
 
@@ -149,60 +118,17 @@ class TfAppBar extends HTMLElement {
                 position: relative;
             }
 
-            .appbar > .infos-right > #account {
+            .appbar > .infos-right > tf-menu#account-menu > #account {
                 display: flex;
                 gap: 12px;
                 align-items: center;
                 cursor: pointer;
             }
 
-            .appbar > .infos-right > #account > img {
+            .appbar > .infos-right > tf-menu#account-menu > #account > img {
                 height: 40px;
                 width: auto;
                 border-radius: 100px;
-            }
-
-            .appbar > .infos-right > #account-menu {
-                background-color: var(--color-surface-dark);
-                position: absolute;
-                top: 64px;
-                right: -16px;
-                margin-top: 8px;
-                border-radius: var(--radius);
-                box-shadow: var(--shadow);
-                display: flex;
-                flex-direction: column;
-                font-weight: normal;
-                min-width: 264px;
-                max-height: 0px;
-                padding: 0px 6px;
-                overflow: hidden;
-                transition-duration: 0.3s;
-                transform: translateY(-8px);
-            }
-
-            .appbar > .infos-right > #account-menu.open {
-                max-height: 156px;
-                padding: 6px;
-                transform: translateY(0px);
-            }
-
-            .appbar > .infos-right > #account-menu > * {
-                display: flex;
-                gap: 16px;
-                padding: 12px;
-                border-radius: calc(var(--radius) - 6px);
-                color: var(--color-primary);
-                text-decoration: none;
-                border: none;
-                cursor: pointer;
-                background-color: transparent;
-                font: inherit;
-                font-size: inherit;
-            }
-
-            .appbar > .infos-right > #account-menu > *:hover {
-                background-color: var(--color-secondary);
             }
 
             .appbar > .infos-right > #money {
@@ -216,12 +142,16 @@ class TfAppBar extends HTMLElement {
                 color: var(--color-gold-dark);
                 line-height: 1;
             }
+
+            .appbar {
+                z-index: 99;
+            }
         `;
 
         const template = document.createElement("template");
         template.innerHTML = `
             <div class="appbar">
-                <tf-dialog title="Mettre la ferme en hibernation" title-icon="person" modal>
+                <tf-dialog title="Mettre la ferme en hibernation" title-icon="pause_circle" modal>
                     Vous retrouverez votre ferme et vos animaux dans le même état qu'à votre départ lors de votre prochaine connexion.
                     Si votre compte hiberne pendant plus de 50 jours, il sera automatiquement supprimé.
                     <tf-button class="cancel" slot="cancel-button" variant="secondary">Annuler</tf-button>
@@ -242,32 +172,44 @@ class TfAppBar extends HTMLElement {
                         <span class="material-symbols-rounded">paid</span>
                         <span id="money-level">-</span>
                     </div>
-                    <div id="account">
-                        <span id="username">-</span>
-                        <img src="/assets/farmer-icon.png" alt="Avatar" />
-                    </div>
-                    <div id="account-menu">
-                        <a href="/doc/rules?from=/dashboard">
-                            <span class="material-symbols-rounded">book</span>
-                            <span>Règles du jeu</span>
-                        </a>
-                        <button id="hibernate">
-                            <span class="material-symbols-rounded">pause_circle</span>
-                            <span>Hiberner</span>
-                        </button>
-                        <button id="logout">
-                            <span class="material-symbols-rounded">logout</span>
-                            <span>Déconnexion</span>
-                        </button>
-                    </div>
+                    <tf-menu id="account-menu" offset-x="-151" offset-y="32">
+                        <div id="account" slot="menu-target">
+                            <span id="username">-</span>
+                            <img src="/assets/farmer-icon.png" alt="Avatar" />
+                        </div>
+                        <tf-menu-group slot="group">
+                            <tf-menu-entry
+                                id="rules"
+                                slot="entry"
+                                icon="book"
+                                href="/doc/rules"
+                            >
+                                Règles du jeu
+                            </tf-menu-entry>
+                        </tf-menu-group>
+                        <tf-menu-group slot="group" legend="Compte">
+                            <tf-menu-entry
+                                id="hibernate"
+                                slot="entry"
+                                icon="pause_circle"
+                            >
+                                Hiberner
+                            </tf-menu-entry>
+                            <tf-menu-entry
+                                id="logout"
+                                slot="entry"
+                                icon="logout"
+                            >
+                                Déconnexion
+                            </tf-menu-entry>
+                        </tf-menu-group>
+                    </tf-menu>
                 </div>
             </div>
         `;
 
-        let script = document.createElement("script");
-        script.src = "/components/tf-dialog.js";
-        document.getElementsByTagName("head")[0].appendChild(script);
-
+        loadScriptIfNeeded("/components/tf-menu.js");
+        loadScriptIfNeeded("/components/tf-dialog.js");
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(template.content.cloneNode(true));
         this.appbarElement = this.shadowRoot.querySelector(".appbar");
@@ -276,7 +218,6 @@ class TfAppBar extends HTMLElement {
         this.usernameElement = this.appbarElement.querySelector("#username");
         this.moneyLevelElement =
             this.appbarElement.querySelector("#money-level");
-        this.accountButton = this.appbarElement.querySelector("#account");
         this.accountMenu = this.appbarElement.querySelector("#account-menu");
         this.logoutButton = this.accountMenu.querySelector("#logout");
         this.hibernateButton = this.accountMenu.querySelector("#hibernate");
@@ -286,8 +227,8 @@ class TfAppBar extends HTMLElement {
         this.rendered = true;
     }
 
-    async update() {
-        if (!this.levelElement || this.userLoaded) {
+    async update(force = false) {
+        if (!this.levelElement || (this.userLoaded && !force)) {
             return;
         }
 
@@ -300,13 +241,11 @@ class TfAppBar extends HTMLElement {
         this.usernameElement.textContent = this.user.name;
         this.moneyLevelElement.textContent = this.user.ecus;
         this.appbarElement.classList.add("ready");
-        this.userLoaded = true;
     }
 
     setupEventListeners() {
         if (
             this.listenersAttached ||
-            !this.accountButton ||
             !this.accountMenu ||
             !this.logoutButton ||
             !this.hibernateButton ||
@@ -315,10 +254,6 @@ class TfAppBar extends HTMLElement {
         ) {
             return;
         }
-
-        this.accountButton.addEventListener("click", () => {
-            this.accountMenu.classList.toggle("open");
-        });
 
         this.logoutButton.addEventListener("click", () => {
             this.logout();
@@ -336,15 +271,8 @@ class TfAppBar extends HTMLElement {
             this.hibernate();
         });
 
-        // Close menu if outside click
-        document.addEventListener("click", (e) => {
-            const path = e.composedPath();
-            const clickedAccount = path.includes(this.accountButton);
-            const clickedMenu = path.includes(this.accountMenu);
-
-            if (!clickedAccount && !clickedMenu) {
-                this.accountMenu.classList.remove("open");
-            }
+        window.addEventListener("refresh-user-data", () => {
+            this.update(true);
         });
 
         this.listenersAttached = true;

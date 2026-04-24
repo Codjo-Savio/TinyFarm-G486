@@ -4,6 +4,7 @@ import com.api.tinyfarm.model.Cow;
 import com.api.tinyfarm.service.CowService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,7 @@ public class CowController {
     }
 
     @GetMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id)")
     public ResponseEntity<Cow> getById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(cowService.findById(id));
@@ -46,6 +48,7 @@ public class CowController {
     }
 
     @PostMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Cow> create(@RequestBody Cow cow) {
         try {
             return ResponseEntity.ok(cowService.create(cow));
@@ -57,6 +60,7 @@ public class CowController {
     }
 
     @PutMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id)")
     public ResponseEntity<Cow> update(@PathVariable Long id, @RequestBody Cow cow) {
         try {
             return ResponseEntity.ok(cowService.update(id, cow));
@@ -66,6 +70,7 @@ public class CowController {
     }
 
     @DeleteMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id)")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
             cowService.delete(id);

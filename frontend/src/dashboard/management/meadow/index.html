@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,15 +8,16 @@
         <!-- Config -->
         <script src="/config.js"></script>
         <!-- Components -->
-        <script src="/components/tf-app-bar.js"></script>
-        <script src="/components/tf-bottom-actions.js"></script>
-        <script src="/components/tf-layout.js"></script>
-        <script src="/components/tf-card.js"></script>
-        <script src="/components/tf-pill.js"></script>
-        <script src="/components/tf-button.js"></script>
-        <script src="/components/tf-progress-bar.js"></script>
+        <script type="module" src="/components/tf-app-bar.js"></script>
+        <script type="module" src="/components/tf-bottom-actions.js"></script>
+        <script type="module" src="/components/tf-layout.js"></script>
+        <script type="module" src="/components/tf-card.js"></script>
+        <script type="module" src="/components/tf-pill.js"></script>
+        <script type="module" src="/components/tf-button.js"></script>
+        <script type="module" src="/components/tf-progress-bar.js"></script>
+        <script type="module" src="/components/tf-menu.js"></script>
         <!-- Theme -->
-        <link rel="stylesheet" href="/styles/theme.css" />
+        <link rel="stylesheet" href="/utils/theme.css" />
         <!-- Font -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,7 +27,7 @@
         />
         <!-- Custom page style and script -->
         <link rel="stylesheet" href="style.css" />
-        <script src="script.js"></script>
+        <script type="module" src="script.js"></script>
     </head>
 
     <body>
@@ -37,19 +38,15 @@
                     <tf-button
                         icon="keyboard_backspace"
                         variant="secondary"
-                        onclick="
-                            window.location.href = window.location.search
-                                ? window.location.search.replace('?from=', '')
-                                : '/dashboard'
-                        "
+                        onclick="window.history.back()"
                         >Retour</tf-button
                     >
                     <div class="cows-stats">
                         <tf-pill icon="heart_broken"
-                            >Malade : <span id="sick-count"></span
+                            >Malades : <span id="sick-count"></span
                         ></tf-pill>
-                        <tf-pill icon="heart_broken"
-                            >Sale : <span id="dirty-count"></span
+                        <tf-pill icon="mop"
+                            >Sales : <span id="dirty-count"></span
                         ></tf-pill>
                         <span
                             ><span class="material-symbols-rounded">pets</span>
@@ -64,44 +61,47 @@
                         <tf-button icon="sell" variant="secondary"
                             >Vendre</tf-button
                         >
-                        <div class="actions-wrapper">
-                            <button
-                                class="menu-actions"
-                                onclick="toggleActionsMenu()"
+                        <tf-menu id="actions-menu" offset-x="-233" offset-y="8">
+                            <tf-button
+                                slot="menu-target"
+                                variant="secondary"
+                                icon="more_vert"
+                                icon-only
+                            ></tf-button>
+                            <tf-menu-group
+                                slot="group"
+                                legend="Actions collectives"
                             >
-                                ...
-                            </button>
-                            <div class="actions-menu" id="actions-menu">
-                                <button
-                                    onclick="feedAll()"
-                                    class="action-button"
+                                <tf-menu-entry
                                     id="feed-btn"
+                                    slot="entry"
+                                    icon="wheat"
                                 >
                                     Nourrir
-                                </button>
-                                <button
-                                    onclick="waterAll()"
-                                    class="action-button"
+                                </tf-menu-entry>
+                                <tf-menu-entry
                                     id="water-btn"
+                                    slot="entry"
+                                    icon="water_drop"
                                 >
                                     Abreuver
-                                </button>
-                                <button
-                                    onclick="healAll()"
-                                    class="action-button"
+                                </tf-menu-entry>
+                                <tf-menu-entry
                                     id="heal-btn"
+                                    slot="entry"
+                                    icon="healing"
                                 >
                                     Soigner
-                                </button>
-                                <button
-                                    onclick="cleanAll()"
-                                    class="action-button"
+                                </tf-menu-entry>
+                                <tf-menu-entry
                                     id="clean-btn"
+                                    slot="entry"
+                                    icon="mop"
                                 >
                                     Nettoyer
-                                </button>
-                            </div>
-                        </div>
+                                </tf-menu-entry>
+                            </tf-menu-group>
+                        </tf-menu>
                     </div>
                 </div>
 
