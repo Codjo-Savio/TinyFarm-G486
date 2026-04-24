@@ -1,4 +1,4 @@
-import { fetchApiWithCredentials } from "/utils/fetch.js";
+import { API_URL, fetchApiWithCredentials } from "/utils/fetch.js";
 
 const FAKE_MARKET_URL = "/fakeapi/trade/marketplace.json";
 const snackbarElement = document.querySelector("tf-snackbar");
@@ -6,6 +6,26 @@ const appbarElement = document.querySelector("tf-app-bar");
 
 async function fetchAllMarkets() {
     const response = await fetchApiWithCredentials("/market");
+    if (!response.ok) {
+        throw new Error(`Erreur HTTP : ${response.status}`);
+    }
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
+}
+
+function normalizeMarkets(marketsRaw) {
+    return (Array.isArray(marketsRaw) ? marketsRaw : []).map((market) => ({
+        ...market,
+        userId: Number(market.userId),
+        productId: Number(market.productId),
+        quantity: Number(market.quantity),
+        // Le backend expose unitPrice; on garde aussi price pour le rendu actuel.
+        price: Number(market.unitPrice ?? market.price ?? 0),
+    }));
+}
+
+async function fetchProducts() {
+    const response = await fetchApiWithCredentials("/products");
     if (!response.ok) {
         throw new Error(`Erreur HTTP : ${response.status}`);
     }
@@ -28,6 +48,21 @@ function shouldUseFakePreview() {
     return params.get("fake") === "1" || params.get("mockData") === "1";
 }
 
+function getCurrentBuyerId() {
+    return localStorage.getItem("tinyfarm-user-id");
+}
+
+async function fetchRemainingPurchases(userId) {
+    const response = await fetchApiWithCredentials(
+        `/users/remainingPurchases/id/${userId}`,
+    );
+    if (!response.ok) {
+        return null;
+    }
+    const data = await response.json();
+    return Number.isFinite(Number(data)) ? Number(data) : null;
+}
+
 async function fetchMarketByProductId(productId) {
     const response = await fetchApiWithCredentials(
         `/market/product/${productId}`,
@@ -38,10 +73,29 @@ async function fetchMarketByProductId(productId) {
     return response.json();
 }
 
+async function fetchMarketsFromProductEndpoints() {
+    const products = await fetchProducts();
+    if (products.length === 0) {
+        return [];
+    }
+
+    const markets = await Promise.all(
+        products.map(async (product) => {
+            try {
+                return await fetchMarketByProductId(product.id);
+            } catch {
+                return null;
+            }
+        }),
+    );
+
+    return normalizeMarkets(markets.filter(Boolean));
+}
+
 async function fetchMarketsGroupedByProduct(sourceMarkets) {
-    const allMarkets = Array.isArray(sourceMarkets)
-        ? sourceMarkets
-        : await fetchAllMarkets();
+    const allMarkets = normalizeMarkets(
+        Array.isArray(sourceMarkets) ? sourceMarkets : await fetchAllMarkets(),
+    );
 
     // Même produit à la suite
     const productIds = [...new Set(allMarkets.map((m) => m.productId))].sort(
@@ -77,7 +131,7 @@ async function fetchMarketsGroupedByProduct(sourceMarkets) {
             (m) =>
                 m.userId === ref.userId &&
                 m.productId === ref.productId &&
-                m.price === ref.price &&
+                m.price === Number(ref.unitPrice ?? ref.price ?? 0) &&
                 m.quantity === ref.quantity,
         );
 
@@ -100,6 +154,20 @@ function setTotalStock(totalStock) {
     `;
 }
 
+function setRemainingPurchases(remainingPurchases) {
+    const purchaseInfo = document.querySelector(".purchase-info");
+    if (!purchaseInfo) return;
+
+    const value =
+        remainingPurchases === null || remainingPurchases === undefined
+            ? "-"
+            : remainingPurchases;
+    purchaseInfo.innerHTML = `
+        <span class="material-symbols-rounded">shopping_cart</span>
+        Achats restants : ${value}
+    `;
+}
+
 function renderEmptyMarket(container) {
     container.innerHTML = `
         <div class="empty-market-state">
@@ -114,10 +182,29 @@ async function initialiserBoutique() {
     const container = document.getElementById("shop-container");
 
     try {
+        const buyerId = getCurrentBuyerId();
+
+        if (buyerId) {
+            const remainingPurchases = await fetchRemainingPurchases(buyerId);
+            setRemainingPurchases(remainingPurchases);
+        } else {
+            setRemainingPurchases(null);
+        }
+
         const forceFakePreview = shouldUseFakePreview();
-        const sourceMarkets = forceFakePreview
-            ? await fetchFakeMarkets()
-            : await fetchAllMarkets();
+        let sourceMarkets = [];
+
+        if (forceFakePreview) {
+            sourceMarkets = normalizeMarkets(await fetchFakeMarkets());
+        } else {
+            try {
+                // 1) Endpoint idéal (non exposé sur tous les environnements)
+                sourceMarkets = normalizeMarkets(await fetchAllMarkets());
+            } catch {
+                // 2) Fallback faisable avec les APIs actuelles
+                sourceMarkets = await fetchMarketsFromProductEndpoints();
+            }
+        }
 
         markets = await fetchMarketsGroupedByProduct(sourceMarkets);
 
@@ -163,8 +250,6 @@ async function initialiserBoutique() {
         renderEmptyMarket(container);
     }
 }
-
-initialiserBoutique();
 
 // Partie panier
 let markets = [];
@@ -222,6 +307,7 @@ function displayPanier() {
     }
 }
 
+initialiserBoutique();
 displayPanier();
 
 function ajouterAuPanier(productId, userId) {
@@ -266,7 +352,6 @@ function ajouterAuPanier(productId, userId) {
         };
     }
 
-    console.log(panier);
     displayPanier();
 }
 
@@ -278,13 +363,12 @@ function retirerDuPanier(itemKey) {
             delete panier[itemKey];
         }
     }
-    console.log(panier);
     displayPanier();
 }
 
 async function payerPanier() {
     // Récupérer l'ID de l'utilisateur courant (acheteur)
-    const buyerId = localStorage.getItem("tinyfarm-user-id");
+    const buyerId = getCurrentBuyerId();
     const payButton = document.querySelector(
         ".cart-actions tf-button[icon='payment']",
     );
@@ -306,66 +390,29 @@ async function payerPanier() {
     payButton?.setAttribute("loading", "");
 
     try {
-        let totalTransactions = 0;
         let successCount = 0;
-        const transactionIds = [];
+        let failureCount = 0;
 
-        // 1. Créer une transaction pour chaque article du panier
+        // Une seule action métier par article du panier : /api/market/buy
         for (const [key, item] of Object.entries(panier)) {
-            const transaction = {
-                seller: item.userId,
-                buyer: Number(buyerId),
-                product: item.productId,
+            const requestBody = {
+                buyerId: Number(buyerId),
+                sellerId: item.userId,
+                productId: item.productId,
                 quantity: item.quantity,
-                totalPrice: item.price * item.quantity,
             };
 
             try {
-                const createResponse = await fetchApiWithCredentials(
-                    "/transaction",
-                    "POST",
-                    JSON.stringify(transaction),
-                );
-
-                if (!createResponse.ok) {
-                    throw new Error(
-                        `Erreur création transaction: ${createResponse.status}`,
-                    );
-                }
-
-                const createdTransaction = await createResponse.json();
-                transactionIds.push(createdTransaction.id);
-                totalTransactions++;
-            } catch (err) {
-                console.error(
-                    `Erreur transaction produit ${item.productId}:`,
-                    err,
-                );
-                snackbarElement.showSnackbar(
-                    `Erreur lors de la création de la transaction pour le produit ${item.productId}`,
-                    false,
-                );
-                continue;
-            }
-        }
-
-        // 2. Exécuter les transferts de stock (sell + buy)
-        for (const tid of transactionIds) {
-            try {
-                // Appel sell: le vendeur perd le stock
-                const sellResponse = await fetchApiWithCredentials(
-                    `/stocks/sell/${tid}`,
-                    "POST",
-                );
-
-                if (!sellResponse.ok) {
-                    throw new Error(`Erreur sell: ${sellResponse.status}`);
-                }
-
-                // Appel buy: l'acheteur reçoit le stock
-                const buyResponse = await fetchApiWithCredentials(
-                    `/stocks/buy/${tid}`,
-                    "POST",
+                const buyResponse = await fetch(
+                    `${API_URL}/market/buy`,
+                    {
+                        method: "POST",
+                        credentials: "include",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(requestBody),
+                    },
                 );
 
                 if (!buyResponse.ok) {
@@ -375,35 +422,34 @@ async function payerPanier() {
                 successCount++;
             } catch (err) {
                 console.error(
-                    `Erreur transfert stock pour transaction ${tid}:`,
+                    `Erreur achat produit ${item.productId}:`,
                     err,
                 );
                 snackbarElement.showSnackbar(
-                    `Erreur lors du transfert de stock pour la transaction ${tid}`,
+                    `Erreur lors de l'achat du produit ${item.productId}`,
                     false,
                 );
+                failureCount++;
                 continue;
             }
         }
 
-        // 3. Afficher le résultat et vider le panier si succès
-        if (successCount === totalTransactions && totalTransactions > 0) {
+        // Afficher le résultat et vider le panier si tout est passé
+        if (successCount > 0 && failureCount === 0) {
             snackbarElement.showSnackbar(
-                `Paiement réussi ! ${successCount} transaction(s) complétée(s).`,
+                `Paiement réussi ! ${successCount} achat(s) complété(s).`,
             );
             Object.keys(panier).forEach((key) => delete panier[key]);
             displayPanier();
             await initialiserBoutique(); // Actualiser la liste des produits
         } else if (successCount > 0) {
             snackbarElement.showSnackbar(
-                `Paiement partiel : ${successCount}/${totalTransactions} transaction(s) complétée(s).`,
+                `Paiement partiel : ${successCount} achat(s) validé(s), ${failureCount} en erreur.`,
                 false,
             );
+            await initialiserBoutique();
         } else {
-            snackbarElement.showSnackbar(
-                "Aucune transaction n'a pu être complétée.",
-                false,
-            );
+            snackbarElement.showSnackbar("Aucun achat n'a pu être complété.", false);
         }
     } catch (err) {
         console.error("Erreur paiement:", err);
@@ -417,5 +463,3 @@ async function payerPanier() {
         payButton?.removeAttribute("loading");
     }
 }
-
-document.querySelector("#pay-btn").addEventListener("click", payerPanier);
