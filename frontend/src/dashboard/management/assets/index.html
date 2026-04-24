@@ -30,13 +30,7 @@
             <tf-app-bar></tf-app-bar>
             <main class="container">
                 <div class="sub-header">
-                    <a
-                        onclick="
-                            window.location.href = window.location.search
-                                ? window.location.search.replace('?from=', '')
-                                : '/dashboard'
-                        "
-                        class="btn-back"
+                    <a onclick="window.history.back()" class="btn-back"
                         ><span class="material-symbols-rounded">
                             keyboard_backspace
                         </span>

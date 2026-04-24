@@ -4,6 +4,7 @@ import com.api.tinyfarm.model.Animal;
 import com.api.tinyfarm.service.AnimalService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +28,7 @@ public class AnimalController {
     }
 
     @GetMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id)")
     public ResponseEntity<Animal> getById(@PathVariable Long id) {
         try{
             return ResponseEntity.ok(animalService.findById(id));
@@ -36,6 +38,7 @@ public class AnimalController {
     }
 
     @PostMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Animal> create(@RequestBody Animal animal) {
         try{
             return ResponseEntity.ok(animalService.create(animal));
@@ -48,6 +51,7 @@ public class AnimalController {
     }
 
     @DeleteMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id)")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
             animalService.delete(id);

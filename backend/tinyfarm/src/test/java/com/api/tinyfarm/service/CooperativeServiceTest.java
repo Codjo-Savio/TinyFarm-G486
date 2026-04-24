@@ -11,9 +11,12 @@ import static org.mockito.Mockito.when;
 
 import com.api.tinyfarm.model.Cooperative;
 import com.api.tinyfarm.model.Product;
+import com.api.tinyfarm.model.Stock;
+import com.api.tinyfarm.model.StockId;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.CooperativeRepository;
 import com.api.tinyfarm.repository.ProductRepository;
+import com.api.tinyfarm.repository.StockRepository;
 import com.api.tinyfarm.repository.UserRepository;
 import java.util.HashMap;
 import java.util.List;
@@ -35,6 +38,8 @@ class CooperativeServiceTest {
 
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private StockRepository stockRepository;
 
     @InjectMocks
     private CooperativeService cooperativeService;
@@ -100,7 +105,7 @@ class CooperativeServiceTest {
         assertEquals(188.0f, buyer.getEcus());
         verify(userRepository).save(seller);
         verify(userRepository).save(buyer);
-        verify(cooperativeRepository).deleteByUserIdAndProductId(1L, 10L);
+        verify(cooperativeRepository).deleteByCooperativeIdUserIdAndCooperativeIdProductId(1L, 10L);
     }
 
     @Test
@@ -116,7 +121,8 @@ class CooperativeServiceTest {
         cooperativeService.deleteLessExpensiveWithDescription(2L, "Milk");
 
         verify(userRepository, never()).save(org.mockito.ArgumentMatchers.any(User.class));
-        verify(cooperativeRepository, never()).deleteByUserIdAndProductId(1L, 10L);
+        verify(cooperativeRepository, never())
+                .deleteByCooperativeIdUserIdAndCooperativeIdProductId(1L, 10L);
     }
 
     @Test
@@ -125,6 +131,29 @@ class CooperativeServiceTest {
 
         assertTrue(open || !open);
         assertFalse(Boolean.valueOf(open) == null);
+    }
+
+    @Test
+    void shouldSellToCooperativeAndUpdateStockAndEcus() {
+        Stock stock = new Stock();
+        stock.setId(new StockId(1L, 10L));
+        stock.setQuantity(4);
+        stock.setCollectible(false);
+
+        Product product = createProduct(10L, "egg", 99.0f);
+        User seller = createUser(1L, 100.0f);
+
+        when(stockRepository.findById(new StockId(1L, 10L))).thenReturn(Optional.of(stock));
+        when(productRepository.findById(10L)).thenReturn(Optional.of(product));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(seller));
+
+        Float total = cooperativeService.sellToCooperative(1L, 10L, 2);
+
+        assertEquals(16.0f, total);
+        assertEquals(2, stock.getQuantity());
+        assertEquals(116.0f, seller.getEcus());
+        verify(stockRepository).save(stock);
+        verify(userRepository).save(seller);
     }
 
     private Cooperative createCooperative(Long userId, Long productId, Float price) {

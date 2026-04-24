@@ -5,6 +5,7 @@ import com.api.tinyfarm.service.ProductService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,6 +38,7 @@ public class ProductController {
     }
 
     @PostMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Product> create(@RequestBody Product product) {
         try{
             return ResponseEntity.ok(
@@ -50,6 +52,7 @@ public class ProductController {
     }
 
     @PutMapping("/id/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Product> update(
         @PathVariable Long id,
         @RequestBody Product product
@@ -62,6 +65,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/id/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.delete(id);
         try {

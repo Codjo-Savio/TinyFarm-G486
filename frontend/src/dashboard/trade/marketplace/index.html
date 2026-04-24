@@ -1,151 +1,108 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Marché - TinyFarm</title>
+        <link rel="icon" href="/assets/logo-128-rounded.png" />
+        <!-- Config -->
+        <script src="/config.js"></script>
+        <!-- Components -->
+        <script type="module" src="/components/tf-app-bar.js"></script>
+        <script type="module" src="/components/tf-bottom-actions.js"></script>
+        <script type="module" src="/components/tf-layout.js"></script>
+        <script type="module" src="/components/tf-button.js"></script>
+        <script type="module" src="/components/tf-snackbar.js"></script>
+        <!-- Theme -->
+        <link rel="stylesheet" href="/utils/theme.css" />
+        <!-- Font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+            rel="stylesheet"
+        />
+        <!-- Custom page style and script -->
+        <link rel="stylesheet" href="style.css" />
+        <script type="module" src="script.js"></script>
+    </head>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marché - TinyFarm</title>
-    <link rel="icon" href="/assets/logo-128-rounded.png" />
-    <!-- Config -->
-    <script src="/config.js"></script>
-    <!-- Components -->
-    <script type="module" src="/components/tf-app-bar.js"></script>
-    <script type="module" src="/components/tf-bottom-actions.js"></script>
-    <script type="module" src="/components/tf-layout.js"></script>
-    <!-- Theme -->
-    <link rel="stylesheet" href="/utils/theme.css">
-    <!-- Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-    <!-- Custom page style and script -->
-    <link rel="stylesheet" href="style.css">
-    <script type="module" src="script.js"></script>
-</head>
+    <body>
+        <tf-layout>
+            <tf-app-bar></tf-app-bar>
+            <tf-snackbar></tf-snackbar>
+            <main class="container">
+                <div class="sub-header">
+                    <tf-button
+                        icon="keyboard_backspace"
+                        variant="secondary"
+                        onclick="window.history.back()"
+                    >
+                        Retour
+                    </tf-button>
+                    <div class="market-stats">
+                        <span class="purchase-info"
+                            ><span class="material-symbols-rounded"
+                                >shopping_cart</span
+                            >
+                            Achats restants : 10</span
+                        >
+                        <span class="stock-info"
+                            ><span class="material-symbols-rounded">store</span>
+                            En stock :
+                        </span>
 
-<body>
-    <tf-layout>
-        <tf-app-bar></tf-app-bar>
-        <main class="container">
-
-            <div class="sub-header">
-                <a onclick="window.location.href = window.location.search ?  window.location.search.replace('?from=', '') : '/dashboard'" class="btn-back"><svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M13.9997 22.1668L5.83301 14.0002M5.83301 14.0002L13.9997 5.8335M5.83301 14.0002H22.1663" stroke="#55361B" stroke-width="2.91667" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                    Retour</a>
-                <div class="market-stats">
-                    <span><svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <g clip-path="url(#clip0_146_131)">
-                                <path d="M2.3916 2.3916H4.72494L7.82827 16.8816C7.94211 17.4123 8.23738 17.8867 8.66326 18.2231C9.08915 18.5595 9.61899 18.737 10.1616 18.7249H21.5716C22.1026 18.7241 22.6175 18.5421 23.0311 18.2091C23.4448 17.876 23.7324 17.4119 23.8466 16.8933L25.7716 8.22493H5.97327M10.4999 24.4999C10.4999 25.1443 9.9776 25.6666 9.33327 25.6666C8.68894 25.6666 8.1666 25.1443 8.1666 24.4999C8.1666 23.8556 8.68894 23.3333 9.33327 23.3333C9.9776 23.3333 10.4999 23.8556 10.4999 24.4999ZM23.3333 24.4999C23.3333 25.1443 22.8109 25.6666 22.1666 25.6666C21.5223 25.6666 20.9999 25.1443 20.9999 24.4999C20.9999 23.8556 21.5223 23.3333 22.1666 23.3333C22.8109 23.3333 23.3333 23.8556 23.3333 24.4999Z" stroke="#55361B" stroke-width="2.91667" stroke-linecap="round" stroke-linejoin="round" />
-                            </g>
-                            <defs>
-                                <clipPath id="clip0_146_131">
-                                    <rect width="28" height="28" fill="white" />
-                                </clipPath>
-                            </defs>
-                        </svg>
-                        Achats restants : 10</span>
-                    <span><svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M17.4998 24.5002V18.6668C17.4998 18.3574 17.3769 18.0607 17.1581 17.8419C16.9393 17.6231 16.6425 17.5002 16.3331 17.5002H11.6664C11.357 17.5002 11.0603 17.6231 10.8415 17.8419C10.6227 18.0607 10.4998 18.3574 10.4998 18.6668V24.5002M20.7361 12.0285C20.4929 11.7957 20.1692 11.6657 19.8325 11.6657C19.4958 11.6657 19.1722 11.7957 18.9289 12.0285C18.3865 12.5459 17.6656 12.8346 16.9159 12.8346C16.1662 12.8346 15.4453 12.5459 14.9028 12.0285C14.6596 11.796 14.3362 11.6663 13.9998 11.6663C13.6634 11.6663 13.3399 11.796 13.0968 12.0285C12.5542 12.5463 11.8331 12.8352 11.0831 12.8352C10.3331 12.8352 9.612 12.5463 9.06945 12.0285C8.82624 11.7957 8.50255 11.6657 8.16586 11.6657C7.82918 11.6657 7.50549 11.7957 7.26228 12.0285C6.73827 12.5285 6.04693 12.8157 5.32285 12.8341C4.59876 12.8525 3.89372 12.6009 3.34497 12.1281C2.79622 11.6553 2.44301 10.9953 2.3541 10.2764C2.26518 9.5576 2.44693 8.83139 2.86395 8.23916L6.23445 3.35783C6.44831 3.04226 6.73622 2.78389 7.07302 2.60532C7.40982 2.42676 7.78524 2.33343 8.16645 2.3335H19.8331C20.2132 2.33335 20.5876 2.42606 20.9237 2.60357C21.2598 2.78107 21.5474 3.03799 21.7616 3.352L25.1391 8.24266C25.5562 8.83536 25.7377 9.56212 25.6483 10.2813C25.5588 11.0006 25.2048 11.6607 24.6551 12.1331C24.1055 12.6056 23.3997 12.8565 22.6752 12.8369C21.9507 12.8173 21.2594 12.5287 20.7361 12.0273M4.66645 12.7752V22.1668C4.66645 22.7857 4.91228 23.3792 5.34987 23.8167C5.78745 24.2543 6.38094 24.5002 6.99978 24.5002H20.9998C21.6186 24.5002 22.2121 24.2543 22.6497 23.8167C23.0873 23.3792 23.3331 22.7857 23.3331 22.1668V12.7752" stroke="#55361B" stroke-width="2.91667" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        En stock : 17</span>
-                    <button onclick="window.location.href = `/dashboard/management/assets?from=${window.location.pathname}${window.location.search}`" class="btn-sell">
-                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <g clip-path="url(#clip0_146_173)">
-                                <path d="M12.833 17.5002H15.1663C15.7852 17.5002 16.3787 17.2543 16.8163 16.8167C17.2538 16.3792 17.4997 15.7857 17.4997 15.1668C17.4997 14.548 17.2538 13.9545 16.8163 13.5169C16.3787 13.0793 15.7852 12.8335 15.1663 12.8335H11.6663C10.9663 12.8335 10.383 13.0668 10.033 13.5335L3.49967 19.8335M8.16634 24.5002L10.033 22.8668C10.383 22.4002 10.9663 22.1668 11.6663 22.1668H16.333C17.6163 22.1668 18.783 21.7002 19.5997 20.7668L24.9663 15.6335C25.4165 15.208 25.6793 14.6212 25.6968 14.002C25.7143 13.3828 25.4851 12.782 25.0597 12.3318C24.6342 11.8816 24.0474 11.6189 23.4282 11.6014C22.809 11.5839 22.2082 11.813 21.758 12.2385L16.858 16.7885M2.33301 18.6668L9.33301 25.6668M22.0497 10.5002C22.0497 12.3687 20.5349 13.8835 18.6663 13.8835C16.7978 13.8835 15.283 12.3687 15.283 10.5002C15.283 8.6316 16.7978 7.11683 18.6663 7.11683C20.5349 7.11683 22.0497 8.6316 22.0497 10.5002ZM10.4997 5.8335C10.4997 7.76649 8.93267 9.3335 6.99967 9.3335C5.06668 9.3335 3.49967 7.76649 3.49967 5.8335C3.49967 3.9005 5.06668 2.3335 6.99967 2.3335C8.93267 2.3335 10.4997 3.9005 10.4997 5.8335Z" stroke="#55361B" stroke-width="2.91667" stroke-linecap="round" stroke-linejoin="round" />
-                            </g>
-                            <defs>
-                                <clipPath id="clip0_146_173">
-                                    <rect width="28" height="28" fill="white" />
-                                </clipPath>
-                            </defs>
-                        </svg>
-                        Vendre
-                    </button>
-                </div>
-            </div>
-
-            <h1 class="page-title">Marché</h1>
-
-            <div class="game-grid">
-
-                <aside class="left-panel">
-
-                    <div class="cart-card">
-
-                        <div class="cart-total-box">
-                            <div class="cart-icon-title">
-                                <svg viewBox="0 0 40 40">
-                                    <path d="M3.41699 3.4165H6.75033L11.1837 24.1165C11.3463 24.8746 11.7681 25.5523 12.3765 26.0329C12.9849 26.5136 13.7418 26.7671 14.517 26.7498H30.817C31.5756 26.7486 32.3111 26.4887 32.902 26.0129C33.4929 25.5371 33.9039 24.8741 34.067 24.1332L36.817 11.7498H8.53366M15.0003 34.9998C15.0003 35.9203 14.2541 36.6665 13.3337 36.6665C12.4132 36.6665 11.667 35.9203 11.667 34.9998C11.667 34.0794 12.4132 33.3332 13.3337 33.3332C14.2541 33.3332 15.0003 34.0794 15.0003 34.9998ZM33.3337 34.9998C33.3337 35.9203 32.5875 36.6665 31.667 36.6665C30.7465 36.6665 30.0003 35.9203 30.0003 34.9998C30.0003 34.0794 30.7465 33.3332 31.667 33.3332C32.5875 33.3332 33.3337 34.0794 33.3337 34.9998Z" stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                Total
-                            </div>
-                            <div class="cart-actions">
-                                <span class="total-price">$20</span>
-                                <button class="btn-pay">Payer</button>
-                            </div>
-                        </div>
-
-                        <div class="cart-list">
-                            <div class="cart-item">
-                                <span>Botte de paille</span>
-                                <div class="qty-control">
-                                    <button class="btn-qty">
-                                        <svg viewBox="0 0 32 32">
-                                            <path d="M10.667 15.9998H21.3337M29.3337 15.9998C29.3337 23.3636 23.3641 29.3332 16.0003 29.3332C8.63653 29.3332 2.66699 23.3636 2.66699 15.9998C2.66699 8.63604 8.63653 2.6665 16.0003 2.6665C23.3641 2.6665 29.3337 8.63604 29.3337 15.9998Z" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                    </button>
-                                    <span>1</span>
-                                    <button class="btn-qty">
-                                        <svg viewBox="0 0 32 32">
-                                            <path d="M10.667 15.9998H21.3337M16.0003 10.6665V21.3332M29.3337 15.9998C29.3337 23.3636 23.3641 29.3332 16.0003 29.3332C8.63653 29.3332 2.66699 23.3636 2.66699 15.9998C2.66699 8.63604 8.63653 2.6665 16.0003 2.6665C23.3641 2.6665 29.3337 8.63604 29.3337 15.9998Z" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="cart-item">
-                                <span>Savon</span>
-                                <div class="qty-control">
-                                    <button class="btn-qty">
-                                        <svg viewBox="0 0 32 32">
-                                            <path d="M10.667 15.9998H21.3337M29.3337 15.9998C29.3337 23.3636 23.3641 29.3332 16.0003 29.3332C8.63653 29.3332 2.66699 23.3636 2.66699 15.9998C2.66699 8.63604 8.63653 2.6665 16.0003 2.6665C23.3641 2.6665 29.3337 8.63604 29.3337 15.9998Z" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                    </button>
-                                    <span>5</span>
-                                    <button class="btn-qty">
-                                        <svg viewBox="0 0 32 32">
-                                            <path d="M10.667 15.9998H21.3337M16.0003 10.6665V21.3332M29.3337 15.9998C29.3337 23.3636 23.3641 29.3332 16.0003 29.3332C8.63653 29.3332 2.66699 23.3636 2.66699 15.9998C2.66699 8.63604 8.63653 2.6665 16.0003 2.6665C23.3641 2.6665 29.3337 8.63604 29.3337 15.9998Z" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div class="cart-item">
-                                <span>Seringue</span>
-                                <div class="qty-control">
-                                    <button class="btn-qty">
-                                        <svg viewBox="0 0 32 32">
-                                            <path d="M10.667 15.9998H21.3337M29.3337 15.9998C29.3337 23.3636 23.3641 29.3332 16.0003 29.3332C8.63653 29.3332 2.66699 23.3636 2.66699 15.9998C2.66699 8.63604 8.63653 2.6665 16.0003 2.6665C23.3641 2.6665 29.3337 8.63604 29.3337 15.9998Z" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                    </button>
-                                    <span>2</span>
-                                    <button class="btn-qty">
-                                        <svg viewBox="0 0 32 32">
-                                            <path d="M10.667 15.9998H21.3337M16.0003 10.6665V21.3332M29.3337 15.9998C29.3337 23.3636 23.3641 29.3332 16.0003 29.3332C8.63653 29.3332 2.66699 23.3636 2.66699 15.9998C2.66699 8.63604 8.63653 2.6665 16.0003 2.6665C23.3641 2.6665 29.3337 8.63604 29.3337 15.9998Z" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                        <tf-button
+                            icon="sell"
+                            variant="secondary"
+                            onclick="
+                                window.location.href =
+                                    '/dashboard/management/assets'
+                            "
+                        >
+                            Vendre
+                        </tf-button>
                     </div>
+                </div>
 
-                    <section class="right-panel" id="shop-container">
-                    </section>
-            </div>
-        </main>
-        <tf-bottom-actions size="small" variant="coop-only"></tf-bottom-actions>
-    </tf-layout>
-</body>
+                <h1 class="page-title">Marché</h1>
 
+                <div class="game-grid">
+                    <aside class="left-panel">
+                        <div class="cart-card">
+                            <div class="cart-total-box">
+                                <div class="cart-icon-title">
+                                    <span class="material-symbols-rounded">
+                                        shopping_cart
+                                    </span>
+                                    Total
+                                </div>
+                                <div class="cart-actions">
+                                    <span
+                                        class="total-price"
+                                        id="totalPrice"
+                                    ></span>
+                                    <tf-button
+                                        id="pay-btn"
+                                        icon="payment"
+                                        variant="primary"
+                                    >
+                                        Payer
+                                    </tf-button>
+                                </div>
+                            </div>
+
+                            <div class="cart-list"></div>
+                        </div>
+                    </aside>
+
+                    <section class="right-panel" id="shop-container"></section>
+                </div>
+            </main>
+            <tf-bottom-actions
+                size="small"
+                variant="coop-only"
+            ></tf-bottom-actions>
+        </tf-layout>
+    </body>
 </html>

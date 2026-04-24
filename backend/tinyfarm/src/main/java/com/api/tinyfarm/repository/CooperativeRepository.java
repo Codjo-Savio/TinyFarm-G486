@@ -8,9 +8,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CooperativeRepository extends JpaRepository<Cooperative, CooperativeID> {
-    Optional<Cooperative> findByUserId(Long userId);
-    Optional<Cooperative> findByProductId(Long productId);
-    Optional<Cooperative> findByUserIdAndProductId(Long userId, Long productId);
-    void deleteByUserIdAndProductId(Long userId, Long productId);
-    void deleteByUserId(Long userId);
+    Optional<Cooperative> findByCooperativeIdUserId(Long userId);
+    Optional<Cooperative> findByCooperativeIdProductId(Long productId);
+    Optional<Cooperative> findByCooperativeIdUserIdAndCooperativeIdProductId(Long userId, Long productId);
+    void deleteByCooperativeIdUserIdAndCooperativeIdProductId(Long userId, Long productId);
+    void deleteByCooperativeIdUserId(Long userId);
 }

@@ -26,11 +26,7 @@
                 class="back-btn"
                 variant="secondary"
                 icon="keyboard_backspace"
-                onclick="
-                    window.location.href = window.location.search
-                        ? window.location.search.replace('?from=', '')
-                        : '/'
-                "
+                onclick="window.history.back()"
                 >Retour</tf-button
             >
             <h1>À propos</h1>

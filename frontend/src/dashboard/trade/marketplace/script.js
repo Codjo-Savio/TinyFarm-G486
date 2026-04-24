@@ -1,53 +1,421 @@
-async function initialiserBoutique() {
-    const container = document.getElementById('shop-container');
+import { fetchApiWithCredentials } from "/utils/fetch.js";
 
-    try {
-        const response = await fetch('../../../fakeapi/trade/marketplace.json');
+const FAKE_MARKET_URL = "/fakeapi/trade/marketplace.json";
+const snackbarElement = document.querySelector("tf-snackbar");
+const appbarElement = document.querySelector("tf-app-bar");
 
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP : ${response.status}`);
+async function fetchAllMarkets() {
+    const response = await fetchApiWithCredentials("/market");
+    if (!response.ok) {
+        throw new Error(`Erreur HTTP : ${response.status}`);
+    }
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
+}
+
+async function fetchFakeMarkets() {
+    const response = await fetch(FAKE_MARKET_URL);
+    if (!response.ok) {
+        return [];
+    }
+
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
+}
+
+function shouldUseFakePreview() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("fake") === "1" || params.get("mockData") === "1";
+}
+
+async function fetchMarketByProductId(productId) {
+    const response = await fetchApiWithCredentials(
+        `/market/product/${productId}`,
+    );
+    if (!response.ok) {
+        return null;
+    }
+    return response.json();
+}
+
+async function fetchMarketsGroupedByProduct(sourceMarkets) {
+    const allMarkets = Array.isArray(sourceMarkets)
+        ? sourceMarkets
+        : await fetchAllMarkets();
+
+    // Même produit à la suite
+    const productIds = [...new Set(allMarkets.map((m) => m.productId))].sort(
+        (a, b) => a - b,
+    );
+
+    // On utilise /product/{id} pour récupérer une offre de référence par produit.
+    // Comme l'endpoint renvoie un seul Market, on conserve /api/market pour toutes les offres.
+    const referenceByProduct = new Map();
+    await Promise.all(
+        productIds.map(async (productId) => {
+            try {
+                const ref = await fetchMarketByProductId(productId);
+                if (ref) {
+                    referenceByProduct.set(productId, ref);
+                }
+            } catch (erreur) {
+                // fallback silencieux
+            }
+        }),
+    );
+
+    return productIds.flatMap((productId) => {
+        const group = allMarkets
+            .filter((m) => m.productId === productId)
+            .sort((a, b) => a.userId - b.userId);
+
+        // Si une référence est trouvée via /product/{id}, la mettre en tête
+        const ref = referenceByProduct.get(productId);
+        if (!ref) return group;
+
+        const idx = group.findIndex(
+            (m) =>
+                m.userId === ref.userId &&
+                m.productId === ref.productId &&
+                m.price === ref.price &&
+                m.quantity === ref.quantity,
+        );
+
+        if (idx > 0) {
+            const [item] = group.splice(idx, 1);
+            group.unshift(item);
         }
 
-        const inventaire = await response.json();
-        container.innerHTML = "";
+        return group;
+    });
+}
 
-        for (const [nom, details] of Object.entries(inventaire)) {
+function setTotalStock(totalStock) {
+    const stockInfo = document.querySelector(".stock-info");
+    if (!stockInfo) return;
+
+    stockInfo.innerHTML = `
+        <span class="material-symbols-rounded">store</span>
+        En stock : ${totalStock}
+    `;
+}
+
+function renderEmptyMarket(container) {
+    container.innerHTML = `
+        <div class="empty-market-state">
+            <span class="material-symbols-rounded empty-market-icon">air</span>
+            <h2>Aucun article disponible</h2>
+            <p>Le marché est vide pour le moment. Revenez un peu plus tard.</p>
+        </div>
+    `;
+}
+
+async function initialiserBoutique() {
+    const container = document.getElementById("shop-container");
+
+    try {
+        const forceFakePreview = shouldUseFakePreview();
+        const sourceMarkets = forceFakePreview
+            ? await fetchFakeMarkets()
+            : await fetchAllMarkets();
+
+        markets = await fetchMarketsGroupedByProduct(sourceMarkets);
+
+        container.innerHTML = "";
+        let totalStock = 0;
+
+        if (markets.length === 0) {
+            setTotalStock(0);
+            renderEmptyMarket(container);
+            return;
+        }
+
+        markets.forEach((market) => {
+            const stock = Number(market.quantity);
+            const nom = `Produit ${market.productId}`; // À remplacer par vraie récupération du nom si possible
+            const seller = `Utilisateur ${market.userId}`;
             const productHTML = `
                 <div class="product-row">
                     <div class="prod-info">
                         <span class="stock-badge">
-                            <svg viewBox="0 0 32 32">
-                                <path
-                                    d="M19.9996 27.9998V21.3332C19.9996 20.9795 19.8591 20.6404 19.6091 20.3904C19.359 20.1403 19.0199 19.9998 18.6663 19.9998H13.3329C12.9793 19.9998 12.6402 20.1403 12.3901 20.3904C12.1401 20.6404 11.9996 20.9795 11.9996 21.3332V27.9998M23.6983 13.7465C23.4203 13.4804 23.0504 13.3319 22.6656 13.3319C22.2808 13.3319 21.9109 13.4804 21.6329 13.7465C21.013 14.3379 20.1891 14.6678 19.3323 14.6678C18.4755 14.6678 17.6516 14.3379 17.0316 13.7465C16.7537 13.4808 16.3841 13.3325 15.9996 13.3325C15.6151 13.3325 15.2455 13.4808 14.9676 13.7465C14.3476 14.3383 13.5234 14.6684 12.6663 14.6684C11.8092 14.6684 10.985 14.3383 10.3649 13.7465C10.087 13.4804 9.71706 13.3319 9.33228 13.3319C8.94749 13.3319 8.57756 13.4804 8.29961 13.7465C7.70074 14.318 6.91064 14.6462 6.08311 14.6672C5.25558 14.6883 4.44983 14.4007 3.82268 13.8603C3.19554 13.32 2.79187 12.5657 2.69026 11.7442C2.58864 10.9226 2.79635 10.0927 3.27294 9.41584L7.12494 3.83717C7.36935 3.47652 7.6984 3.18124 8.08331 2.97716C8.46823 2.77309 8.89728 2.66642 9.33294 2.6665H22.6663C23.1007 2.66634 23.5285 2.77229 23.9126 2.97515C24.2968 3.17802 24.6255 3.47165 24.8703 3.8305L28.7303 9.41984C29.207 10.0972 29.4144 10.9278 29.3122 11.7498C29.2099 12.5717 28.8053 13.3262 28.1772 13.8661C27.549 14.406 26.7424 14.6927 25.9144 14.6704C25.0864 14.648 24.2964 14.3182 23.6983 13.7452M5.33294 14.5998V25.3332C5.33294 26.0404 5.6139 26.7187 6.11399 27.2188C6.61409 27.7189 7.29237 27.9998 7.99961 27.9998H23.9996C24.7069 27.9998 25.3851 27.7189 25.8852 27.2188C26.3853 26.7187 26.6663 26.0404 26.6663 25.3332V14.5998"
-                                    stroke-linecap="round" stroke-linejoin="round" />
-                            </svg>
-                            ${details.stock}
-                        </span>
-                        <span class="prod-name">
-                            ${nom} 
-                            <span class="seller" style="font-size: 0.8em; opacity: 0.7;">
-                                • Vendu par ${details.seller}
+                            <span class="material-symbols-rounded">
+                                store
                             </span>
+                            ${stock}
                         </span>
+                        <span class="prod-name">${nom}</span><span class="seller-name">• ${seller}</span>
                     </div>
                     <div class="prod-action">
-                        <span class="price">$${details.price}</span>
-                        <button class="btn-add" onclick="ajouterAuPanier('${nom.replace(/'/g, "\\'")}')">Ajouter</button>
+                        <span class="price">$${market.price}</span>
+                        <button class="btn-add" onclick="ajouterAuPanier(${market.productId}, ${market.userId})">Ajouter</button>
                     </div>
                 </div>
             `;
 
-            container.insertAdjacentHTML('beforeend', productHTML);
-        }
+            container.insertAdjacentHTML("beforeend", productHTML);
 
+            totalStock += stock;
+        });
+        setTotalStock(totalStock);
     } catch (erreur) {
-        console.error("Erreur :", erreur);
-        container.innerHTML = "<p>Inventaire indisponible.</p>";
+        console.error("Impossible de charger l'inventaire :", erreur);
+        setTotalStock(0);
+        renderEmptyMarket(container);
     }
 }
 
-document.addEventListener('DOMContentLoaded', initialiserBoutique);
+initialiserBoutique();
 
-function ajouterAuPanier(nomProduit) {
-    alert(`Vous avez ajouté : ${nomProduit}`);
+// Partie panier
+let markets = [];
+const panier = {};
+
+function cartItemKey(productId, userId) {
+    return `${productId}-${userId}`;
 }
+
+function getPanierTotalQuantity() {
+    return Object.values(panier).reduce(
+        (total, item) => total + item.quantity,
+        0,
+    );
+}
+
+function displayPanier() {
+    // Logique pour afficher le contenu du panier
+    let total = 0;
+
+    for (const item of Object.values(panier)) {
+        total += item.price * item.quantity;
+    }
+
+    document.getElementById("totalPrice").textContent = `$${total}`;
+
+    document.querySelector(".cart-list").innerHTML = "";
+
+    for (const [key, item] of Object.entries(panier)) {
+        const productHTML = `
+                            <div class="cart-item">
+                                    <span>Produit ${item.productId} • ${item.seller}</span>
+                                    <div class="qty-control">
+                                        <button class="btn-qty" onclick="retirerDuPanier('${key}')">
+                                            <span
+                                                class="material-symbols-rounded"
+                                            >
+                                                remove_circle
+                                            </span>
+                                        </button>
+                                        <span>${item.quantity}</span>
+                                        <button class="btn-qty" onclick="ajouterAuPanier(${item.productId}, ${item.userId})">
+                                            <span
+                                                class="material-symbols-rounded"
+                                            >
+                                                add_circle
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                                `;
+        document
+            .querySelector(".cart-list")
+            .insertAdjacentHTML("beforeend", productHTML);
+    }
+}
+
+displayPanier();
+
+function ajouterAuPanier(productId, userId) {
+    const market = markets.find(
+        (m) =>
+            Number(m.productId) === Number(productId) &&
+            Number(m.userId) === Number(userId),
+    );
+
+    if (!market) {
+        return;
+    }
+
+    const itemKey = cartItemKey(productId, userId);
+    const stock = Number(market.quantity);
+
+    if (panier[itemKey] && panier[itemKey].quantity >= stock) {
+        snackbarElement.showSnackbar(
+            "Limite de stock atteinte pour ce produit.",
+            false,
+        );
+        return;
+    }
+
+    if (getPanierTotalQuantity() >= 10) {
+        snackbarElement.showSnackbar(
+            "Limite de 10 achats dans le panier atteinte.",
+            false,
+        );
+        return;
+    }
+
+    if (panier[itemKey]) {
+        panier[itemKey].quantity++;
+    } else {
+        panier[itemKey] = {
+            productId: Number(market.productId),
+            userId: Number(market.userId),
+            seller: `Utilisateur ${market.userId}`,
+            price: Number(market.price) || 0,
+            quantity: 1,
+        };
+    }
+
+    console.log(panier);
+    displayPanier();
+}
+
+function retirerDuPanier(itemKey) {
+    // Logique pour retirer le produit du panier
+    if (panier[itemKey]) {
+        panier[itemKey].quantity--;
+        if (panier[itemKey].quantity <= 0) {
+            delete panier[itemKey];
+        }
+    }
+    console.log(panier);
+    displayPanier();
+}
+
+async function payerPanier() {
+    // Récupérer l'ID de l'utilisateur courant (acheteur)
+    const buyerId = localStorage.getItem("tinyfarm-user-id");
+    const payButton = document.querySelector(
+        ".cart-actions tf-button[icon='payment']",
+    );
+
+    if (!buyerId) {
+        snackbarElement.showSnackbar(
+            "Utilisateur non identifié. Impossible de procéder.",
+            false,
+        );
+        return;
+    }
+
+    if (Object.keys(panier).length === 0) {
+        snackbarElement.showSnackbar("Votre panier est vide.", false);
+        return;
+    }
+
+    // Active le mode loading du composant tf-button
+    payButton?.setAttribute("loading", "");
+
+    try {
+        let totalTransactions = 0;
+        let successCount = 0;
+        const transactionIds = [];
+
+        // 1. Créer une transaction pour chaque article du panier
+        for (const [key, item] of Object.entries(panier)) {
+            const transaction = {
+                seller: item.userId,
+                buyer: Number(buyerId),
+                product: item.productId,
+                quantity: item.quantity,
+                totalPrice: item.price * item.quantity,
+            };
+
+            try {
+                const createResponse = await fetchApiWithCredentials(
+                    "/transaction",
+                    "POST",
+                    JSON.stringify(transaction),
+                );
+
+                if (!createResponse.ok) {
+                    throw new Error(
+                        `Erreur création transaction: ${createResponse.status}`,
+                    );
+                }
+
+                const createdTransaction = await createResponse.json();
+                transactionIds.push(createdTransaction.id);
+                totalTransactions++;
+            } catch (err) {
+                console.error(
+                    `Erreur transaction produit ${item.productId}:`,
+                    err,
+                );
+                snackbarElement.showSnackbar(
+                    `Erreur lors de la création de la transaction pour le produit ${item.productId}`,
+                    false,
+                );
+                continue;
+            }
+        }
+
+        // 2. Exécuter les transferts de stock (sell + buy)
+        for (const tid of transactionIds) {
+            try {
+                // Appel sell: le vendeur perd le stock
+                const sellResponse = await fetchApiWithCredentials(
+                    `/stocks/sell/${tid}`,
+                    "POST",
+                );
+
+                if (!sellResponse.ok) {
+                    throw new Error(`Erreur sell: ${sellResponse.status}`);
+                }
+
+                // Appel buy: l'acheteur reçoit le stock
+                const buyResponse = await fetchApiWithCredentials(
+                    `/stocks/buy/${tid}`,
+                    "POST",
+                );
+
+                if (!buyResponse.ok) {
+                    throw new Error(`Erreur buy: ${buyResponse.status}`);
+                }
+
+                successCount++;
+            } catch (err) {
+                console.error(
+                    `Erreur transfert stock pour transaction ${tid}:`,
+                    err,
+                );
+                snackbarElement.showSnackbar(
+                    `Erreur lors du transfert de stock pour la transaction ${tid}`,
+                    false,
+                );
+                continue;
+            }
+        }
+
+        // 3. Afficher le résultat et vider le panier si succès
+        if (successCount === totalTransactions && totalTransactions > 0) {
+            snackbarElement.showSnackbar(
+                `Paiement réussi ! ${successCount} transaction(s) complétée(s).`,
+            );
+            Object.keys(panier).forEach((key) => delete panier[key]);
+            displayPanier();
+            await initialiserBoutique(); // Actualiser la liste des produits
+        } else if (successCount > 0) {
+            snackbarElement.showSnackbar(
+                `Paiement partiel : ${successCount}/${totalTransactions} transaction(s) complétée(s).`,
+                false,
+            );
+        } else {
+            snackbarElement.showSnackbar(
+                "Aucune transaction n'a pu être complétée.",
+                false,
+            );
+        }
+    } catch (err) {
+        console.error("Erreur paiement:", err);
+        snackbarElement.showSnackbar(
+            "Erreur lors du paiement. Veuillez réessayer.",
+            false,
+        );
+    } finally {
+        // Met à jour les écus de l'appbar et désactive le mode loading du composant tf-button
+        await appbarElement.update();
+        payButton?.removeAttribute("loading");
+    }
+}
+
+document.querySelector("#pay-btn").addEventListener("click", payerPanier);
