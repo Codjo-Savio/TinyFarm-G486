@@ -63,6 +63,10 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + email));
     }
 
+    public Integer getRemainingPurchases(Long id) {
+        return findById(id).getRemainingPurchases();
+    }
+
     public boolean existsByEmail(String email) {
         return userRepository.findByEmail(email).isPresent();
     }

@@ -6,6 +6,9 @@
     - In cooperativeController
          @PostMapping("/sell") -> sellToCooperative in cooperativeService
 
+    - In UserController
+         @GetMapping("/remainingPurchases/id/{id}" -> getRemainingPurchases in UserService
+
 - new files :
     TradeService : buy, sell, executeTrade
 

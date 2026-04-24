@@ -76,6 +76,13 @@ public class UserControllerTest extends AuthenticatedControllerTestSupport {
     }
 
     @Test
+    void shouldReturnRemainingPurchasesByUserId() throws Exception {
+        mockMvc.perform(get("/api/users/remainingPurchases/id/" + createdUserId).with(authenticated()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(12));
+    }
+
+    @Test
     void userShouldNotBeFoundById() throws Exception {
         mockMvc.perform(get("/api/users/id/0").with(authenticated()))
                 .andExpect(status().isNotFound());

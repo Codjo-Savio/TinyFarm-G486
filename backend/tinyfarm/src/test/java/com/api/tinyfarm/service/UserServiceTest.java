@@ -167,4 +167,17 @@ public class UserServiceTest {
         assertEquals(12, userService.findByEmail("reset.one@gmail.com").getRemainingPurchases());
         assertEquals(12, userService.findByEmail("reset.two@gmail.com").getRemainingPurchases());
     }
+
+    @Test
+    void shouldReturnRemainingPurchasesForUser() {
+        User user = new User();
+        user.setName("Buyer");
+        user.setEmail("buyer@gmail.com");
+        user.setGender(User.Gender.F);
+        user.setRemainingPurchases(7);
+
+        User created = userService.create(user);
+
+        assertEquals(7, userService.getRemainingPurchases(created.getId()));
+    }
 }
