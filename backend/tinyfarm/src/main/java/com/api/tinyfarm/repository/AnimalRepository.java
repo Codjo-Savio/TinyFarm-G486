@@ -11,11 +11,6 @@ public interface AnimalRepository extends JpaRepository<Animal, Long>{
     // Animal
     Optional<Animal> findById(Long id);
     Optional<Animal> findByUserId(Long userId);
-    Optional<List<Animal>> findByClean(Boolean clean);
-    Optional<List<Animal>> findByHealthy(Boolean healthy);
-    Optional<List<Animal>> findByAge(int age);
-    Optional<List<Animal>> findByWeight(float weight);
-    Optional<List<Animal>> findByGender(Animal.AnimalGender gender);
     void deleteAll();
     void deleteById(Long id);
 }

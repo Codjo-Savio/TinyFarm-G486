@@ -5,18 +5,17 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import com.api.tinyfarm.model.Cooperative;
-import com.api.tinyfarm.model.Product;
-import com.api.tinyfarm.model.User;
+import com.api.tinyfarm.model.*;
 import com.api.tinyfarm.repository.CooperativeRepository;
 import com.api.tinyfarm.repository.ProductRepository;
+import com.api.tinyfarm.repository.StockRepository;
 
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.api.tinyfarm.repository.UserRepository;
@@ -30,6 +29,8 @@ public class CooperativeService {
     private ProductRepository productRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private StockRepository stockRepository;
 
     public Integer getMediumPriceForProduct(String description) {
         List<Product> products = new ArrayList<>();
@@ -87,8 +88,6 @@ public class CooperativeService {
     public void deleteLessExpensiveWithDescription(Long idBuyer, String description) {
         List<Cooperative> cooperatives = cooperativeRepository.findAll();
         List<Product> products = productRepository.findByDescription(description);
-        HashMap<String, Product> productMap = new HashMap<>();
-
         Long uid = null;
         Long pid = null;
 
@@ -99,14 +98,15 @@ public class CooperativeService {
                 if (!product.getDescription().equals(description))
                     continue;
 
-                if (uid == null || pid == null) {
+                if (uid == null) {
                     uid = coop.getUserId();
                     pid = coop.getProductId();
+                    break;
                 }
             }
         }
 
-        if (uid == null || pid == null)
+        if (uid == null)
             return;
 
         User sellerUser = userRepository.findById(uid).orElse(null);
@@ -126,6 +126,66 @@ public class CooperativeService {
         userRepository.save(buyerUser);
 
         cooperativeRepository.deleteByUserIdAndProductId(uid, pid);
+    }
+
+    public Float sellToCooperative(Long sellerId, Long productId, Integer quantity) {
+        if (quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException("Quantité invalide");
+        }
+
+        StockId stockId = new StockId(sellerId, productId);
+        Stock sellerStock = stockRepository
+            .findById(stockId)
+            .orElseThrow(() ->
+                new RuntimeException("Stock vendeur introuvable")
+            );
+
+        if (sellerStock.getQuantity() < quantity) {
+            throw new RuntimeException("Stock insuffisant");
+        }
+
+        Product product = productRepository
+            .findById(productId)
+            .orElseThrow(() ->
+                new RuntimeException("Produit introuvable : " + productId)
+            );
+
+        Float unitPrice = resolveCooperativeUnitPrice(product);
+        Float total = unitPrice * quantity;
+
+        User seller = userRepository
+            .findById(sellerId)
+            .orElseThrow(() ->
+                new RuntimeException("Utilisateur introuvable : " + sellerId)
+            );
+
+        sellerStock.setQuantity(sellerStock.getQuantity() - quantity);
+        seller.setEcus(seller.getEcus() + total);
+
+        stockRepository.save(sellerStock);
+        userRepository.save(seller);
+
+        return total;
+    }
+
+    private Float resolveCooperativeUnitPrice(Product product) {
+        String description = product.getDescription() == null
+            ? ""
+            : product.getDescription().toLowerCase(Locale.ROOT);
+
+        if (description.contains("egg") || description.contains("oeuf")) {
+            return 8f;
+        }
+        if (description.contains("rabbit") || description.contains("lapin")) {
+            return 25f;
+        }
+        if (description.contains("milk") || description.contains("lait")) {
+            return 2f;
+        }
+        if (product.getPrice() == null) {
+            throw new IllegalArgumentException("Prix produit manquant");
+        }
+        return product.getPrice();
     }
 
     // handling open or closen hours in AoE (UTC-12)
@@ -160,5 +220,17 @@ public class CooperativeService {
         DayOfWeek day = now.getDayOfWeek();
 
         return isWeekend(day) ? isOpenWeekend(time) : isOpenWeekday(time);
+    }
+
+    public Cooperative create(Cooperative cooperative) {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+        if (
+                authentication != null &&
+                        authentication.getPrincipal() instanceof User currentUser
+        ) {
+            cooperative.setUserId(currentUser.getId());
+        }
+        return cooperativeRepository.save(cooperative);
     }
 }

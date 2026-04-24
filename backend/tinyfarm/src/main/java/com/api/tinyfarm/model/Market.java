@@ -29,8 +29,8 @@ public class Market {
     @Column(name = "product_id", insertable = false, updatable = false)
     private Long productId;
 
-    @Column(name = "price")
-    private Float price;
+    @Column(name = "unitPrice")
+    private Float unitPrice;
 
     @Column(name = "quantity")
     private int quantity;

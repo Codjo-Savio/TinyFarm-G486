@@ -37,6 +37,15 @@ public class UserController {
         }
     }
 
+    @GetMapping("/remainingPurchases/id/{id}")
+    public ResponseEntity<Integer> getRemainingPurchases(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(userService.getRemainingPurchases(id));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping("")
     public ResponseEntity<User> create(@RequestBody User user) {
         try {

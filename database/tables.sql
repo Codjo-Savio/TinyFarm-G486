@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS "user" (
     ecus INTEGER,
     hibernation BOOLEAN DEFAULT FALSE,
     hibernation_date TIMESTAMP,
-    level INTEGER DEFAULT 1
+    level INTEGER DEFAULT 1,
+    remainingPurchases INTEGER DEFAULT 12
 );
 
 CREATE TABLE IF NOT EXISTS product (
@@ -83,7 +84,7 @@ CREATE TABLE IF NOT EXISTS event (
 CREATE TABLE IF NOT EXISTS market (
     uid INTEGER NOT NULL REFERENCES "user" (uid) ON DELETE CASCADE ON UPDATE CASCADE,
     product_id INTEGER NOT NULL REFERENCES product (product_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    price FLOAT NOT NULL,
+    unitPrice FLOAT NOT NULL,
     quantity INTEGER,
     PRIMARY KEY (uid, product_id)
 );
@@ -92,5 +93,6 @@ CREATE TABLE IF NOT EXISTS cooperative (
     uid INTEGER NOT NULL REFERENCES "user" (uid) ON DELETE CASCADE ON UPDATE CASCADE,
     product_id INTEGER NOT NULL REFERENCES product (product_id) ON DELETE CASCADE ON UPDATE CASCADE,
     is_open BOOLEAN,
+    quantity INTEGER,
     PRIMARY KEY (uid, product_id)
 );

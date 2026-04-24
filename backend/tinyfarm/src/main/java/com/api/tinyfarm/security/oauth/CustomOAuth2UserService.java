@@ -66,6 +66,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             rabbit.setName(rabbitName);
             rabbit.setRabbitType(RabbitTypeEnum.lapereau);
             rabbit.setUserId(owner.getId());
+            rabbit.setAge(0);
             this.rabbitService.create(rabbit);
         }
 
@@ -74,6 +75,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         cow.setName("Nathalie");
         cow.setCowType(CowType.D);
         cow.setUserId(owner.getId());
+        cow.setAge(10);
+        cow.setWeight((float) 80);
         this.cowService.create(cow);
 
         // 1 rooster
@@ -81,6 +84,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         rooster.setName("Coco");
         rooster.setChickenType(ChickenType.R);
         rooster.setUserId(owner.getId());
+        rooster.setAge(5);
+        rooster.setWeight((float) 5);
         this.chickenService.create(rooster);
 
         // 3 hens
@@ -90,6 +95,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             hen.setName(henName);
             hen.setChickenType(ChickenType.H);
             hen.setUserId(owner.getId());
+            rooster.setAge(5);
+            rooster.setWeight((float) 5);
             this.chickenService.create(hen);
         }
     }

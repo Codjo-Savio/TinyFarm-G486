@@ -26,4 +26,7 @@ public class Cooperative {
 
     @Column(name = "price")
     private Float price;
+
+    @Column(name = "quantity")
+    private int quantity;
 }

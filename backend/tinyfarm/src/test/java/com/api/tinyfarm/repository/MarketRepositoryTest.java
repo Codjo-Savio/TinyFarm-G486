@@ -33,7 +33,7 @@ public class MarketRepositoryTest {
         market.setMarketId(new MarketID(1L, 10L));
         market.setUserId(1L);
         market.setProductId(10L);
-        market.setPrice(25.0f);
+        market.setUnitPrice(25.0f);
         market.setQuantity(100);
 
         Market saved = marketRepository.save(market);
@@ -41,7 +41,7 @@ public class MarketRepositoryTest {
         assertNotNull(saved.getMarketId());
         assertEquals(1L, saved.getUserId());
         assertEquals(10L, saved.getProductId());
-        assertEquals(25.0f, saved.getPrice());
+        assertEquals(25.0f, saved.getUnitPrice());
         assertEquals(100, saved.getQuantity());
     }
 
@@ -51,7 +51,7 @@ public class MarketRepositoryTest {
         market.setMarketId(new MarketID(1L, 10L));
         market.setUserId(1L);
         market.setProductId(10L);
-        market.setPrice(25.0f);
+        market.setUnitPrice(25.0f);
         marketRepository.save(market);
 
         Optional<Market> found = marketRepository.findByUserId(
@@ -68,7 +68,7 @@ public class MarketRepositoryTest {
         market.setMarketId(new MarketID(1L, 10L));
         market.setUserId(1L);
         market.setProductId(10L);
-        market.setPrice(25.0f);
+        market.setUnitPrice(25.0f);
         marketRepository.save(market);
 
         Optional<Market> found = marketRepository.findByProductId(
@@ -85,11 +85,11 @@ public class MarketRepositoryTest {
         market.setMarketId(new MarketID(1L, 10L));
         market.setUserId(1L);
         market.setProductId(10L);
-        market.setPrice(25.0f);
+        market.setUnitPrice(25.0f);
         marketRepository.save(market);
 
         Optional<Market> found = marketRepository.findByPrice(
-            market.getPrice()
+            market.getUnitPrice()
         );
 
         assertTrue(found.isPresent());
@@ -102,7 +102,7 @@ public class MarketRepositoryTest {
         market.setMarketId(new MarketID(1L, 10L));
         market.setUserId(1L);
         market.setProductId(10L);
-        market.setPrice(25.0f);
+        market.setUnitPrice(25.0f);
         market.setQuantity(100);
         marketRepository.save(market);
 
@@ -120,7 +120,7 @@ public class MarketRepositoryTest {
         market.setMarketId(new MarketID(1L, 10L));
         market.setUserId(1L);
         market.setProductId(10L);
-        market.setPrice(25.0f);
+        market.setUnitPrice(25.0f);
         marketRepository.save(market);
 
         marketRepository.deleteById(market.getMarketId());
@@ -135,13 +135,13 @@ public class MarketRepositoryTest {
         first.setMarketId(new MarketID(1L, 10L));
         first.setUserId(1L);
         first.setProductId(10L);
-        first.setPrice(25.0f);
+        first.setUnitPrice(25.0f);
 
         Market second = new Market();
         second.setMarketId(new MarketID(2L, 20L));
         second.setUserId(2L);
         second.setProductId(20L);
-        second.setPrice(13.0f);
+        second.setUnitPrice(13.0f);
 
         marketRepository.save(first);
         marketRepository.save(second);

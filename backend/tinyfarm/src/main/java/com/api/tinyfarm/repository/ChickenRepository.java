@@ -12,9 +12,4 @@ public interface ChickenRepository extends JpaRepository<Chicken, Long> {
     void deleteByName(String name);
 
     java.util.List<Chicken> findByUserId(Long userId);
-
-    java.util.List<Chicken> findByUserIdAndChickenType(
-        Long userId,
-        Chicken.ChickenType chickenType
-    );
 }
