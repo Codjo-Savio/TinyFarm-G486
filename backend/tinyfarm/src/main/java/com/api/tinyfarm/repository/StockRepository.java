@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface StockRepository extends JpaRepository<Stock, StockId> {
     Optional<Stock> findById(StockId id);
 
-    Optional<Stock> findByUserId(Long userId);
+    Optional<Stock> findByIdUserId(Long userId);
 }

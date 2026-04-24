@@ -8,6 +8,7 @@ import com.api.tinyfarm.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,6 +21,7 @@ public class MarketController {
     private StockService stockService;
 
     @GetMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #id)")
     public ResponseEntity<Market> getByUserId(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(marketService.findByUserId(id));
@@ -56,6 +58,7 @@ public class MarketController {
     }
 
     @PostMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Market> create(@RequestBody Market market) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -71,6 +74,7 @@ public class MarketController {
     }
 
     @PostMapping("/buy")
+    @PreAuthorize("@securityAuthorizationService.canBuyFromMarket(authentication, #request)")
     public ResponseEntity<Void> buyFromMarket(@RequestBody MarketBuyRequest request) {
         try {
             marketService.buyFromMarket(
@@ -90,6 +94,7 @@ public class MarketController {
     }
 
     @PostMapping("/ad")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Market> publishToMarket(@RequestBody PublishProductToTradeRequest request) {
         try {
             Market market = stockService.publishToMarket(
@@ -106,6 +111,7 @@ public class MarketController {
     }
 
     @PutMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #id)")
     public ResponseEntity<Market> update(
         @PathVariable Long id,
         @RequestBody Market market
@@ -118,6 +124,7 @@ public class MarketController {
     }
 
     @DeleteMapping("/{userId}/{productId}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Void> deleteByProductId(
         @PathVariable Long userId,
         @PathVariable Long productId
@@ -131,6 +138,7 @@ public class MarketController {
     }
 
     @DeleteMapping("/id/{uid}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #uid)")
     public ResponseEntity<Void> deleteById(@PathVariable Long uid) {
         try {
             marketService.deleteByID(uid);

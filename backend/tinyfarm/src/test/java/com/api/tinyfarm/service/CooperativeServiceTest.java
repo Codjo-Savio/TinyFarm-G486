@@ -105,7 +105,7 @@ class CooperativeServiceTest {
         assertEquals(188.0f, buyer.getEcus());
         verify(userRepository).save(seller);
         verify(userRepository).save(buyer);
-        verify(cooperativeRepository).deleteByUserIdAndProductId(1L, 10L);
+        verify(cooperativeRepository).deleteByCooperativeIdUserIdAndCooperativeIdProductId(1L, 10L);
     }
 
     @Test
@@ -121,7 +121,8 @@ class CooperativeServiceTest {
         cooperativeService.deleteLessExpensiveWithDescription(2L, "Milk");
 
         verify(userRepository, never()).save(org.mockito.ArgumentMatchers.any(User.class));
-        verify(cooperativeRepository, never()).deleteByUserIdAndProductId(1L, 10L);
+        verify(cooperativeRepository, never())
+                .deleteByCooperativeIdUserIdAndCooperativeIdProductId(1L, 10L);
     }
 
     @Test

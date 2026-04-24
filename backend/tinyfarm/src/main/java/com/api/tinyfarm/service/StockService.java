@@ -35,7 +35,7 @@ public class StockService {
         return stockRepository
             .findAll()
             .stream()
-            .filter(stock -> stock.getId().getUid().equals(userId))
+            .filter(stock -> stock.getId().getUserId().equals(userId))
             .collect(Collectors.toList());
     }
 
@@ -43,7 +43,7 @@ public class StockService {
         return stockRepository
             .findAll()
             .stream()
-            .filter(stock -> stock.getId().getProductID().equals(productId))
+            .filter(stock -> stock.getId().getProductId().equals(productId))
             .collect(Collectors.toList());
     }
 
@@ -53,8 +53,8 @@ public class StockService {
         }
 
         StockId id = stock.getId();
-        Long userId = id.getUid();
-        Long productId = id.getProductID();
+        Long userId = id.getUserId();
+        Long productId = id.getProductId();
         if (userId == null || productId == null) {
             throw new IllegalArgumentException(
                 "Clé composite manquante dans stock"

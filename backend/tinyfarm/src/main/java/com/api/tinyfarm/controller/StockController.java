@@ -5,6 +5,7 @@ import com.api.tinyfarm.service.StockService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,6 +29,7 @@ public class StockController {
     }
 
     @GetMapping("/user/{userId}/product/{productId}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Stock> getById(
             @PathVariable Long userId,
             @PathVariable Long productId) {
@@ -39,6 +41,7 @@ public class StockController {
     }
 
     @GetMapping("/user/{userId}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<List<Stock>> getByUser(@PathVariable Long userId) {
         try {
             return ResponseEntity.ok(stockService.findByUser(userId));
@@ -60,6 +63,7 @@ public class StockController {
     }
 
     @PostMapping("")
+    @PreAuthorize("@securityAuthorizationService.canAccessStock(authentication, #stock)")
     public ResponseEntity<Stock> create(@RequestBody Stock stock) {
         try {
             Stock created = stockService.create(stock);
@@ -73,6 +77,7 @@ public class StockController {
     }
 
     @PutMapping("/user/{userId}/product/{productId}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Stock> update(
             @PathVariable Long userId,
             @PathVariable Long productId,
@@ -86,6 +91,7 @@ public class StockController {
     }
 
     @DeleteMapping("/user/{userId}/product/{productId}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Void> delete(
             @PathVariable Long userId,
             @PathVariable Long productId) {
@@ -98,6 +104,7 @@ public class StockController {
     }
 
     @DeleteMapping("/user/{userId}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Void> deleteByUser(@PathVariable Long userId) {
         try {
             stockService.deleteByUser(userId);
@@ -109,6 +116,7 @@ public class StockController {
     }
 
     @DeleteMapping("/product/{productId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> deleteByProduct(@PathVariable Long productId) {
         try {
             stockService.deleteByProduct(productId);

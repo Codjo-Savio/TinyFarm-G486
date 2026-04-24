@@ -22,7 +22,7 @@ public class MarketService {
 
     public Market findByUserId(Long uid) {
         return marketRepository
-            .findByUserId(uid)
+            .findByMarketIdUserId(uid)
             .orElseThrow(() ->
                 new RuntimeException("Marché introuvable : " + uid)
             );
@@ -33,13 +33,13 @@ public class MarketService {
                 .findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Marché introuvable pour l'utilisateur : " + id.getUserId()
-                         + " ou pour le produit : " + id.getProductID())
+                         + " ou pour le produit : " + id.getProductId())
                 );
     }
 
     public Market findByProductId(Long productID) {
         return marketRepository
-            .findByProductId(productID)
+            .findByMarketIdProductId(productID)
             .orElseThrow(() ->
                 new RuntimeException("Marché introuvable : " + productID)
             );
@@ -62,7 +62,6 @@ public class MarketService {
     }
 
     public Market create(Market market) {
-        syncMarketId(market);
         Authentication authentication =
             SecurityContextHolder.getContext().getAuthentication();
         if (
@@ -71,6 +70,7 @@ public class MarketService {
         ) {
             market.setUserId(currentUser.getId());
         }
+        syncMarketId(market);
         return marketRepository.save(market);
     }
 
@@ -90,7 +90,7 @@ public class MarketService {
     @Transactional
     public void deleteProductById(Long userId, Long productId) {
         try {
-            marketRepository.deleteByUserIdAndProductId(userId, productId);
+            marketRepository.deleteByMarketIdUserIdAndMarketIdProductId(userId, productId);
         } catch (Exception e) {
             throw new RuntimeException(
                 "Impossible de retirer le produit du marché : " + e.getMessage()
@@ -100,7 +100,7 @@ public class MarketService {
 
     @Transactional
     public void deleteByID(Long uid) {
-        marketRepository.deleteByUserId(uid);
+        marketRepository.deleteByMarketIdUserId(uid);
     }
 
     private void syncMarketId(Market market) {

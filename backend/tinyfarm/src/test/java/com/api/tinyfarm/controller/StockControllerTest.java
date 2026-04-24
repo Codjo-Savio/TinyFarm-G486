@@ -53,13 +53,9 @@ public class StockControllerTest extends AuthenticatedControllerTestSupport {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private Stock testStock;
-    private Long testUserId = 1L;
-    private Long testProductId = 10L;
+    private final Long testUserId = 1L;
+    private final Long testProductId = 10L;
 
-    private User buyer;
-    private User seller;
-    private Stock sellerStock;
     private Transaction transaction;
 
     private static final AtomicLong testCounter = new AtomicLong(0);
@@ -74,14 +70,14 @@ public class StockControllerTest extends AuthenticatedControllerTestSupport {
         userRepository.deleteAll();
 
         // Create test stock
-        testStock = new Stock();
+        Stock testStock = new Stock();
         testStock.setId(new StockId(testUserId, testProductId));
         testStock.setCollectible(false);
         testStock.setQuantity(1000);
         testStock = stockService.create(testStock);
 
         // Create seller with unique email
-        seller = new User();
+        User seller = new User();
         seller.setName("Vendeur Test");
         seller.setEmail("vendeur_" + testId + "@test.com");
         seller.setEcus(100.0f);
@@ -90,7 +86,7 @@ public class StockControllerTest extends AuthenticatedControllerTestSupport {
         seller = userService.create(seller);
 
         // Create buyer with unique email
-        buyer = new User();
+        User buyer = new User();
         buyer.setName("Acheteur Test");
         buyer.setEmail("acheteur_" + testId + "@test.com");
         buyer.setEcus(200.0f);
@@ -99,7 +95,7 @@ public class StockControllerTest extends AuthenticatedControllerTestSupport {
         buyer = userService.create(buyer);
 
         // Create seller's stock
-        sellerStock = new Stock();
+        Stock sellerStock = new Stock();
         sellerStock.setId(new StockId(seller.getId(), 1L));
         sellerStock.setQuantity(10);
         sellerStock.setCollectible(false);

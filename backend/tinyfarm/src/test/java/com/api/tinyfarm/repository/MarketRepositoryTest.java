@@ -54,7 +54,7 @@ public class MarketRepositoryTest {
         market.setUnitPrice(25.0f);
         marketRepository.save(market);
 
-        Optional<Market> found = marketRepository.findByUserId(
+        Optional<Market> found = marketRepository.findByMarketIdUserId(
             market.getUserId()
         );
 
@@ -71,7 +71,7 @@ public class MarketRepositoryTest {
         market.setUnitPrice(25.0f);
         marketRepository.save(market);
 
-        Optional<Market> found = marketRepository.findByProductId(
+        Optional<Market> found = marketRepository.findByMarketIdProductId(
             market.getProductId()
         );
 
@@ -125,7 +125,7 @@ public class MarketRepositoryTest {
 
         marketRepository.deleteById(market.getMarketId());
 
-        Optional<Market> found = marketRepository.findByUserId(1L);
+        Optional<Market> found = marketRepository.findByMarketIdUserId(1L);
         assertFalse(found.isPresent());
     }
 
