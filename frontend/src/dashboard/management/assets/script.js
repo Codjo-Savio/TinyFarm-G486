@@ -1,5 +1,25 @@
 import { API_URL, fetchApiWithCredentials, loadScriptIfNeeded } from "/utils/fetch.js";
 
+/* =========================
+ * Etat global
+ * ========================= */
+
+let inventaire = {
+    products: [],
+    stocks: [],
+};
+const panier = {};
+let idUtilisateurCourant = null;
+const idProduitParNom = new Map();
+const stockParNom = new Map();
+const prixParNom = new Map();
+
+let dialoguePrixVente = null;
+
+/* =========================
+ * Utilitaires
+ * ========================= */
+
 function utiliserModeFake() {
     const params = new URLSearchParams(window.location.search);
     return params.get("fake") === "1" || params.get("mockData") === "1";
@@ -40,20 +60,8 @@ function echapperPourOnclick(value) {
     return String(value).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
 }
 
-function obtenirIdPrix(nomProduit) {
-    return `price-${nomProduit}`;
-}
-
-function obtenirIdBoutonEdition(nomProduit) {
-    return `edit-${nomProduit}`;
-}
-
-function formaterPrix(prix) {
-    return `$${normaliserNombre(prix).toFixed(2)}`;
-}
-
-function renderEmptyInventoryState(container) {
-    container.innerHTML = `
+function afficherEtatInventaireVide(conteneur) {
+    conteneur.innerHTML = `
         <div class="empty-state">
             <span class="material-symbols-rounded empty-state-icon">inventory_2</span>
             <h2 class="empty-state-title">Aucun article disponible</h2>
@@ -62,20 +70,22 @@ function renderEmptyInventoryState(container) {
     `;
 }
 
-let dialogPrixVente = null;
+/* =========================
+ * Dialogue prix
+ * ========================= */
 
-function obtenirDialogPrixVente() {
-    if (dialogPrixVente) {
-        return dialogPrixVente;
+function obtenirDialoguePrixVente() {
+    if (dialoguePrixVente) {
+        return dialoguePrixVente;
     }
 
     loadScriptIfNeeded("/components/tf-dialog.js");
 
-    const dialog = document.createElement("tf-dialog");
-    dialog.setAttribute("modal", "");
-    dialog.setAttribute("title", "Prix de vente");
-    dialog.setAttribute("title-icon", "sell");
-    dialog.innerHTML = `
+    const dialogue = document.createElement("tf-dialog");
+    dialogue.setAttribute("modal", "");
+    dialogue.setAttribute("title", "Prix de vente");
+    dialogue.setAttribute("title-icon", "sell");
+    dialogue.innerHTML = `
         <div style="display:flex; flex-direction:column; gap:8px;">
             <label for="sale-price-input" style="font-weight:600;">Prix unitaire</label>
             <input id="sale-price-input" type="number" min="0" step="0.01" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(0,0,0,.2); font-size:16px;" />
@@ -84,18 +94,18 @@ function obtenirDialogPrixVente() {
         <tf-button slot="confirm-button" variant="primary">Valider</tf-button>
     `;
 
-    document.body.appendChild(dialog);
-    dialogPrixVente = dialog;
-    return dialog;
+    document.body.appendChild(dialogue);
+    dialoguePrixVente = dialogue;
+    return dialogue;
 }
 
-function demanderPrixViaDialog(nomProduit, valeurInitiale) {
-    const dialog = obtenirDialogPrixVente();
-    dialog.setAttribute("title", `Prix de vente - ${nomProduit}`);
+function demanderPrixViaDialogue(nomProduit, valeurInitiale) {
+    const dialogue = obtenirDialoguePrixVente();
+    dialogue.setAttribute("title", `Prix de vente - ${nomProduit}`);
 
-    const input = dialog.querySelector("#sale-price-input");
-    const boutonAnnuler = dialog.querySelector('[slot="cancel-button"]');
-    const boutonValider = dialog.querySelector('[slot="confirm-button"]');
+    const input = dialogue.querySelector("#sale-price-input");
+    const boutonAnnuler = dialogue.querySelector('[slot="cancel-button"]');
+    const boutonValider = dialogue.querySelector('[slot="confirm-button"]');
 
     if (!input || !boutonAnnuler || !boutonValider) {
         return Promise.resolve(null);
@@ -105,11 +115,11 @@ function demanderPrixViaDialog(nomProduit, valeurInitiale) {
         ? normaliserNombre(valeurInitiale).toFixed(2)
         : "";
 
-    dialog.setAttribute("show", "");
+    dialogue.setAttribute("show", "");
 
     return new Promise((resolve) => {
         const fermer = (resultat) => {
-            dialog.removeAttribute("show");
+            dialogue.removeAttribute("show");
             input.removeEventListener("keydown", gererClavier);
             boutonAnnuler.removeEventListener("click", annuler);
             boutonValider.removeEventListener("click", valider);
@@ -151,6 +161,10 @@ function demanderPrixViaDialog(nomProduit, valeurInitiale) {
         });
     });
 }
+
+/* =========================
+ * Chargement des donnees
+ * ========================= */
 
 async function chargerInventaireFake() {
     const urlsCandidates = ["/fakeapi/assets.json", "../../../fakeapi/assets.json"];
@@ -200,6 +214,10 @@ async function chargerInventaireReel() {
     return { products, stocks };
 }
 
+/* =========================
+ * Indexation des donnees
+ * ========================= */
+
 function indexerInventaire(source) {
     idProduitParNom.clear();
     stockParNom.clear();
@@ -242,8 +260,12 @@ function indexerInventaire(source) {
     }
 }
 
+/* =========================
+ * Affichage catalogue
+ * ========================= */
+
 async function initialiserBoutique() {
-    const container = document.getElementById("shop-container");
+    const conteneur = document.getElementById("shop-container");
 
     try {
         const modeFake = utiliserModeFake();
@@ -267,7 +289,7 @@ async function initialiserBoutique() {
             stockParId.set(idProduit, normaliserNombre(stock?.quantity));
         }
 
-        container.innerHTML = "";
+        conteneur.innerHTML = "";
 
         const produitsAffichables = produits.length > 0
             ? produits
@@ -280,7 +302,7 @@ async function initialiserBoutique() {
         inventaire.products = produitsAffichables;
 
         if (produitsAffichables.length === 0) {
-            renderEmptyInventoryState(container);
+            afficherEtatInventaireVide(conteneur);
             return;
         }
 
@@ -320,25 +342,18 @@ async function initialiserBoutique() {
             catalogueHTML.push(htmlProduit);
         }
 
-        container.insertAdjacentHTML("beforeend", catalogueHTML.join(""));
+        conteneur.insertAdjacentHTML("beforeend", catalogueHTML.join(""));
     } catch (erreur) {
         console.error("Impossible de charger l'inventaire :", erreur);
-        container.innerHTML = "<p>Erreur lors du chargement des produits.</p>";
+        conteneur.innerHTML = "<p>Erreur lors du chargement des produits.</p>";
     }
 }
 
 document.addEventListener("DOMContentLoaded", initialiserBoutique);
 
-// Partie panier
-let inventaire = {
-    products: [],
-    stocks: [],
-};
-const panier = {};
-let idUtilisateurCourant = null;
-const idProduitParNom = new Map();
-const stockParNom = new Map();
-const prixParNom = new Map();
+/* =========================
+ * Contexte publication
+ * ========================= */
 
 async function chargerContextePublication() {
     try {
@@ -371,6 +386,10 @@ async function chargerContextePublication() {
     }
 }
 
+/* =========================
+ * Metier panier
+ * ========================= */
+
 function obtenirIdProduitParNom(nomProduit) {
     if (idProduitParNom.has(nomProduit)) {
         return idProduitParNom.get(nomProduit);
@@ -389,7 +408,7 @@ function obtenirIdProduitParNom(nomProduit) {
 function trouverProduitDansInventaire(nomProduit) {
     const produits = Array.isArray(inventaire.products) ? inventaire.products : [];
     const trouve = produits.find((produit) => {
-        const description = typeof produit?.description === "string"
+           const description = typeof produit?.description === "string"
             ? produit.description.trim().toLowerCase()
             : "";
         return description === nomProduit.trim().toLowerCase();
@@ -412,27 +431,10 @@ function trouverProduitDansInventaire(nomProduit) {
 
 async function demanderPrixVente(nomProduit) {
     const prixDefaut = prixParNom.get(nomProduit.trim().toLowerCase());
-    return await demanderPrixViaDialog(nomProduit, prixDefaut);
+    return await demanderPrixViaDialogue(nomProduit, prixDefaut);
 }
 
-async function modifierPrix(nomProduit) {
-    const cle = nomProduit.trim().toLowerCase();
-    const prixCourant = prixParNom.get(cle) ?? 0;
-
-    const prix = await demanderPrixViaDialog(nomProduit, prixCourant);
-    if (prix === null) {
-        return;
-    }
-
-    prixParNom.set(cle, prix);
-
-    const elementPrix = document.getElementById(obtenirIdPrix(nomProduit));
-    if (elementPrix) {
-        elementPrix.textContent = formaterPrix(prix);
-    }
-}
-
-function displayPanier() {
+function afficherPanier() {
     let total = 0;
 
     for (const item of Object.values(panier)) {
@@ -487,7 +489,7 @@ function displayPanier() {
     }
 }
 
-displayPanier();
+afficherPanier();
 
 async function ajouterAuPanier(nomProduit) {
     const produit = trouverProduitDansInventaire(nomProduit);
@@ -517,7 +519,7 @@ async function ajouterAuPanier(nomProduit) {
         };
     }
 
-    displayPanier();
+    afficherPanier();
 }
 
 function retirerDuPanier(nomProduit) {
@@ -528,7 +530,7 @@ function retirerDuPanier(nomProduit) {
         }
     }
 
-    displayPanier();
+    afficherPanier();
 }
 
 async function modifierPrixPanier(nomProduit) {
@@ -537,14 +539,18 @@ async function modifierPrixPanier(nomProduit) {
         return;
     }
 
-    const prix = await demanderPrixViaDialog(nomProduit, item.prixVente);
+    const prix = await demanderPrixViaDialogue(nomProduit, item.prixVente);
     if (prix === null) {
         return;
     }
 
     item.prixVente = prix;
-    displayPanier();
+    afficherPanier();
 }
+
+/* =========================
+ * Publication marche
+ * ========================= */
 
 async function publierProduitAuMarche(payload) {
     const responseAvecUserId = await fetch(`${API_URL}/market/ad`, {
@@ -620,7 +626,7 @@ async function mettrePanierEnVente() {
         }
     }
 
-    displayPanier();
+    afficherPanier();
 
     if (succes > 0 && erreurs.length === 0) {
         window.alert("Produits publies au marche avec succes.");
@@ -642,7 +648,10 @@ boutonVente?.addEventListener("click", () => {
     void mettrePanierEnVente();
 });
 
+/* =========================
+ * Exposition globale
+ * ========================= */
+
 window.ajouterAuPanier = ajouterAuPanier;
 window.retirerDuPanier = retirerDuPanier;
 window.modifierPrixPanier = modifierPrixPanier;
-window.modifierPrix = modifierPrix;
