@@ -1,14 +1,24 @@
 import { API_URL, fetchApiWithCredentials } from "/utils/fetch.js";
 
-const FAKE_MARKET_URL = "/fakeapi/trade/marketplace.json";
+// =========================
+// Constantes et état global
+// =========================
+
 const snackbarElement = document.querySelector("tf-snackbar");
 const appbarElement = document.querySelector("tf-app-bar");
+let markets = [];
+const panier = {};
+
+// =========================
+// Chargement des données
+// =========================
 
 async function fetchAllMarkets() {
     const response = await fetchApiWithCredentials("/market");
     if (!response.ok) {
         throw new Error(`Erreur HTTP : ${response.status}`);
     }
+
     const data = await response.json();
     return Array.isArray(data) ? data : [];
 }
@@ -19,7 +29,6 @@ function normalizeMarkets(marketsRaw) {
         userId: Number(market.userId),
         productId: Number(market.productId),
         quantity: Number(market.quantity),
-        // Le backend expose unitPrice; on garde aussi price pour le rendu actuel.
         price: Number(market.unitPrice ?? market.price ?? 0),
     }));
 }
@@ -29,23 +38,9 @@ async function fetchProducts() {
     if (!response.ok) {
         throw new Error(`Erreur HTTP : ${response.status}`);
     }
-    const data = await response.json();
-    return Array.isArray(data) ? data : [];
-}
-
-async function fetchFakeMarkets() {
-    const response = await fetch(FAKE_MARKET_URL);
-    if (!response.ok) {
-        return [];
-    }
 
     const data = await response.json();
     return Array.isArray(data) ? data : [];
-}
-
-function shouldUseFakePreview() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("fake") === "1" || params.get("mockData") === "1";
 }
 
 function getCurrentBuyerId() {
@@ -59,6 +54,7 @@ async function fetchRemainingPurchases(userId) {
     if (!response.ok) {
         return null;
     }
+
     const data = await response.json();
     return Number.isFinite(Number(data)) ? Number(data) : null;
 }
@@ -70,6 +66,7 @@ async function fetchMarketByProductId(productId) {
     if (!response.ok) {
         return null;
     }
+
     return response.json();
 }
 
@@ -79,7 +76,7 @@ async function fetchMarketsFromProductEndpoints() {
         return [];
     }
 
-    const markets = await Promise.all(
+    const productMarkets = await Promise.all(
         products.map(async (product) => {
             try {
                 return await fetchMarketByProductId(product.id);
@@ -89,7 +86,7 @@ async function fetchMarketsFromProductEndpoints() {
         }),
     );
 
-    return normalizeMarkets(markets.filter(Boolean));
+    return normalizeMarkets(productMarkets.filter(Boolean));
 }
 
 async function fetchMarketsGroupedByProduct(sourceMarkets) {
@@ -97,52 +94,54 @@ async function fetchMarketsGroupedByProduct(sourceMarkets) {
         Array.isArray(sourceMarkets) ? sourceMarkets : await fetchAllMarkets(),
     );
 
-    // Même produit à la suite
-    const productIds = [...new Set(allMarkets.map((m) => m.productId))].sort(
+    const marketProductIds = [...new Set(allMarkets.map((market) => market.productId))].sort(
         (a, b) => a - b,
     );
 
-    // On utilise /product/{id} pour récupérer une offre de référence par produit.
-    // Comme l'endpoint renvoie un seul Market, on conserve /api/market pour toutes les offres.
     const referenceByProduct = new Map();
     await Promise.all(
-        productIds.map(async (productId) => {
+        marketProductIds.map(async (productId) => {
             try {
-                const ref = await fetchMarketByProductId(productId);
-                if (ref) {
-                    referenceByProduct.set(productId, ref);
+                const referenceMarket = await fetchMarketByProductId(productId);
+                if (referenceMarket) {
+                    referenceByProduct.set(productId, referenceMarket);
                 }
-            } catch (erreur) {
+            } catch {
                 // fallback silencieux
             }
         }),
     );
 
-    return productIds.flatMap((productId) => {
-        const group = allMarkets
-            .filter((m) => m.productId === productId)
+    return marketProductIds.flatMap((productId) => {
+        const marketGroup = allMarkets
+            .filter((market) => market.productId === productId)
             .sort((a, b) => a.userId - b.userId);
 
-        // Si une référence est trouvée via /product/{id}, la mettre en tête
-        const ref = referenceByProduct.get(productId);
-        if (!ref) return group;
-
-        const idx = group.findIndex(
-            (m) =>
-                m.userId === ref.userId &&
-                m.productId === ref.productId &&
-                m.price === Number(ref.unitPrice ?? ref.price ?? 0) &&
-                m.quantity === ref.quantity,
-        );
-
-        if (idx > 0) {
-            const [item] = group.splice(idx, 1);
-            group.unshift(item);
+        const referenceMarket = referenceByProduct.get(productId);
+        if (!referenceMarket) {
+            return marketGroup;
         }
 
-        return group;
+        const referenceIndex = marketGroup.findIndex(
+            (market) =>
+                market.userId === referenceMarket.userId &&
+                market.productId === referenceMarket.productId &&
+                market.price === Number(referenceMarket.unitPrice ?? referenceMarket.price ?? 0) &&
+                market.quantity === referenceMarket.quantity,
+        );
+
+        if (referenceIndex > 0) {
+            const [firstMarket] = marketGroup.splice(referenceIndex, 1);
+            marketGroup.unshift(firstMarket);
+        }
+
+        return marketGroup;
     });
 }
+
+// =========================
+// Affichage des compteurs
+// =========================
 
 function setTotalStock(totalStock) {
     const stockInfo = document.querySelector(".stock-info");
@@ -162,6 +161,7 @@ function setRemainingPurchases(remainingPurchases) {
         remainingPurchases === null || remainingPurchases === undefined
             ? "-"
             : remainingPurchases;
+
     purchaseInfo.innerHTML = `
         <span class="material-symbols-rounded">shopping_cart</span>
         Achats restants : ${value}
@@ -178,6 +178,10 @@ function renderEmptyMarket(container) {
     `;
 }
 
+// =========================
+// Initialisation du marché
+// =========================
+
 async function initialiserBoutique() {
     const container = document.getElementById("shop-container");
 
@@ -191,24 +195,17 @@ async function initialiserBoutique() {
             setRemainingPurchases(null);
         }
 
-        const forceFakePreview = shouldUseFakePreview();
-        let sourceMarkets = [];
+        let rawMarkets = [];
 
-        if (forceFakePreview) {
-            sourceMarkets = normalizeMarkets(await fetchFakeMarkets());
-        } else {
-            try {
-                // 1) Endpoint idéal (non exposé sur tous les environnements)
-                sourceMarkets = normalizeMarkets(await fetchAllMarkets());
-            } catch {
-                // 2) Fallback faisable avec les APIs actuelles
-                sourceMarkets = await fetchMarketsFromProductEndpoints();
-            }
+        try {
+            rawMarkets = normalizeMarkets(await fetchAllMarkets());
+        } catch {
+            rawMarkets = await fetchMarketsFromProductEndpoints();
         }
 
-        markets = await fetchMarketsGroupedByProduct(sourceMarkets);
-
+        markets = await fetchMarketsGroupedByProduct(rawMarkets);
         container.innerHTML = "";
+
         let totalStock = 0;
 
         if (markets.length === 0) {
@@ -219,8 +216,8 @@ async function initialiserBoutique() {
 
         markets.forEach((market) => {
             const stock = Number(market.quantity);
-            const nom = `Produit ${market.productId}`; // À remplacer par vraie récupération du nom si possible
-            const seller = `Utilisateur ${market.userId}`;
+            const productLabel = `Produit ${market.productId}`;
+            const sellerLabel = `Utilisateur ${market.userId}`;
             const productHTML = `
                 <div class="product-row">
                     <div class="prod-info">
@@ -230,7 +227,7 @@ async function initialiserBoutique() {
                             </span>
                             ${stock}
                         </span>
-                        <span class="prod-name">${nom}</span><span class="seller-name">• ${seller}</span>
+                        <span class="prod-name">${productLabel}</span><span class="seller-name">• ${sellerLabel}</span>
                     </div>
                     <div class="prod-action">
                         <span class="price">$${market.price}</span>
@@ -240,22 +237,22 @@ async function initialiserBoutique() {
             `;
 
             container.insertAdjacentHTML("beforeend", productHTML);
-
             totalStock += stock;
         });
+
         setTotalStock(totalStock);
-    } catch (erreur) {
-        console.error("Impossible de charger l'inventaire :", erreur);
+    } catch (error) {
+        console.error("Impossible de charger l'inventaire :", error);
         setTotalStock(0);
         renderEmptyMarket(container);
     }
 }
 
-// Partie panier
-let markets = [];
-const panier = {};
+// =========================
+// Panier
+// =========================
 
-function cartItemKey(productId, userId) {
+function getPanierItemKey(productId, userId) {
     return `${productId}-${userId}`;
 }
 
@@ -267,61 +264,54 @@ function getPanierTotalQuantity() {
 }
 
 function displayPanier() {
-    // Logique pour afficher le contenu du panier
     let total = 0;
 
-    for (const item of Object.values(panier)) {
-        total += item.price * item.quantity;
+    for (const cartItem of Object.values(panier)) {
+        total += cartItem.price * cartItem.quantity;
     }
 
-    document.getElementById("totalPrice").textContent = `$${total}`;
+    const totalPriceElement = document.getElementById("totalPrice");
+    if (totalPriceElement) {
+        totalPriceElement.textContent = `$${total}`;
+    }
 
-    document.querySelector(".cart-list").innerHTML = "";
+    const cartList = document.querySelector(".cart-list");
+    if (!cartList) return;
 
-    for (const [key, item] of Object.entries(panier)) {
+    cartList.innerHTML = "";
+
+    for (const [cartItemKey, cartItem] of Object.entries(panier)) {
         const productHTML = `
-                            <div class="cart-item">
-                                    <span>Produit ${item.productId} • ${item.seller}</span>
-                                    <div class="qty-control">
-                                        <button class="btn-qty" onclick="retirerDuPanier('${key}')">
-                                            <span
-                                                class="material-symbols-rounded"
-                                            >
-                                                remove_circle
-                                            </span>
-                                        </button>
-                                        <span>${item.quantity}</span>
-                                        <button class="btn-qty" onclick="ajouterAuPanier(${item.productId}, ${item.userId})">
-                                            <span
-                                                class="material-symbols-rounded"
-                                            >
-                                                add_circle
-                                            </span>
-                                        </button>
-                                    </div>
-                                </div>
-                                `;
-        document
-            .querySelector(".cart-list")
-            .insertAdjacentHTML("beforeend", productHTML);
+            <div class="cart-item">
+                <span>Produit ${cartItem.productId} • ${cartItem.seller}</span>
+                <div class="qty-control">
+                    <button class="btn-qty" onclick="retirerDuPanier('${cartItemKey}')">
+                        <span class="material-symbols-rounded">remove_circle</span>
+                    </button>
+                    <span>${cartItem.quantity}</span>
+                    <button class="btn-qty" onclick="ajouterAuPanier(${cartItem.productId}, ${cartItem.userId})">
+                        <span class="material-symbols-rounded">add_circle</span>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        cartList.insertAdjacentHTML("beforeend", productHTML);
     }
 }
 
-initialiserBoutique();
-displayPanier();
-
 function ajouterAuPanier(productId, userId) {
     const market = markets.find(
-        (m) =>
-            Number(m.productId) === Number(productId) &&
-            Number(m.userId) === Number(userId),
+        (marketEntry) =>
+            Number(marketEntry.productId) === Number(productId) &&
+            Number(marketEntry.userId) === Number(userId),
     );
 
     if (!market) {
         return;
     }
 
-    const itemKey = cartItemKey(productId, userId);
+    const itemKey = getPanierItemKey(productId, userId);
     const stock = Number(market.quantity);
 
     if (panier[itemKey] && panier[itemKey].quantity >= stock) {
@@ -355,19 +345,22 @@ function ajouterAuPanier(productId, userId) {
     displayPanier();
 }
 
-function retirerDuPanier(itemKey) {
-    // Logique pour retirer le produit du panier
-    if (panier[itemKey]) {
-        panier[itemKey].quantity--;
-        if (panier[itemKey].quantity <= 0) {
-            delete panier[itemKey];
+function retirerDuPanier(cartItemKey) {
+    if (panier[cartItemKey]) {
+        panier[cartItemKey].quantity--;
+        if (panier[cartItemKey].quantity <= 0) {
+            delete panier[cartItemKey];
         }
     }
+
     displayPanier();
 }
 
+// =========================
+// Paiement
+// =========================
+
 async function payerPanier() {
-    // Récupérer l'ID de l'utilisateur courant (acheteur)
     const buyerId = getCurrentBuyerId();
     const payButton = document.querySelector(
         ".cart-actions tf-button[icon='payment']",
@@ -386,62 +379,55 @@ async function payerPanier() {
         return;
     }
 
-    // Active le mode loading du composant tf-button
     payButton?.setAttribute("loading", "");
 
     try {
         let successCount = 0;
         let failureCount = 0;
 
-        // Une seule action métier par article du panier : /api/market/buy
-        for (const [key, item] of Object.entries(panier)) {
+        for (const cartItem of Object.values(panier)) {
             const requestBody = {
                 buyerId: Number(buyerId),
-                sellerId: item.userId,
-                productId: item.productId,
-                quantity: item.quantity,
+                sellerId: cartItem.userId,
+                productId: cartItem.productId,
+                quantity: cartItem.quantity,
             };
 
             try {
-                const buyResponse = await fetch(
-                    `${API_URL}/market/buy`,
-                    {
-                        method: "POST",
-                        credentials: "include",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(requestBody),
+                const buyResponse = await fetch(`${API_URL}/market/buy`, {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
                     },
-                );
+                    body: JSON.stringify(requestBody),
+                });
 
                 if (!buyResponse.ok) {
                     throw new Error(`Erreur buy: ${buyResponse.status}`);
                 }
 
                 successCount++;
-            } catch (err) {
+            } catch (error) {
                 console.error(
-                    `Erreur achat produit ${item.productId}:`,
-                    err,
+                    `Erreur achat produit ${cartItem.productId}:`,
+                    error,
                 );
                 snackbarElement.showSnackbar(
-                    `Erreur lors de l'achat du produit ${item.productId}`,
+                    `Erreur lors de l'achat du produit ${cartItem.productId}`,
                     false,
                 );
                 failureCount++;
-                continue;
             }
         }
 
-        // Afficher le résultat et vider le panier si tout est passé
         if (successCount > 0 && failureCount === 0) {
             snackbarElement.showSnackbar(
                 `Paiement réussi ! ${successCount} achat(s) complété(s).`,
             );
             Object.keys(panier).forEach((key) => delete panier[key]);
             displayPanier();
-            await initialiserBoutique(); // Actualiser la liste des produits
+            await initialiserBoutique();
         } else if (successCount > 0) {
             snackbarElement.showSnackbar(
                 `Paiement partiel : ${successCount} achat(s) validé(s), ${failureCount} en erreur.`,
@@ -449,17 +435,26 @@ async function payerPanier() {
             );
             await initialiserBoutique();
         } else {
-            snackbarElement.showSnackbar("Aucun achat n'a pu être complété.", false);
+            snackbarElement.showSnackbar(
+                "Aucun achat n'a pu être complété.",
+                false,
+            );
         }
-    } catch (err) {
-        console.error("Erreur paiement:", err);
+    } catch (error) {
+        console.error("Erreur paiement:", error);
         snackbarElement.showSnackbar(
             "Erreur lors du paiement. Veuillez réessayer.",
             false,
         );
     } finally {
-        // Met à jour les écus de l'appbar et désactive le mode loading du composant tf-button
         await appbarElement.update();
         payButton?.removeAttribute("loading");
     }
 }
+
+// =========================
+// Démarrage
+// =========================
+
+initialiserBoutique();
+displayPanier();
