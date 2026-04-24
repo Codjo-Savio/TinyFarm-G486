@@ -159,6 +159,12 @@ class TfDialog extends HTMLElement {
         this.headerElement = this.dialogElement.querySelector(".header");
         this.footerElement = this.dialogElement.querySelector(".footer");
         this.titleElement = this.headerElement.querySelector(".title");
+        this.scrimElement = this.dialogElement.querySelector(".scrim");
+
+        this.scrimElement.addEventListener("click", () => {
+            this.removeAttribute("show");
+        });
+
         this.rendered = true;
     }
 
