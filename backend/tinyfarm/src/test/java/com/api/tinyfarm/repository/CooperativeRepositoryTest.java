@@ -43,10 +43,10 @@ class CooperativeRepositoryTest {
     void shouldFindByUserId() {
         cooperativeRepository.save(createCooperative(1L, 10L, 25.0f));
 
-        Optional<Cooperative> found = cooperativeRepository.findByCooperativeIdUserId(1L);
+        List<Cooperative> found = cooperativeRepository.findByCooperativeIdUserId(1L);
 
-        assertTrue(found.isPresent());
-        assertEquals(10L, found.get().getProductId());
+        assertFalse(found.isEmpty());
+        assertEquals(10L, found.getFirst().getProductId());
     }
 
     @Test

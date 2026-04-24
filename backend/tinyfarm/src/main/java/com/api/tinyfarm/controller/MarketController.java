@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/market")
 public class MarketController {
@@ -22,9 +24,15 @@ public class MarketController {
 
     @GetMapping("/id/{id}")
     @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #id)")
-    public ResponseEntity<Market> getByUserId(@PathVariable Long id) {
+    public ResponseEntity<List<Market>> getByUserId(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(marketService.findByUserId(id));
+            List<Market> markets = marketService.findByUserId(id);
+
+            if (markets.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(markets);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -40,7 +48,7 @@ public class MarketController {
     }
 
     @GetMapping("/price/{price}")
-    public ResponseEntity<Market> getByPrice(@PathVariable float price) {
+    public ResponseEntity<List<Market>> getByPrice(@PathVariable float price) {
         try {
             return ResponseEntity.ok(marketService.findByPrice(price));
         } catch (Exception e) {
@@ -49,7 +57,7 @@ public class MarketController {
     }
 
     @GetMapping("/quantity/{quantity}")
-    public ResponseEntity<Market> getByQuantity(@PathVariable int quantity) {
+    public ResponseEntity<List<Market>> getByQuantity(@PathVariable int quantity) {
         try {
             return ResponseEntity.ok(marketService.findByQuantity(quantity));
         } catch (Exception e) {
@@ -110,14 +118,15 @@ public class MarketController {
         }
     }
 
-    @PutMapping("/id/{id}")
+    @PutMapping("/uid/{uid}/pid/{pid}")
     @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #id)")
     public ResponseEntity<Market> update(
-        @PathVariable Long id,
+        @PathVariable Long uid,
+        @PathVariable Long pid,
         @RequestBody Market market
     ) {
         try {
-            return ResponseEntity.ok(marketService.update(id, market));
+            return ResponseEntity.ok(marketService.update(uid, pid, market));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

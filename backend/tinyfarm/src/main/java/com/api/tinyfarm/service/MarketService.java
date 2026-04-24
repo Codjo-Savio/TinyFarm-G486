@@ -20,12 +20,9 @@ public class MarketService {
     @Autowired
     private TradeService tradeService;
 
-    public Market findByUserId(Long uid) {
+    public List<Market> findByUserId(Long uid) {
         return marketRepository
-            .findByMarketIdUserId(uid)
-            .orElseThrow(() ->
-                new RuntimeException("Marché introuvable : " + uid)
-            );
+            .findByMarketIdUserId(uid);
     }
 
     public Market findById(MarketID id) {
@@ -45,20 +42,14 @@ public class MarketService {
             );
     }
 
-    public Market findByPrice(float price) {
+    public List<Market> findByPrice(float price) {
         return marketRepository
-            .findByPrice(price)
-            .orElseThrow(() ->
-                new RuntimeException("Marché introuvable : " + price)
-            );
+            .findByPrice(price);
     }
 
-    public Market findByQuantity(int quantity) {
+    public List<Market> findByQuantity(int quantity) {
         return marketRepository
-            .findByQuantity(quantity)
-            .orElseThrow(() ->
-                new RuntimeException("Marché introuvable : " + quantity)
-            );
+            .findByQuantity(quantity);
     }
 
     public Market create(Market market) {
@@ -78,8 +69,9 @@ public class MarketService {
         return marketRepository.findAll();
     }
 
-    public Market update(Long uid, Market modifiedMarket) {
-        Market existing = findByUserId(uid);
+    public Market update(Long uid, Long productId, Market modifiedMarket) {
+        MarketID marketID = new MarketID(uid, productId);
+        Market existing = findById(marketID);
         existing.setUserId(modifiedMarket.getUserId());
         existing.setProductId(modifiedMarket.getProductId());
         existing.setUnitPrice(modifiedMarket.getUnitPrice());
