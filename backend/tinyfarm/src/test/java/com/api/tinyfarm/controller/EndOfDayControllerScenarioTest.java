@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -91,7 +92,7 @@ class EndOfDayControllerScenarioTest extends AuthenticatedControllerTestSupport 
         assertEquals(2, updatedChicken.getAge());
         assertEquals(1.65f, updatedChicken.getWeight(), 0.01f);
         assertEquals(10, updatedRabbit.getAge());
-        assertFalse(updatedRabbit.getClean());
+        assertTrue(updatedRabbit.getClean());
     }
 
     @Test

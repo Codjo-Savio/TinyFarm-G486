@@ -1,6 +1,5 @@
 package com.api.tinyfarm.service;
 
-import com.api.tinyfarm.model.Animal;
 import com.api.tinyfarm.model.Cow;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.CowRepository;
@@ -14,18 +13,12 @@ import java.util.List;
 @Service
 public class CowService {
 
+    @Autowired
     private CowRepository cowRepository;
+
+    @Autowired
+    private UserService userService;
     
-    private final UserService userService;
-
-    public CowService(
-        CowRepository cowRepository,
-        UserService userService
-    ) {
-        this.cowRepository = cowRepository;
-        this.userService = userService;
-    }
-
     public List<Cow> findAll() {
         return cowRepository.findAll();
     }

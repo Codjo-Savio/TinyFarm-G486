@@ -43,7 +43,7 @@ class CooperativeRepositoryTest {
     void shouldFindByUserId() {
         cooperativeRepository.save(createCooperative(1L, 10L, 25.0f));
 
-        Optional<Cooperative> found = cooperativeRepository.findByUserId(1L);
+        Optional<Cooperative> found = cooperativeRepository.findByCooperativeIdUserId(1L);
 
         assertTrue(found.isPresent());
         assertEquals(10L, found.get().getProductId());
@@ -53,7 +53,7 @@ class CooperativeRepositoryTest {
     void shouldFindByProductId() {
         cooperativeRepository.save(createCooperative(1L, 10L, 25.0f));
 
-        Optional<Cooperative> found = cooperativeRepository.findByProductId(10L);
+        Optional<Cooperative> found = cooperativeRepository.findByCooperativeIdProductId(10L);
 
         assertTrue(found.isPresent());
         assertEquals(1L, found.get().getUserId());
@@ -63,7 +63,8 @@ class CooperativeRepositoryTest {
     void shouldFindByUserIdAndProductId() {
         cooperativeRepository.save(createCooperative(1L, 10L, 25.0f));
 
-        Optional<Cooperative> found = cooperativeRepository.findByUserIdAndProductId(1L, 10L);
+        Optional<Cooperative> found =
+                cooperativeRepository.findByCooperativeIdUserIdAndCooperativeIdProductId(1L, 10L);
 
         assertTrue(found.isPresent());
         assertEquals(25.0f, found.get().getPrice());
@@ -73,9 +74,12 @@ class CooperativeRepositoryTest {
     void shouldDeleteByUserIdAndProductId() {
         cooperativeRepository.save(createCooperative(1L, 10L, 25.0f));
 
-        cooperativeRepository.deleteByUserIdAndProductId(1L, 10L);
+        cooperativeRepository.deleteByCooperativeIdUserIdAndCooperativeIdProductId(1L, 10L);
 
-        assertFalse(cooperativeRepository.findByUserIdAndProductId(1L, 10L).isPresent());
+        assertFalse(
+                cooperativeRepository
+                        .findByCooperativeIdUserIdAndCooperativeIdProductId(1L, 10L)
+                        .isPresent());
     }
 
     @Test
@@ -83,7 +87,7 @@ class CooperativeRepositoryTest {
         cooperativeRepository.save(createCooperative(1L, 10L, 25.0f));
         cooperativeRepository.save(createCooperative(2L, 20L, 13.0f));
 
-        cooperativeRepository.deleteByUserId(1L);
+        cooperativeRepository.deleteByCooperativeIdUserId(1L);
 
         List<Cooperative> cooperatives = cooperativeRepository.findAll();
         assertEquals(1, cooperatives.size());

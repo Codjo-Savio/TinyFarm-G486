@@ -5,12 +5,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Clapier - TinyFarm</title>
         <link rel="icon" href="/assets/logo-128-rounded.png" />
-        <!-- Config -->
+
         <script src="/config.js"></script>
         <!-- Components -->
         <script type="module" src="/components/tf-app-bar.js"></script>
         <script type="module" src="/components/tf-bottom-actions.js"></script>
         <script type="module" src="/components/tf-layout.js"></script>
+        <script type="module" src="/components/tf-card.js"></script>
+        <script type="module" src="/components/tf-pill.js"></script>
+        <script type="module" src="/components/tf-button.js"></script>
+        <script type="module" src="/components/tf-progress-bar.js"></script>
+        <script type="module" src="/components/tf-menu.js"></script>
+        <script type="module" src="/components/tf-snackbar.js"></script>
         <!-- Theme -->
         <link rel="stylesheet" href="/utils/theme.css" />
         <!-- Font -->
@@ -28,10 +34,79 @@
     <body>
         <tf-layout>
             <tf-app-bar></tf-app-bar>
-            <main>
-                <!-- Write your code here -->
+            <main class="container">
+                <div class="sub-header">
+                    <tf-button
+                        icon="keyboard_backspace"
+                        variant="secondary"
+                        onclick="window.history.back()"
+                        >Retour</tf-button
+                    >
+
+                    <div class="rabbits-stats">
+                        <tf-pill icon="heart_broken"
+                            >Malades : <span id="sick-count">0%</span></tf-pill
+                        >
+                        <tf-pill icon="mop"
+                            >Sales : <span id="dirty-count">0%</span></tf-pill
+                        >
+                        <span>
+                            <span class="material-symbols-rounded">pets</span>
+                            <span id="rabbit-count">0</span>
+                        </span>
+                        <tf-button icon="sell" variant="secondary"
+                            >Vendre</tf-button
+                        >
+                        <tf-menu id="actions-menu" offset-x="-233" offset-y="8">
+                            <tf-button
+                                slot="menu-target"
+                                variant="secondary"
+                                icon="more_vert"
+                                icon-only
+                            ></tf-button>
+                            <tf-menu-group
+                                slot="group"
+                                legend="Actions collectives"
+                            >
+                                <tf-menu-entry
+                                    id="feed-btn"
+                                    slot="entry"
+                                    icon="nutrition"
+                                >
+                                    Nourrir
+                                </tf-menu-entry>
+                                <tf-menu-entry
+                                    id="water-btn"
+                                    slot="entry"
+                                    icon="water_drop"
+                                >
+                                    Abreuver
+                                </tf-menu-entry>
+                                <tf-menu-entry
+                                    id="heal-btn"
+                                    slot="entry"
+                                    icon="healing"
+                                >
+                                    Soigner
+                                </tf-menu-entry>
+                                <tf-menu-entry
+                                    id="clean-btn"
+                                    slot="entry"
+                                    icon="mop"
+                                >
+                                    Nettoyer
+                                </tf-menu-entry>
+                            </tf-menu-group>
+                        </tf-menu>
+                    </div>
+                </div>
+
+                <h1 class="page-title">Clapier</h1>
+
+                <div class="game-grid" id="game-grid"></div>
             </main>
             <tf-bottom-actions size="small"></tf-bottom-actions>
+            <tf-snackbar id="hutch-snackbar"></tf-snackbar>
         </tf-layout>
     </body>
 </html>

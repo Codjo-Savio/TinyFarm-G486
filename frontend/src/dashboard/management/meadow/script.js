@@ -94,7 +94,7 @@ async function initializeMeadow() {
                                         calendar_today
                                     </span>
                                     <div class="animal-age-text">
-                                        <p>${cow.age} ans</p>
+                                        <p>${cow.age} jours</p>
                                     </div>
                                 </div>
                                 </div>
