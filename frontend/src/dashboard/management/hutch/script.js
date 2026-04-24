@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2d29b5230cb0bf0817169cd7585cd028c2929f7c
 const API_URL = window.apiUrl || "http://localhost:8080/api";
 
 let rabbits = [];
@@ -120,6 +123,7 @@ async function initializeHutch() {
 }
 
 function updateActionMenuCosts() {
+<<<<<<< HEAD
 =======
 import { fetchApiWithCredentials } from "/utils/fetch.js";
 
@@ -272,12 +276,17 @@ function getRabbitsForCurrentUser(allRabbits) {
 
 function updateActionMenuCounts() {
 >>>>>>> main
+=======
+>>>>>>> 2d29b5230cb0bf0817169cd7585cd028c2929f7c
     const feedBtn = document.getElementById("feed-btn");
     const waterBtn = document.getElementById("water-btn");
     const healBtn = document.getElementById("heal-btn");
     const cleanBtn = document.getElementById("clean-btn");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2d29b5230cb0bf0817169cd7585cd028c2929f7c
     if (!feedBtn || !waterBtn || !healBtn || !cleanBtn) return;
 
     const hungryCount = rabbits.filter(r => !r.fedToday).length;
@@ -444,6 +453,7 @@ async function cleanAll() {
         )
     );
     await initializeHutch();
+<<<<<<< HEAD
 }
 =======
     if (!feedBtn || !waterBtn || !healBtn || !cleanBtn) {
@@ -679,3 +689,6 @@ document.querySelector("#water-btn")?.addEventListener("click", waterAll);
 document.querySelector("#heal-btn")?.addEventListener("click", healAll);
 document.querySelector("#clean-btn")?.addEventListener("click", cleanAll);
 >>>>>>> main
+=======
+}
+>>>>>>> 2d29b5230cb0bf0817169cd7585cd028c2929f7c
