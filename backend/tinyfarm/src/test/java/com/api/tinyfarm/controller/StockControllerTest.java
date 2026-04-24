@@ -256,55 +256,27 @@ public class StockControllerTest extends AuthenticatedControllerTestSupport {
             .andExpect(status().isNoContent());
     }
 
-    // Sell Test
+    // Legacy route removed from StockController
     @Test
-    void shouldModifyBySelling() throws Exception {
+    void shouldReturnNotFoundForLegacySellRoute() throws Exception {
         mockMvc
             .perform(
                 post("/api/stocks/sell/{tid}", transaction.getId()).with(
                     authenticated()
                 )
             )
-            .andExpect(status().isOk());
-
-        // Verify seller's stock decreased
-        Stock updatedSellerStock = stockService.findById(seller.getId(), 1L);
-        assertEquals(7, updatedSellerStock.getQuantity()); // 10 - 3
-
-        // Verify buyer's stock was created
-        Stock buyerStock = stockService.findById(buyer.getId(), 1L);
-        assertEquals(3, buyerStock.getQuantity()); // 0 + 3
-
-        // Verify ecus were transferred correctly
-        User updatedSeller = userService.findById(seller.getId());
-        User updatedBuyer = userService.findById(buyer.getId());
-        assertEquals(130.0f, updatedSeller.getEcus()); // 100 + 30
-        assertEquals(170.0f, updatedBuyer.getEcus()); // 200 - 30
+            .andExpect(status().isNotFound());
     }
 
-    // Buy Test
+    // Legacy route removed from StockController
     @Test
-    void shouldModifyByBuying() throws Exception {
+    void shouldReturnNotFoundForLegacyBuyRoute() throws Exception {
         mockMvc
             .perform(
                 post("/api/stocks/buy/{tid}", transaction.getId()).with(
                     authenticated()
                 )
             )
-            .andExpect(status().isOk());
-
-        // Verify seller's stock decreased
-        Stock updatedSellerStock = stockService.findById(seller.getId(), 1L);
-        assertEquals(7, updatedSellerStock.getQuantity()); // 10 - 3
-
-        // Verify buyer's stock was created
-        Stock buyerStock = stockService.findById(buyer.getId(), 1L);
-        assertEquals(3, buyerStock.getQuantity()); // 0 + 3
-
-        // Verify ecus were transferred correctly
-        User updatedSeller = userService.findById(seller.getId());
-        User updatedBuyer = userService.findById(buyer.getId());
-        assertEquals(130.0f, updatedSeller.getEcus()); // 100 + 30
-        assertEquals(170.0f, updatedBuyer.getEcus()); // 200 - 30
+            .andExpect(status().isNotFound());
     }
 }

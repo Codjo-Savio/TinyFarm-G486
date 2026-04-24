@@ -57,6 +57,9 @@ public class User {
     @Column(name = "level")
     private Integer level;
 
+    @Column(name = "remainingPurchases")
+    private Integer remainingPurchases;
+
     // default values for ecus and level
     @PrePersist
     public void prePersist() {
@@ -70,6 +73,10 @@ public class User {
 
         if (this.level == null) {
             this.level = 1;
+        }
+
+        if (this.remainingPurchases== null) {
+            this.remainingPurchases= 12;
         }
     }
 }

@@ -2,14 +2,13 @@ package com.api.tinyfarm.controller;
 
 import java.util.HashMap;
 
+import com.api.tinyfarm.dto.CooperativeSaleRequest;
 import com.api.tinyfarm.service.CooperativeService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/cooperative")
@@ -45,6 +44,24 @@ public class CooperativeController {
         try {
             cooperativeService.deleteLessExpensiveWithDescription(idBuyer, description);
             return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/sell")
+    public ResponseEntity<Float> sellToCooperative(
+        @RequestBody CooperativeSaleRequest request
+    ) {
+        try {
+            Float total = cooperativeService.sellToCooperative(
+                request.getSellerId(),
+                request.getProductId(),
+                request.getQuantity()
+            );
+            return ResponseEntity.ok(total);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

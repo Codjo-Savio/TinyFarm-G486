@@ -4,7 +4,6 @@ import com.api.tinyfarm.model.Transaction;
 import com.api.tinyfarm.service.TransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

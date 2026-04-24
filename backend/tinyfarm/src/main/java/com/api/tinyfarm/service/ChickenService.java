@@ -1,6 +1,5 @@
 package com.api.tinyfarm.service;
 
-import com.api.tinyfarm.model.Animal;
 import com.api.tinyfarm.model.Chicken;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.ChickenRepository;

@@ -11,14 +11,4 @@ public interface StockRepository extends JpaRepository<Stock, StockId> {
     Optional<Stock> findById(StockId id);
 
     Optional<Stock> findByUserId(Long userId);
-
-    Optional<Stock> findByProductId(Long productId);
-
-    Optional<Stock> findByQuantity(Integer quantity);
-
-    Optional<Stock> findByCollectible(Boolean collectible);
-
-    void deleteByUserId(Long userId);
-
-    void deleteByProductId(Long productId);
 }

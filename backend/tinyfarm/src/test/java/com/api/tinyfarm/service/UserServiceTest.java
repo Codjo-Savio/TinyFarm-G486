@@ -145,4 +145,26 @@ public class UserServiceTest {
         assertNull(found.getHibernationDate());
         assertEquals(1, userService.findAll().size());
     }
+
+    @Test
+    void shouldResetRemainingPurchasesAtMidnightJob() {
+        User userOne = new User();
+        userOne.setName("Reset One");
+        userOne.setEmail("reset.one@gmail.com");
+        userOne.setGender(User.Gender.M);
+        userOne.setRemainingPurchases(2);
+        userService.create(userOne);
+
+        User userTwo = new User();
+        userTwo.setName("Reset Two");
+        userTwo.setEmail("reset.two@gmail.com");
+        userTwo.setGender(User.Gender.F);
+        userTwo.setRemainingPurchases(0);
+        userService.create(userTwo);
+
+        userService.resetRemainingPurchases();
+
+        assertEquals(12, userService.findByEmail("reset.one@gmail.com").getRemainingPurchases());
+        assertEquals(12, userService.findByEmail("reset.two@gmail.com").getRemainingPurchases());
+    }
 }

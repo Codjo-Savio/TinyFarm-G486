@@ -13,8 +13,6 @@ public class EndOfTheDayService {
     @Autowired
     ChickenService chickenService;
     @Autowired
-    CowService cowService;
-    @Autowired
     RabbitService rabbitService;
     @Autowired
     UserService userService;

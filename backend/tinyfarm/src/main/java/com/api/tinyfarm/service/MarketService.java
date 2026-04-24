@@ -5,6 +5,8 @@ import com.api.tinyfarm.model.MarketID;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.MarketRepository;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -13,11 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class MarketService {
 
-    private final MarketRepository marketRepository;
-
-    public MarketService(MarketRepository marketRepository) {
-        this.marketRepository = marketRepository;
-    }
+    @Autowired
+    private MarketRepository marketRepository;
+    @Autowired
+    private TradeService tradeService;
 
     public Market findByUserId(Long uid) {
         return marketRepository
@@ -25,6 +26,15 @@ public class MarketService {
             .orElseThrow(() ->
                 new RuntimeException("Marché introuvable : " + uid)
             );
+    }
+
+    public Market findById(MarketID id) {
+        return marketRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Marché introuvable pour l'utilisateur : " + id.getUserId()
+                         + " ou pour le produit : " + id.getProductID())
+                );
     }
 
     public Market findByProductId(Long productID) {
@@ -72,7 +82,7 @@ public class MarketService {
         Market existing = findByUserId(uid);
         existing.setUserId(modifiedMarket.getUserId());
         existing.setProductId(modifiedMarket.getProductId());
-        existing.setPrice(modifiedMarket.getPrice());
+        existing.setUnitPrice(modifiedMarket.getUnitPrice());
         syncMarketId(existing);
         return marketRepository.save(existing);
     }
@@ -93,10 +103,6 @@ public class MarketService {
         marketRepository.deleteByUserId(uid);
     }
 
-    public void deleteAll() {
-        marketRepository.deleteAll();
-    }
-
     private void syncMarketId(Market market) {
         if (market.getUserId() == null || market.getProductId() == null) {
             return;
@@ -104,5 +110,27 @@ public class MarketService {
         market.setMarketId(
             new MarketID(market.getUserId(), market.getProductId())
         );
+    }
+
+    public void buyFromMarket(
+        Long buyerId,
+        Long sellerId,
+        Long productId,
+        Integer quantity
+    ) {
+        MarketID marketId = new MarketID(sellerId, productId);
+        Market market = findById(marketId);
+
+        syncMarketId(market);
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+        if (
+                authentication != null &&
+                        authentication.getPrincipal() instanceof User currentUser
+        ) {
+            buyerId = currentUser.getId(); // the buyer is the one who is connected on his application
+        }
+
+        tradeService.buy(sellerId, buyerId, productId, quantity, market.getUnitPrice());
     }
 }

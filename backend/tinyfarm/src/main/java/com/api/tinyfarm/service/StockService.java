@@ -1,37 +1,21 @@
 package com.api.tinyfarm.service;
 
-import com.api.tinyfarm.model.Stock;
-import com.api.tinyfarm.model.StockId;
-import com.api.tinyfarm.model.Transaction;
-import com.api.tinyfarm.model.User;
+import com.api.tinyfarm.model.*;
 import com.api.tinyfarm.repository.StockRepository;
-import com.api.tinyfarm.repository.TransactionRepository;
-import com.api.tinyfarm.repository.UserRepository;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class StockService {
 
-    private final StockRepository stockRepository;
-    private final TransactionRepository transactionRepository;
-    private final UserRepository userRepository;
-    private final UserService userService;
-
-    public StockService(
-        StockRepository stockRepository,
-        TransactionRepository transactionRepository,
-        UserRepository userRepository,
-        UserService userService
-    ) {
-        this.stockRepository = stockRepository;
-        this.transactionRepository = transactionRepository;
-        this.userRepository = userRepository;
-        this.userService = userService;
-    }
-
+    @Autowired
+    private StockRepository stockRepository;
+    @Autowired
+    private MarketService marketService;
+   
     public List<Stock> findAll() {
         return stockRepository.findAll();
     }
@@ -116,181 +100,11 @@ public class StockService {
         );
     }
 
-    public void sell(Long tid) {
-        // Récupération de la transaction de vente
-        Optional<Transaction> transaction = transactionRepository.findById(tid);
-        if (!transaction.isPresent()) {
-            throw new RuntimeException("Transaction non trouvée");
-        }
-
-        Transaction trans = transaction.get();
-        Long sellerId = trans.getSeller();
-        Long buyerId = trans.getBuyer();
-        Long productId = trans.getProduct();
-        int quantity = trans.getQuantity();
-        float totalPrice = trans.getTotalPrice();
-
-        // Récupération du stock du vendeur pour ce produit
-        List<Stock> sellerStocks = findByUser(sellerId);
-        Stock sellerStock = sellerStocks
-            .stream()
-            .filter(s -> s.getId().getProductID().equals(productId))
-            .findFirst()
-            .orElseThrow(() ->
-                new RuntimeException("Stock du vendeur non trouvé")
-            );
-
-        // Mise à jour du stock du vendeur (diminution de la quantité vendue)
-        Stock updatedSellerStock = new Stock();
-        updatedSellerStock.setId(sellerStock.getId());
-        updatedSellerStock.setUserId(sellerStock.getUserId());
-        updatedSellerStock.setProductId(sellerStock.getProductId());
-        updatedSellerStock.setQuantity(sellerStock.getQuantity() - quantity);
-        updatedSellerStock.setCollectible(sellerStock.getCollectible());
-
-        // Mise à jour du stock de l'acheteur
-        List<Stock> buyerStocks = findByUser(buyerId);
-        Stock buyerStock = buyerStocks
-            .stream()
-            .filter(s -> s.getId().getProductID().equals(productId))
-            .findFirst()
-            .orElse(null);
-
-        if (buyerStock == null) {
-            // Créer un nouveau stock pour l'acheteur
-            buyerStock = new Stock();
-            buyerStock.setId(new StockId(buyerId, productId));
-            buyerStock.setQuantity(quantity);
-            buyerStock.setCollectible(sellerStock.getCollectible());
-            stockRepository.save(buyerStock);
-        } else {
-            // Augmenter le stock existant
-            Stock updatedBuyerStock = new Stock();
-            updatedBuyerStock.setId(buyerStock.getId());
-            updatedBuyerStock.setUserId(buyerStock.getUserId());
-            updatedBuyerStock.setProductId(buyerStock.getProductId());
-            updatedBuyerStock.setQuantity(buyerStock.getQuantity() + quantity);
-            updatedBuyerStock.setCollectible(buyerStock.getCollectible());
-            update(buyerId, productId, updatedBuyerStock);
-        }
-
-        // Mise à jour des écus
-        Optional<User> seller = userRepository.findById(sellerId);
-        Optional<User> buyer = userRepository.findById(buyerId);
-
-        if (seller.isPresent() && buyer.isPresent()) {
-            // Mise à jour du vendeur (gain d'écus)
-            User updatedSeller = new User();
-            updatedSeller.setId(seller.get().getId());
-            updatedSeller.setName(seller.get().getName());
-            updatedSeller.setEmail(seller.get().getEmail());
-            updatedSeller.setEcus(seller.get().getEcus() + totalPrice);
-            updatedSeller.setGender(seller.get().getGender());
-            updatedSeller.setHibernation(seller.get().getHibernation());
-
-            // Mise à jour de l'acheteur (perte d'écus)
-            User updatedBuyer = new User();
-            updatedBuyer.setId(buyer.get().getId());
-            updatedBuyer.setName(buyer.get().getName());
-            updatedBuyer.setEmail(buyer.get().getEmail());
-            updatedBuyer.setEcus(buyer.get().getEcus() - totalPrice);
-            updatedBuyer.setGender(buyer.get().getGender());
-            updatedBuyer.setHibernation(buyer.get().getHibernation());
-
-            userService.update(sellerId, updatedSeller);
-            userService.update(buyerId, updatedBuyer);
-        }
-
-        // Mise à jour du stock du vendeur
-        update(sellerId, productId, updatedSellerStock);
-    }
-
-    public void buy(Long tid) {
-        // Récupération de la transaction d'achat
-        Optional<Transaction> transaction = transactionRepository.findById(tid);
-        if (!transaction.isPresent()) {
-            throw new RuntimeException("Transaction non trouvée");
-        }
-
-        Transaction trans = transaction.get();
-        Long sellerId = trans.getSeller();
-        Long buyerId = trans.getBuyer();
-        Long productId = trans.getProduct();
-        int quantity = trans.getQuantity();
-        float totalPrice = trans.getTotalPrice();
-
-        // Récupération du stock du vendeur pour ce produit
-        List<Stock> sellerStocks = findByUser(sellerId);
-        Stock sellerStock = sellerStocks
-            .stream()
-            .filter(s -> s.getId().getProductID().equals(productId))
-            .findFirst()
-            .orElseThrow(() ->
-                new RuntimeException("Stock du vendeur non trouvé")
-            );
-
-        // Mise à jour du stock du vendeur (diminution de la quantité vendue)
-        Stock updatedSellerStock = new Stock();
-        updatedSellerStock.setId(sellerStock.getId());
-        updatedSellerStock.setUserId(sellerStock.getUserId());
-        updatedSellerStock.setProductId(sellerStock.getProductId());
-        updatedSellerStock.setQuantity(sellerStock.getQuantity() - quantity);
-        updatedSellerStock.setCollectible(sellerStock.getCollectible());
-
-        // Mise à jour du stock de l'acheteur
-        List<Stock> buyerStocks = findByUser(buyerId);
-        Stock buyerStock = buyerStocks
-            .stream()
-            .filter(s -> s.getId().getProductID().equals(productId))
-            .findFirst()
-            .orElse(null);
-
-        if (buyerStock == null) {
-            // Créer un nouveau stock pour l'acheteur
-            buyerStock = new Stock();
-            buyerStock.setId(new StockId(buyerId, productId));
-            buyerStock.setQuantity(quantity);
-            buyerStock.setCollectible(sellerStock.getCollectible());
-            stockRepository.save(buyerStock);
-        } else {
-            // Augmenter le stock existant
-            Stock updatedBuyerStock = new Stock();
-            updatedBuyerStock.setId(buyerStock.getId());
-            updatedBuyerStock.setUserId(buyerStock.getUserId());
-            updatedBuyerStock.setProductId(buyerStock.getProductId());
-            updatedBuyerStock.setQuantity(buyerStock.getQuantity() + quantity);
-            updatedBuyerStock.setCollectible(buyerStock.getCollectible());
-            update(buyerId, productId, updatedBuyerStock);
-        }
-
-        // Mise à jour des écus
-        Optional<User> seller = userRepository.findById(sellerId);
-        Optional<User> buyer = userRepository.findById(buyerId);
-
-        if (seller.isPresent() && buyer.isPresent()) {
-            // Mise à jour du vendeur (gain d'écus)
-            User updatedSeller = new User();
-            updatedSeller.setId(seller.get().getId());
-            updatedSeller.setName(seller.get().getName());
-            updatedSeller.setEmail(seller.get().getEmail());
-            updatedSeller.setEcus(seller.get().getEcus() + totalPrice);
-            updatedSeller.setGender(seller.get().getGender());
-            updatedSeller.setHibernation(seller.get().getHibernation());
-
-            // Mise à jour de l'acheteur (perte d'écus)
-            User updatedBuyer = new User();
-            updatedBuyer.setId(buyer.get().getId());
-            updatedBuyer.setName(buyer.get().getName());
-            updatedBuyer.setEmail(buyer.get().getEmail());
-            updatedBuyer.setEcus(buyer.get().getEcus() - totalPrice);
-            updatedBuyer.setGender(buyer.get().getGender());
-            updatedBuyer.setHibernation(buyer.get().getHibernation());
-
-            userService.update(sellerId, updatedSeller);
-            userService.update(buyerId, updatedBuyer);
-        }
-
-        // Mise à jour du stock du vendeur
-        update(sellerId, productId, updatedSellerStock);
+    public Market publishToMarket(Long productId, Integer quantity, Float unitPrice){
+            Market market = new Market();
+            market.setProductId(productId);
+            market.setQuantity(quantity);
+            market.setUnitPrice(unitPrice);
+            return marketService.create(market);
     }
 }
