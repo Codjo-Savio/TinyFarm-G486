@@ -6,21 +6,29 @@ async function initialiserBoutique() {
     const container = document.getElementById("shop-container");
 
     try {
-        const productsResponse = await fetch(`${API_URL}/products`);
-        if (productsResponse.ok) {
+        let productsResponse = await fetch(`${API_URL}/products`).catch(() => null);
+        if (productsResponse && productsResponse.ok) {
             const productsList = await productsResponse.json();
             productsList.forEach(p => {
                 nomsProduits[p.id] = p.description;
             });
         }
 
-        const response = await fetch(`${API_URL}/cooperative`);
+        let response = await fetch(`${API_URL}/cooperative`).catch(() => null);
 
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP : ${response.status}`);
+        if (!response || !response.ok) {
+            response = await fetch("/fakeapi/trade/cooperative.json");
         }
 
         inventaire = await response.json();
+        
+        if (inventaire && Object.values(inventaire)[0] && typeof Object.values(inventaire)[0] === 'object') {
+            const temp = {};
+            for (const [k, v] of Object.entries(inventaire)) {
+                temp[k] = v.price;
+            }
+            inventaire = temp;
+        }
 
 
         try {
