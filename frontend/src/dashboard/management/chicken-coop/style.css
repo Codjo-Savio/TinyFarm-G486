@@ -1,0 +1,101 @@
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+/* carte */
+.grid-item {
+    background: #f2d49f;
+    border-radius: 16px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* titre */
+.animal-title h2 {
+    margin: 0;
+    font-size: 18px;
+}
+
+/* contenu */
+.animal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* nourriture */
+.food-state {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.food-state-line-place-holder {
+    flex: 1;
+    height: 8px;
+    background: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.food-state-line {
+    height: 100%;
+    background: #4caf50;
+}
+
+/* infos */
+.animal-type,
+.animal-weight {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* boutons */
+.animal-actions {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.action-button {
+    background: #55361b;
+    color: #fff4e0;
+    border: none;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.action-button:hover {
+    background: #6b4725;
+}
+
+/* top bar */
+.taskbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+}
+
+.taskbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.sell-button {
+    background: #55361b;
+    color: #fff4e0;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}

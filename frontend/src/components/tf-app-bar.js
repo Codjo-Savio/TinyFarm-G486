@@ -6,7 +6,6 @@ class TfAppBar extends HTMLElement {
         this.attachShadow({ mode: "open" });
         this.rendered = false;
         this.userLoadPromise = null;
-        this.userLoaded = false;
         this.listenersAttached = false;
     }
 
@@ -179,7 +178,7 @@ class TfAppBar extends HTMLElement {
                                 id="rules"
                                 slot="entry"
                                 icon="book"
-                                href="/doc/rules?from=/dashboard"
+                                href="/doc/rules"
                             >
                                 Règles du jeu
                             </tf-menu-entry>
@@ -225,7 +224,7 @@ class TfAppBar extends HTMLElement {
     }
 
     async update() {
-        if (!this.levelElement || this.userLoaded) {
+        if (!this.levelElement) {
             return;
         }
 
@@ -238,7 +237,6 @@ class TfAppBar extends HTMLElement {
         this.usernameElement.textContent = this.user.name;
         this.moneyLevelElement.textContent = this.user.ecus;
         this.appbarElement.classList.add("ready");
-        this.userLoaded = true;
     }
 
     setupEventListeners() {
