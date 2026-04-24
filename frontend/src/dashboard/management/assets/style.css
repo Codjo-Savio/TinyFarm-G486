@@ -344,6 +344,7 @@ h2.category-title {
     display: flex;
     align-items: center;
     gap: 20px;
+    min-width: 0;
 }
 
 .stock-badge {
@@ -362,6 +363,10 @@ h2.category-title {
     font-size: 22px;
     font-weight: 400;
     color: var(--color-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: min(44vw, 420px);
 }
 
 .seller {
@@ -377,6 +382,7 @@ h2.category-title {
     display: flex;
     align-items: center;
     gap: 30px;
+    flex-shrink: 0;
 }
 
 .price {

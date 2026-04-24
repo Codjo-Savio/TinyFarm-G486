@@ -1,16 +1,43 @@
-import { API_URL, fetchApiWithCredentials } from "/utils/fetch.js";
+import { API_URL, fetchApiWithCredentials, loadScriptIfNeeded } from "/utils/fetch.js";
 
-const FAKE_ASSETS_URL = "/fakeapi/assets.json";
-const PRICE_DECIMALS = 2;
+function utiliserModeFake() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("fake") === "1" || params.get("mockData") === "1";
+}
 
-let inventaire = {};
-const panier = {};
-const prixPrecedents = new Map();
+function normaliserListe(source, cle) {
+    if (Array.isArray(source)) {
+        return source;
+    }
 
-// === Utilitaires ===
+    if (Array.isArray(source?.[cle])) {
+        return source[cle];
+    }
 
-function echapperPourOnclick(valeur) {
-    return String(valeur).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+    return [];
+}
+
+function normaliserInventaireRecu(source) {
+    if (Array.isArray(source)) {
+        return {
+            products: [],
+            stocks: source,
+        };
+    }
+
+    return {
+        products: normaliserListe(source, "products"),
+        stocks: normaliserListe(source, "stocks"),
+    };
+}
+
+function normaliserNombre(value) {
+    const nombre = Number(value);
+    return Number.isFinite(nombre) ? nombre : 0;
+}
+
+function echapperPourOnclick(value) {
+    return String(value).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
 }
 
 function obtenirIdPrix(nomProduit) {
@@ -21,20 +48,12 @@ function obtenirIdBoutonEdition(nomProduit) {
     return `edit-${nomProduit}`;
 }
 
-function obtenirIdSaisiePrix(nomProduit) {
-    return `new-price-${nomProduit}`;
-}
-
-function obtenirListePanier() {
-    return document.querySelector(".cart-list");
-}
-
 function formaterPrix(prix) {
-    return `$${Number(prix).toFixed(PRICE_DECIMALS)}`;
+    return `$${normaliserNombre(prix).toFixed(2)}`;
 }
 
-function afficherEtatInventaireVide(conteneur) {
-    conteneur.innerHTML = `
+function renderEmptyInventoryState(container) {
+    container.innerHTML = `
         <div class="empty-state">
             <span class="material-symbols-rounded empty-state-icon">inventory_2</span>
             <h2 class="empty-state-title">Aucun article disponible</h2>
@@ -43,136 +62,246 @@ function afficherEtatInventaireVide(conteneur) {
     `;
 }
 
-function normaliserPrix(valeurBrute) {
-    const prix = Number.parseFloat(valeurBrute);
-    if (!Number.isFinite(prix) || prix < 0) {
-        return null;
+let dialogPrixVente = null;
+
+function obtenirDialogPrixVente() {
+    if (dialogPrixVente) {
+        return dialogPrixVente;
     }
 
-    return Math.round(prix * 100) / 100;
+    loadScriptIfNeeded("/components/tf-dialog.js");
+
+    const dialog = document.createElement("tf-dialog");
+    dialog.setAttribute("modal", "");
+    dialog.setAttribute("title", "Prix de vente");
+    dialog.setAttribute("title-icon", "sell");
+    dialog.innerHTML = `
+        <div style="display:flex; flex-direction:column; gap:8px;">
+            <label for="sale-price-input" style="font-weight:600;">Prix unitaire</label>
+            <input id="sale-price-input" type="number" min="0" step="0.01" style="padding:10px 12px; border-radius:10px; border:1px solid rgba(0,0,0,.2); font-size:16px;" />
+        </div>
+        <tf-button slot="cancel-button" variant="secondary">Annuler</tf-button>
+        <tf-button slot="confirm-button" variant="primary">Valider</tf-button>
+    `;
+
+    document.body.appendChild(dialog);
+    dialogPrixVente = dialog;
+    return dialog;
 }
 
-function doitUtiliserApercuFictif() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("fake") === "1";
-}
+function demanderPrixViaDialog(nomProduit, valeurInitiale) {
+    const dialog = obtenirDialogPrixVente();
+    dialog.setAttribute("title", `Prix de vente - ${nomProduit}`);
 
-function obtenirNomProduitAffichage(produit) {
-    if (typeof produit.description === "string") {
-        return produit.description.trim();
+    const input = dialog.querySelector("#sale-price-input");
+    const boutonAnnuler = dialog.querySelector('[slot="cancel-button"]');
+    const boutonValider = dialog.querySelector('[slot="confirm-button"]');
+
+    if (!input || !boutonAnnuler || !boutonValider) {
+        return Promise.resolve(null);
     }
 
-    return `Produit ${produit.id}`;
-}
+    input.value = Number.isFinite(valeurInitiale)
+        ? normaliserNombre(valeurInitiale).toFixed(2)
+        : "";
 
-function convertirApiEnInventaire(stocks, produits) {
-    const produitsParId = new Map(
-        produits.map((produit) => [Number(produit.id), produit]),
-    );
+    dialog.setAttribute("show", "");
 
-    return stocks.reduce((inventaireCourant, stock) => {
-        const produit = produitsParId.get(Number(stock.productId));
-        if (!produit) {
-            return inventaireCourant;
-        }
-
-        const nomProduit = obtenirNomProduitAffichage(produit);
-
-        inventaireCourant[nomProduit] = {
-            id: Number(produit.id),
-            description: produit.description ?? nomProduit,
-            collectible: Boolean(produit.collectible),
-            coefficient: Number(produit.coefficient) || 1,
-            quantity: Number(stock.quantity) || 0,
-            price: Number(produit.price) || 0,
+    return new Promise((resolve) => {
+        const fermer = (resultat) => {
+            dialog.removeAttribute("show");
+            input.removeEventListener("keydown", gererClavier);
+            boutonAnnuler.removeEventListener("click", annuler);
+            boutonValider.removeEventListener("click", valider);
+            resolve(resultat);
         };
 
-        return inventaireCourant;
-    }, {});
+        const annuler = () => fermer(null);
+
+        const valider = () => {
+            const prix = Math.round(Number.parseFloat(input.value) * 100) / 100;
+            if (!Number.isFinite(prix) || prix < 0) {
+                window.alert("Prix invalide. Merci d'entrer un nombre positif.");
+                input.focus();
+                return;
+            }
+
+            fermer(prix);
+        };
+
+        const gererClavier = (event) => {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                valider();
+            }
+
+            if (event.key === "Escape") {
+                event.preventDefault();
+                annuler();
+            }
+        };
+
+        input.addEventListener("keydown", gererClavier);
+        boutonAnnuler.addEventListener("click", annuler);
+        boutonValider.addEventListener("click", valider);
+
+        requestAnimationFrame(() => {
+            input.focus();
+            input.select();
+        });
+    });
 }
 
-// === Chargement des données ===
+async function chargerInventaireFake() {
+    const urlsCandidates = ["/fakeapi/assets.json", "../../../fakeapi/assets.json"];
 
-async function recupererIdUtilisateurCourant() {
-    const response = await fetchApiWithCredentials("/auth/me");
-    if (!response.ok) {
-        throw new Error(`Impossible de recuperer l'utilisateur: ${response.status}`);
+    for (const url of urlsCandidates) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                continue;
+            }
+
+            return await response.json();
+        } catch {
+            // continue to next candidate URL
+        }
     }
 
-    const utilisateur = await response.json();
-    if (!utilisateur || utilisateur.id == null) {
-        throw new Error("Reponse /auth/me invalide");
-    }
-
-    return Number(utilisateur.id);
+    throw new Error("Impossible de charger les donnees fake");
 }
 
 async function chargerInventaireReel() {
-    const userId = await recupererIdUtilisateurCourant();
-
-    const [productsResponse, stocksResponse] = await Promise.all([
+    const [meResponse, productsResponse] = await Promise.all([
+        fetchApiWithCredentials("/auth/me"),
         fetchApiWithCredentials("/products"),
-        fetchApiWithCredentials(`/stocks/user/${userId}`),
     ]);
 
-    if (!productsResponse.ok) {
-        throw new Error(`Erreur produits: ${productsResponse.status}`);
+    if (meResponse.ok) {
+        const utilisateur = await meResponse.json();
+        idUtilisateurCourant = Number(utilisateur?.id) || null;
     }
 
-    if (!stocksResponse.ok) {
-        throw new Error(`Erreur stocks: ${stocksResponse.status}`);
+    let products = [];
+    if (productsResponse.ok) {
+        const jsonProducts = await productsResponse.json();
+        products = Array.isArray(jsonProducts) ? jsonProducts : [];
     }
 
-    const [produits, stocks] = await Promise.all([
-        productsResponse.json(),
-        stocksResponse.json(),
-    ]);
+    let stocks = [];
+    if (idUtilisateurCourant) {
+        const stocksResponse = await fetchApiWithCredentials(`/stocks/user/${idUtilisateurCourant}`);
+        if (stocksResponse.ok) {
+            const jsonStocks = await stocksResponse.json();
+            stocks = Array.isArray(jsonStocks) ? jsonStocks : [];
+        }
+    }
 
-    return convertirApiEnInventaire(
-        Array.isArray(stocks) ? stocks : [],
-        Array.isArray(produits) ? produits : [],
-    );
+    return { products, stocks };
 }
 
-async function chargerInventaireFictif() {
-    const response = await fetch(FAKE_ASSETS_URL);
+function indexerInventaire(source) {
+    idProduitParNom.clear();
+    stockParNom.clear();
 
-    if (!response.ok) {
-        throw new Error(`Erreur fake API: ${response.status}`);
+    const produits = normaliserListe(source, "products");
+    const produitsParId = new Map();
+    for (const produit of produits) {
+        const idProduit = normaliserNombre(produit?.id);
+        const nomProduit = typeof produit?.description === "string"
+            ? produit.description.trim()
+            : "";
+
+        if (!nomProduit || idProduit <= 0) {
+            continue;
+        }
+
+        produitsParId.set(idProduit, produit);
+        idProduitParNom.set(nomProduit, idProduit);
     }
 
-    const donneesFactices = await response.json();
-    const produits = Array.isArray(donneesFactices.products)
-        ? donneesFactices.products
-        : [];
-    const stocks = Array.isArray(donneesFactices.stocks)
-        ? donneesFactices.stocks
-        : [];
+    const stocks = normaliserListe(source, "stocks");
+    for (const stock of stocks) {
+        const idProduit = normaliserNombre(stock?.productId ?? stock?.id?.productID);
+        const quantite = normaliserNombre(stock?.quantity);
 
-    return convertirApiEnInventaire(stocks, produits);
+        if (idProduit <= 0) {
+            continue;
+        }
+
+        const produit = produitsParId.get(idProduit);
+        const nomProduit = typeof produit?.description === "string"
+            ? produit.description.trim()
+            : `Produit ${idProduit}`;
+
+        stockParNom.set(nomProduit.toLowerCase(), quantite);
+
+        if (!idProduitParNom.has(nomProduit)) {
+            idProduitParNom.set(nomProduit, idProduit);
+        }
+    }
 }
-
-// === Rendu de la boutique ===
 
 async function initialiserBoutique() {
-    const conteneurBoutique = document.getElementById("shop-container");
-    if (!conteneurBoutique) {
-        return;
-    }
+    const container = document.getElementById("shop-container");
 
     try {
-        inventaire = doitUtiliserApercuFictif()
-            ? await chargerInventaireFictif()
+        const modeFake = utiliserModeFake();
+        const inventaireRecu = modeFake
+            ? await chargerInventaireFake()
             : await chargerInventaireReel();
+        inventaire = normaliserInventaireRecu(inventaireRecu);
 
-        conteneurBoutique.innerHTML = "";
+        indexerInventaire(inventaire);
 
-        if (Object.keys(inventaire).length === 0) {
-            afficherEtatInventaireVide(conteneurBoutique);
+        const produits = normaliserListe(inventaire, "products");
+        const stocks = normaliserListe(inventaire, "stocks");
+        const stockParId = new Map();
+
+        for (const stock of stocks) {
+            const idProduit = normaliserNombre(stock?.productId ?? stock?.id?.productID);
+            if (idProduit <= 0) {
+                continue;
+            }
+
+            stockParId.set(idProduit, normaliserNombre(stock?.quantity));
+        }
+
+        container.innerHTML = "";
+
+        const produitsAffichables = produits.length > 0
+            ? produits
+            : [...stockParId.keys()].map((idProduit) => ({
+                id: idProduit,
+                description: `Produit ${idProduit}`,
+                price: 0,
+            }));
+
+        inventaire.products = produitsAffichables;
+
+        if (produitsAffichables.length === 0) {
+            renderEmptyInventoryState(container);
             return;
         }
 
-        for (const [nomProduit, valeurs] of Object.entries(inventaire)) {
+        const catalogueHTML = [];
+
+        for (const produit of produitsAffichables) {
+            const idProduit = normaliserNombre(produit?.id);
+            if (idProduit <= 0) {
+                continue;
+            }
+
+            const nomProduit = typeof produit?.description === "string"
+                ? produit.description.trim()
+                : `Produit ${idProduit}`;
+            const valeurs = {
+                quantity: stockParId.get(idProduit) ?? 0,
+                price: normaliserNombre(produit?.price),
+            };
+
+            prixParNom.set(nomProduit.toLowerCase(), valeurs.price);
+
             const nomEchappe = echapperPourOnclick(nomProduit);
             const htmlProduit = `
                 <div class="product-row">
@@ -184,255 +313,336 @@ async function initialiserBoutique() {
                         <span class="prod-name">${nomProduit}</span>
                     </div>
                     <div class="prod-action">
-                        <button class="edit-price-btn" id="${obtenirIdBoutonEdition(nomProduit)}" onclick="modifierPrix('${nomEchappe}')">
-                            <span class="material-symbols-rounded">
-                                edit
-                            </span>
-                        </button>
-                        <span class="price" id="${obtenirIdPrix(nomProduit)}">${formaterPrix(valeurs.price)}</span>
-                        <tf-button variant="primary" onclick="ajouterAuPanier('${nomEchappe}')">Ajouter</tf-button>
+                        <tf-button variant="primary" ${valeurs.quantity <= 0 ? "disabled" : ""} onclick="ajouterAuPanier('${nomEchappe}')">Ajouter</tf-button>
                     </div>
                 </div>
             `;
-            conteneurBoutique.insertAdjacentHTML("beforeend", htmlProduit);
+            catalogueHTML.push(htmlProduit);
         }
+
+        container.insertAdjacentHTML("beforeend", catalogueHTML.join(""));
     } catch (erreur) {
         console.error("Impossible de charger l'inventaire :", erreur);
-        conteneurBoutique.innerHTML = "<p>Erreur lors du chargement des produits.</p>";
+        container.innerHTML = "<p>Erreur lors du chargement des produits.</p>";
     }
 }
 
 document.addEventListener("DOMContentLoaded", initialiserBoutique);
 
-// === Gestion du panier ===
+// Partie panier
+let inventaire = {
+    products: [],
+    stocks: [],
+};
+const panier = {};
+let idUtilisateurCourant = null;
+const idProduitParNom = new Map();
+const stockParNom = new Map();
+const prixParNom = new Map();
 
-function afficherPanier() {
-    let total = 0;
+async function chargerContextePublication() {
+    try {
+        const [meResponse, productsResponse] = await Promise.all([
+            fetchApiWithCredentials("/auth/me"),
+            fetchApiWithCredentials("/products"),
+        ]);
 
-    for (const [nomProduit, quantite] of Object.entries(panier)) {
-        const produit = inventaire[nomProduit];
-        if (produit) {
-            total += produit.price * quantite;
+        if (meResponse.ok) {
+            const utilisateur = await meResponse.json();
+            idUtilisateurCourant = Number(utilisateur?.id) || null;
         }
-    }
 
-    const totalArrondi = Math.round(total * 100) / 100;
-    const totalElement = document.getElementById("totalPrice");
-    if (totalElement) {
-        totalElement.textContent = formaterPrix(totalArrondi);
-    }
-
-    const listePanier = obtenirListePanier();
-    if (!listePanier) {
-        return;
-    }
-
-    listePanier.innerHTML = "";
-
-    if (Object.keys(panier).length === 0) {
-        return;
-    }
-
-    for (const [nomProduit, quantite] of Object.entries(panier)) {
-        const nomEchappe = echapperPourOnclick(nomProduit);
-        const htmlProduit = `
-            <div class="cart-item">
-                <span>${nomProduit}</span>
-                <div class="qty-control">
-                    <button class="btn-qty" onclick="retirerDuPanier('${nomEchappe}')">
-                        <span class="material-symbols-rounded">
-                            remove_circle
-                        </span>
-                    </button>
-                    <span>${quantite}</span>
-                    <button class="btn-qty" onclick="ajouterAuPanier('${nomEchappe}')">
-                        <span class="material-symbols-rounded">
-                            add_circle
-                        </span>
-                    </button>
-                </div>
-            </div>
-        `;
-        listePanier.insertAdjacentHTML("beforeend", htmlProduit);
+        if (productsResponse.ok) {
+            const produits = await productsResponse.json();
+            if (Array.isArray(produits)) {
+                for (const produit of produits) {
+                    const nom = typeof produit?.description === "string"
+                        ? produit.description.trim()
+                        : null;
+                    const productId = Number(produit?.id);
+                    if (nom && Number.isFinite(productId)) {
+                        idProduitParNom.set(nom, productId);
+                    }
+                }
+            }
+        }
+    } catch (erreur) {
+        console.warn("Contexte de publication indisponible:", erreur);
     }
 }
 
-afficherPanier();
+function obtenirIdProduitParNom(nomProduit) {
+    if (idProduitParNom.has(nomProduit)) {
+        return idProduitParNom.get(nomProduit);
+    }
 
-function ajouterAuPanier(nomProduit) {
-    if (!inventaire[nomProduit]) {
+    const cle = nomProduit.trim().toLowerCase();
+    for (const [nom, id] of idProduitParNom.entries()) {
+        if (nom.trim().toLowerCase() === cle) {
+            return id;
+        }
+    }
+
+    return null;
+}
+
+function trouverProduitDansInventaire(nomProduit) {
+    const produits = Array.isArray(inventaire.products) ? inventaire.products : [];
+    const trouve = produits.find((produit) => {
+        const description = typeof produit?.description === "string"
+            ? produit.description.trim().toLowerCase()
+            : "";
+        return description === nomProduit.trim().toLowerCase();
+    }) ?? null;
+
+    if (trouve) {
+        return trouve;
+    }
+
+    const idProduit = obtenirIdProduitParNom(nomProduit);
+    if (Number.isFinite(idProduit)) {
+        return {
+            id: idProduit,
+            description: nomProduit,
+        };
+    }
+
+    return null;
+}
+
+async function demanderPrixVente(nomProduit) {
+    const prixDefaut = prixParNom.get(nomProduit.trim().toLowerCase());
+    return await demanderPrixViaDialog(nomProduit, prixDefaut);
+}
+
+async function modifierPrix(nomProduit) {
+    const cle = nomProduit.trim().toLowerCase();
+    const prixCourant = prixParNom.get(cle) ?? 0;
+
+    const prix = await demanderPrixViaDialog(nomProduit, prixCourant);
+    if (prix === null) {
         return;
     }
 
-    panier[nomProduit] = (panier[nomProduit] || 0) + 1;
-    afficherPanier();
+    prixParNom.set(cle, prix);
+
+    const elementPrix = document.getElementById(obtenirIdPrix(nomProduit));
+    if (elementPrix) {
+        elementPrix.textContent = formaterPrix(prix);
+    }
+}
+
+function displayPanier() {
+    let total = 0;
+
+    for (const item of Object.values(panier)) {
+        total += item.prixVente * item.quantite;
+    }
+
+    const totalArrondi = Math.round(total * 100) / 100;
+    const totalPriceElement = document.getElementById("totalPrice");
+    if (totalPriceElement) {
+        totalPriceElement.textContent = `$${totalArrondi.toFixed(2)}`;
+    }
+
+    const cartListElement = document.querySelector(".cart-list");
+    if (!cartListElement) {
+        return;
+    }
+
+    cartListElement.innerHTML = "";
+
+    for (const [nom, item] of Object.entries(panier)) {
+        const productHTML = `
+                            <div class="cart-item">
+                                    <span>${nom}</span>
+                                    <span>Prix unit.: $${item.prixVente.toFixed(2)}</span>
+                                    <div class="qty-control">
+                                        <button class="btn-qty" onclick="modifierPrixPanier('${nom.replace(/'/g, "\\'")}')">
+                                            <span
+                                                class="material-symbols-rounded"
+                                            >
+                                                edit
+                                            </span>
+                                        </button>
+                                        <button class="btn-qty" onclick="retirerDuPanier('${nom.replace(/'/g, "\\'")}')">
+                                            <span
+                                                class="material-symbols-rounded"
+                                            >
+                                                remove_circle
+                                            </span>
+                                        </button>
+                                        <span>${item.quantite}</span>
+                                        <button class="btn-qty" onclick="ajouterAuPanier('${nom.replace(/'/g, "\\'")}')">
+                                            <span
+                                                class="material-symbols-rounded"
+                                            >
+                                                add_circle
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
+                                `;
+        cartListElement.insertAdjacentHTML("beforeend", productHTML);
+    }
+}
+
+displayPanier();
+
+async function ajouterAuPanier(nomProduit) {
+    const produit = trouverProduitDansInventaire(nomProduit);
+    const stockDisponible = stockParNom.get(nomProduit.trim().toLowerCase()) ?? Infinity;
+
+    if (!produit) {
+        window.alert("Produit introuvable.");
+        return;
+    }
+
+    if (panier[nomProduit]) {
+        if (panier[nomProduit].quantite >= stockDisponible) {
+            window.alert("Stock insuffisant pour ajouter ce produit.");
+            return;
+        }
+
+        panier[nomProduit].quantite++;
+    } else {
+        const prixVente = await demanderPrixVente(nomProduit);
+        if (prixVente === null) {
+            return;
+        }
+
+        panier[nomProduit] = {
+            quantite: 1,
+            prixVente: prixVente,
+        };
+    }
+
+    displayPanier();
 }
 
 function retirerDuPanier(nomProduit) {
     if (panier[nomProduit]) {
-        panier[nomProduit]--;
-        if (panier[nomProduit] <= 0) {
+        panier[nomProduit].quantite--;
+        if (panier[nomProduit].quantite <= 0) {
             delete panier[nomProduit];
         }
     }
 
-    afficherPanier();
+    displayPanier();
 }
 
-// === Gestion des prix ===
-
-function appliquerPrix(nomProduit, valeurBrute, mettreAJourAffichage = true) {
-    const prix = normaliserPrix(valeurBrute);
-    if (prix === null || !inventaire[nomProduit]) {
-        return false;
+async function modifierPrixPanier(nomProduit) {
+    const item = panier[nomProduit];
+    if (!item) {
+        return;
     }
 
-    inventaire[nomProduit].price = prix;
-
-    if (mettreAJourAffichage) {
-        const elementPrix = document.getElementById(obtenirIdPrix(nomProduit));
-        if (elementPrix) {
-            elementPrix.textContent = formaterPrix(prix);
-        }
+    const prix = await demanderPrixViaDialog(nomProduit, item.prixVente);
+    if (prix === null) {
+        return;
     }
 
-    afficherPanier();
-    return true;
+    item.prixVente = prix;
+    displayPanier();
 }
 
-async function sauvegarderPrixProduit(nomProduit) {
-    const produit = inventaire[nomProduit];
-    if (!produit || produit.id == null) {
-        throw new Error(`Produit introuvable: ${nomProduit}`);
-    }
-
-    const response = await fetch(`${API_URL}/products/id/${produit.id}`, {
-        method: "PUT",
+async function publierProduitAuMarche(payload) {
+    const responseAvecUserId = await fetch(`${API_URL}/market/ad`, {
+        method: "POST",
         credentials: "include",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-            id: produit.id,
-            description: produit.description,
-            collectible: produit.collectible,
-            price: produit.price,
-            coefficient: produit.coefficient,
-        }),
+        body: JSON.stringify(payload),
     });
 
-    if (!response.ok) {
-        throw new Error(`Erreur sauvegarde prix: ${response.status}`);
+    if (responseAvecUserId.ok) {
+        return responseAvecUserId;
     }
 
-    const produitMisAJour = await response.json();
-    if (produitMisAJour && produitMisAJour.price != null) {
-        const prixNormalise = normaliserPrix(produitMisAJour.price);
-        if (prixNormalise != null) {
-            inventaire[nomProduit].price = prixNormalise;
-        }
-    }
+    const { userId, ...payloadSansUserId } = payload;
+    const responseSansUserId = await fetch(`${API_URL}/market/ad`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payloadSansUserId),
+    });
+
+    return responseSansUserId;
 }
 
-function mettreAJourBoutonEdition(nomProduit, nomFonction, icone) {
-    const boutonEdition = document.getElementById(obtenirIdBoutonEdition(nomProduit));
-    if (!boutonEdition) {
+async function mettrePanierEnVente() {
+    if (utiliserModeFake()) {
+        window.alert("Mode fake actif: la publication vers le marche n'est pas disponible.");
         return;
     }
 
-    boutonEdition.innerHTML = `<span class="material-symbols-rounded">${icone}</span>`;
-    boutonEdition.setAttribute("onclick", `${nomFonction}('${echapperPourOnclick(nomProduit)}')`);
-}
-
-function restaurerPrix(nomProduit) {
-    const prixPrecedent = prixPrecedents.get(nomProduit);
-    if (prixPrecedent != null && inventaire[nomProduit]) {
-        inventaire[nomProduit].price = prixPrecedent;
-    }
-
-    const elementPrix = document.getElementById(obtenirIdPrix(nomProduit));
-    if (elementPrix && inventaire[nomProduit]) {
-        elementPrix.textContent = formaterPrix(inventaire[nomProduit].price);
-    }
-
-    prixPrecedents.delete(nomProduit);
-    mettreAJourBoutonEdition(nomProduit, "modifierPrix", "edit");
-    afficherPanier();
-}
-
-function modifierPrix(nomProduit) {
-    const elementPrix = document.getElementById(obtenirIdPrix(nomProduit));
-    if (!elementPrix) {
+    const lignesPanier = Object.entries(panier);
+    if (lignesPanier.length === 0) {
+        window.alert("Le panier est vide.");
         return;
     }
 
-    if (inventaire[nomProduit]) {
-        prixPrecedents.set(nomProduit, inventaire[nomProduit].price);
+    if (!idUtilisateurCourant) {
+        await chargerContextePublication();
     }
 
-    const prixActuel = normaliserPrix(elementPrix.textContent.replace("$", ""));
-    const valeurInitiale = prixActuel == null ? 0 : prixActuel.toFixed(2);
+    let succes = 0;
+    const erreurs = [];
 
-    elementPrix.innerHTML = `
-        <input type="number" id="${obtenirIdSaisiePrix(nomProduit)}" value="${valeurInitiale}" min="0" step="0.01">
-    `;
-
-    const saisiePrix = document.getElementById(obtenirIdSaisiePrix(nomProduit));
-    saisiePrix?.addEventListener("input", () => {
-        appliquerPrix(nomProduit, saisiePrix.value, false);
-    });
-    saisiePrix?.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            confirmerPrix(nomProduit);
+    for (const [nomProduit, item] of lignesPanier) {
+        const productId = obtenirIdProduitParNom(nomProduit);
+        if (!Number.isFinite(productId)) {
+            erreurs.push(`Produit introuvable dans l'API: ${nomProduit}`);
+            continue;
         }
 
-        if (event.key === "Escape") {
-            event.preventDefault();
-            restaurerPrix(nomProduit);
-        }
-    });
-    saisiePrix?.focus();
-    saisiePrix?.select();
+        const payload = {
+            productId: productId,
+            userId: idUtilisateurCourant,
+            quantity: Number(item.quantite),
+            unitPrice: Number(item.prixVente),
+        };
 
-    mettreAJourBoutonEdition(nomProduit, "confirmerPrix", "check");
-}
-
-async function confirmerPrix(nomProduit) {
-    const saisiePrix = document.getElementById(obtenirIdSaisiePrix(nomProduit));
-    if (!saisiePrix) {
-        return;
-    }
-
-    const prixMisAJour = appliquerPrix(nomProduit, saisiePrix.value, true);
-    if (!prixMisAJour && inventaire[nomProduit]) {
-        const elementPrix = document.getElementById(obtenirIdPrix(nomProduit));
-        if (elementPrix) {
-            elementPrix.textContent = formaterPrix(inventaire[nomProduit].price);
-        }
-    }
-
-    if (prixMisAJour) {
         try {
-            await sauvegarderPrixProduit(nomProduit);
-            const elementPrix = document.getElementById(obtenirIdPrix(nomProduit));
-            if (elementPrix && inventaire[nomProduit]) {
-                elementPrix.textContent = formaterPrix(inventaire[nomProduit].price);
+            const response = await publierProduitAuMarche(payload);
+            if (!response.ok) {
+                erreurs.push(`Echec publication ${nomProduit} (${response.status})`);
+                continue;
             }
+
+            succes++;
+            delete panier[nomProduit];
         } catch (erreur) {
-            console.error("Impossible de sauvegarder le prix:", erreur);
-            restaurerPrix(nomProduit);
-            return;
+            erreurs.push(`Erreur publication ${nomProduit}`);
         }
     }
 
-    prixPrecedents.delete(nomProduit);
-    mettreAJourBoutonEdition(nomProduit, "modifierPrix", "edit");
+    displayPanier();
+
+    if (succes > 0 && erreurs.length === 0) {
+        window.alert("Produits publies au marche avec succes.");
+        return;
+    }
+
+    if (succes > 0 && erreurs.length > 0) {
+        window.alert(
+            `${succes} publication(s) reussie(s), ${erreurs.length} en echec.`,
+        );
+        return;
+    }
+
+    window.alert("Aucune publication n'a abouti.");
 }
 
-// === Exposition globale ===
+const boutonVente = document.getElementById("sellButton") ?? document.querySelector(".btn-sell");
+boutonVente?.addEventListener("click", () => {
+    void mettrePanierEnVente();
+});
 
 window.ajouterAuPanier = ajouterAuPanier;
 window.retirerDuPanier = retirerDuPanier;
+window.modifierPrixPanier = modifierPrixPanier;
 window.modifierPrix = modifierPrix;
-window.confirmerPrix = confirmerPrix;
