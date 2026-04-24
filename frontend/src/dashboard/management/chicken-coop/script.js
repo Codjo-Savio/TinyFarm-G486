@@ -1,8 +1,9 @@
-const API_URL = "http://localhost:8080/api";
+const API_URL = window.apiUrl || "http://localhost:8080/api";
 
 let chickens = [];
 let eggCount = 0;
 let currentUserId = null;
+let statusTimeout = null;
 
 function getCookie(name) {
     const value = `; ${document.cookie}`;
@@ -22,8 +23,28 @@ function getJwtOrThrow() {
 
 function getAuthHeaders(jwt) {
     return {
+        "Content-Type": "application/json",
         Authorization: "Bearer " + jwt,
     };
+}
+
+function setStatus(message, type = "info") {
+    const el = document.getElementById("chicken-status");
+    if (!el) {
+        return;
+    }
+
+    el.textContent = message;
+    el.className = `chicken-status ${type}`;
+
+    if (statusTimeout) {
+        clearTimeout(statusTimeout);
+    }
+
+    statusTimeout = setTimeout(() => {
+        el.textContent = "";
+        el.className = "chicken-status";
+    }, 3000);
 }
 
 async function fetchCurrentUserId(jwt) {
@@ -109,6 +130,10 @@ function renderChickenCard(chicken) {
     `;
 }
 
+function getChickensForCurrentUser(allChickens) {
+    return allChickens.filter((chicken) => chicken.userId === currentUserId);
+}
+
 async function initializeChickenCoop() {
     const container = document.querySelector(".grid-container");
 
@@ -124,14 +149,23 @@ async function initializeChickenCoop() {
             throw new Error(`Erreur HTTP : ${response.status}`);
         }
 
-        chickens = await response.json();
+        const allChickens = await response.json();
 
-        if (!Array.isArray(chickens)) {
+        if (!Array.isArray(allChickens)) {
             throw new Error("Format API invalide");
         }
 
+        chickens = getChickensForCurrentUser(allChickens);
         eggCount = 0;
         container.innerHTML = "";
+
+        if (chickens.length === 0) {
+            document.getElementById("chicken-count").textContent = "0";
+            document.getElementById("egg-count").textContent = "0";
+            container.innerHTML =
+                '<div class="empty-state"><p>Aucune poule dans le poulailler pour le moment.</p></div>';
+            return;
+        }
 
         for (const chicken of chickens) {
             container.insertAdjacentHTML("beforeend", renderChickenCard(chicken));
@@ -143,43 +177,65 @@ async function initializeChickenCoop() {
     } catch (error) {
         console.error("Erreur chargement poulailler :", error);
         container.innerHTML = "<p>Erreur lors du chargement.</p>";
+        setStatus("Impossible de charger le poulailler.", "error");
     }
 }
 
 async function feed(id) {
     try {
         await performChickenAction(id, "feed");
+        setStatus("Poule nourrie.", "success");
         await initializeChickenCoop();
     } catch (error) {
         console.error("Impossible de nourrir la poule :", error);
+        setStatus("Action nourrir impossible.", "error");
     }
 }
 
 async function water(id) {
     try {
         await performChickenAction(id, "water");
+        setStatus("Poule abreuvee.", "success");
         await initializeChickenCoop();
     } catch (error) {
         console.error("Impossible d'abreuver la poule :", error);
+        setStatus("Action abreuver impossible.", "error");
     }
 }
 
 async function heal(id) {
     try {
         await performChickenAction(id, "heal");
+        setStatus("Poule soignee.", "success");
         await initializeChickenCoop();
     } catch (error) {
         console.error("Impossible de soigner la poule :", error);
+        setStatus("Action soigner impossible.", "error");
     }
 }
 
 async function clean(id) {
     try {
         await performChickenAction(id, "clean");
+        setStatus("Poule nettoyee.", "success");
         await initializeChickenCoop();
     } catch (error) {
         console.error("Impossible de nettoyer la poule :", error);
+        setStatus("Action nettoyer impossible.", "error");
     }
 }
 
-document.addEventListener("DOMContentLoaded", initializeChickenCoop);
+document.addEventListener("DOMContentLoaded", () => {
+    initializeChickenCoop();
+
+    const sellButton = document.querySelector(".sell-button");
+    if (sellButton) {
+        sellButton.disabled = true;
+        sellButton.title = "Vente a brancher avec le module marche";
+    }
+});
+
+window.feed = feed;
+window.water = water;
+window.heal = heal;
+window.clean = clean;

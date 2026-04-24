@@ -99,3 +99,33 @@
     border-radius: 8px;
     cursor: pointer;
 }
+
+.sell-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.chicken-status {
+    min-height: 24px;
+    margin: 6px 20px 0;
+    font-weight: 700;
+}
+
+.chicken-status.info {
+    color: #55361b;
+}
+
+.chicken-status.success {
+    color: #2e7d32;
+}
+
+.chicken-status.error {
+    color: #c62828;
+}
+
+.empty-state {
+    background: #f2d49f;
+    border-radius: 16px;
+    padding: 24px;
+    color: #55361b;
+}
