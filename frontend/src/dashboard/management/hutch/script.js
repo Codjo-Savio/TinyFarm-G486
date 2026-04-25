@@ -101,7 +101,7 @@ function renderRabbitCard(rabbit) {
                 <div class="animal-content">
                     <div class="food-state">
                         <span class="material-symbols-rounded">nutrition</span>
-                        <tf-progress-bar value="${rabbit.fedToday ? 100 : 0}"></tf-progress-bar>
+                        <tf-progress-bar progress="${rabbit.fedToday ? 100 : 0}"></tf-progress-bar>
                     </div>
 
                     <div class="animal-type">

@@ -9,6 +9,10 @@ function createCowActionButton(action, cowId, label, isEnabled) {
     return `<tf-button data-action="${action}" data-cow-id="${cowId}"${isEnabled ? "" : " disabled=true"}>${label}</tf-button>`;
 }
 
+function isCowFed(cow) {
+    return Boolean(cow?.fedToday || cow?.hayToday);
+}
+
 function renderMeadow() {
     const container = document.getElementById("game-grid");
     let healthyCount = 0;
@@ -53,7 +57,7 @@ function renderMeadow() {
                                 <span class="material-symbols-rounded">
                                     wheat
                                 </span>
-                                <tf-progress-bar value="${cow.fedToday ? 100 : 0}"></tf-progress-bar>
+                                <tf-progress-bar progress="${isCowFed(cow) ? 100 : 0}"></tf-progress-bar>
                             </div>
                             <div class="animal-type">
                                 <span class="material-symbols-rounded">
@@ -81,7 +85,7 @@ function renderMeadow() {
                             </div>
                             </div>
                         <div class="animal-actions">
-                            ${createCowActionButton("feed", cow.id, "$5 Nourrir", !cow.fedToday)}
+                            ${createCowActionButton("feed", cow.id, "$5 Nourrir", !isCowFed(cow))}
                             ${createCowActionButton("water", cow.id, "$2 Abreuver", !cow.wateredToday)}
                             ${createCowActionButton("heal", cow.id, "$6 Soigner", !cow.healthy)}
                             ${createCowActionButton("clean", cow.id, "$3 Nettoyer", !cow.clean)}
@@ -165,7 +169,7 @@ function updateActionMenuCosts() {
 
     const unhealthyCows = cows.filter((cow) => !cow.healthy).length;
     const dirtyCows = cows.filter((cow) => !cow.clean).length;
-    const hungryCows = cows.filter((cow) => !cow.fedToday).length;
+    const hungryCows = cows.filter((cow) => !isCowFed(cow)).length;
     const thirstyCows = cows.filter((cow) => !cow.wateredToday).length;
 
     feedBtn.textContent = `$${hungryCows * 5} Nourrir`;
@@ -202,9 +206,10 @@ async function applyActionToCow(cowId, action) {
 
     switch (action) {
         case "feed":
-            canApply = !cow.fedToday;
+            canApply = !isCowFed(cow);
             applyLocalState = () => {
                 cow.fedToday = true;
+                cow.hayToday = true;
             };
             break;
         case "water":
@@ -265,13 +270,15 @@ async function onCowActionClick(event) {
 
 async function feedAll() {
     for (const cow of cows) {
-        if (!cow.fedToday) {
+        if (!isCowFed(cow)) {
             try {
                 if (isFakeMode) {
                     cow.fedToday = true;
+                    cow.hayToday = true;
                 } else {
                     await callCowActionApi(cow, "feed");
                     cow.fedToday = true;
+                    cow.hayToday = true;
                 }
             } catch (error) {
                 console.error(`Impossible de nourrir la vache ${cow.id} :`, error);
