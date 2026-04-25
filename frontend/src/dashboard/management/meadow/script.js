@@ -179,9 +179,10 @@ async function callCowActionApi(cow, action) {
         return;
     }
 
+    const endpointAction = action === "feed" ? "hay" : action;
     const userIdQuery = cow.userId ? `?userId=${encodeURIComponent(cow.userId)}` : "";
     const response = await fetchApiWithCredentials(
-        `/cows/${cow.id}/${action}${userIdQuery}`,
+        `/cows/${cow.id}/${endpointAction}${userIdQuery}`,
         "POST",
     );
 
