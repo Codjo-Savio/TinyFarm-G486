@@ -188,9 +188,9 @@ public class RabbitService {
                     continue;
                 }
 
-                if (rabbit.getFedToday() && !rabbit.getWateredToday()) {
-                    // survit, mais ne grandit pas
-                } else if (rabbit.getFedToday() && rabbit.getWateredToday()) {
+                if (!rabbit.getWateredToday()) {
+                    continue;
+                } else {
                     rabbit.setAge(rabbit.getAge() + 1);
 
                     if (

@@ -44,13 +44,11 @@ public class UserService {
 
                     return userRepository.save(existing);
                 })
-                .orElseGet(() -> {
-                    return userRepository.save(User.builder()
-                            .email(email)
-                            .name(name)
-                            .gender(gender)
-                            .build());
-                });
+                .orElseGet(() -> userRepository.save(User.builder()
+                        .email(email)
+                        .name(name)
+                        .gender(gender)
+                        .build()));
     }
 
     public User findById(Long id) {
@@ -59,16 +57,14 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + id));
     }
 
-    public User findByName(String name) {
-        return userRepository
-                .findByName(name)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + name));
-    }
-
     public User findByEmail(String email) {
         return userRepository
                 .findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + email));
+    }
+
+    public Integer getRemainingPurchases(Long id) {
+        return findById(id).getRemainingPurchases();
     }
 
     public boolean existsByEmail(String email) {
@@ -123,9 +119,15 @@ public class UserService {
         userRepository.deleteByHibernationTrueAndHibernationDateBefore(cutoff);
     }
 
-    public boolean canBuy(Long id, Integer purchaseNumberForToday) {
-        User user = findById(id);
-        int maxPurchase = user.getLevel() * 12; // niveau 1 = 12 achats par jour
-        return purchaseNumberForToday < maxPurchase;
+    // reset remaining purchases every day at midnight
+    @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
+    public void resetRemainingPurchases() {
+        List<User> users = userRepository.findAll();
+        for (User user : users) {
+            user.setRemainingPurchases(12);
+        }
+        userRepository.saveAll(users);
     }
+
 }

@@ -19,7 +19,11 @@ class TfAppBar extends HTMLElement {
         try {
             const currentUserRes = await fetchApiWithCredentials("/auth/me");
             if (currentUserRes.status !== 200) throw new Error();
-            return currentUserRes.json();
+            const authUser = await currentUserRes.json();
+            
+            const fullUserRes = await fetchApiWithCredentials(`/users/id/${authUser.id}`);
+            if (fullUserRes.status !== 200) throw new Error();
+            return fullUserRes.json();
         } catch (e) {
             window.location.href = "/";
             return null;
@@ -223,8 +227,8 @@ class TfAppBar extends HTMLElement {
         this.rendered = true;
     }
 
-    async update() {
-        if (!this.levelElement) {
+    async update(force = false) {
+        if (!this.levelElement || (this.userLoaded && !force)) {
             return;
         }
 
@@ -265,6 +269,10 @@ class TfAppBar extends HTMLElement {
 
         this.dialogConfirmButton.addEventListener("click", () => {
             this.hibernate();
+        });
+
+        window.addEventListener("refresh-user-data", () => {
+            this.update(true);
         });
 
         this.listenersAttached = true;

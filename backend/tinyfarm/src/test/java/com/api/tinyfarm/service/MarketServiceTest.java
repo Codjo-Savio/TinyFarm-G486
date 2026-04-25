@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.api.tinyfarm.model.Market;
+import com.api.tinyfarm.repository.MarketRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,12 @@ public class MarketServiceTest {
 
     @Autowired
     private MarketService marketService;
+    @Autowired
+    private MarketRepository marketRepository;
 
     @BeforeEach
     void setup() {
-        marketService.deleteAll();
+        marketRepository.deleteAll();
     }
 
     @Test
@@ -27,7 +30,7 @@ public class MarketServiceTest {
         Market market = new Market();
         market.setUserId(1L);
         market.setProductId(10L);
-        market.setPrice(25.0f);
+        market.setUnitPrice(25.0f);
         market.setQuantity(100);
 
         Market created = marketService.create(market);
@@ -43,7 +46,7 @@ public class MarketServiceTest {
         Market market = new Market();
         market.setUserId(1L);
         market.setProductId(10L);
-        market.setPrice(25.0f);
+        market.setUnitPrice(25.0f);
 
         marketService.create(market);
 
@@ -58,7 +61,7 @@ public class MarketServiceTest {
         Market market = new Market();
         market.setUserId(1L);
         market.setProductId(10L);
-        market.setPrice(25.0f);
+        market.setUnitPrice(25.0f);
         marketService.create(market);
 
         marketService.deleteProductById(1L, 10L);
@@ -71,7 +74,7 @@ public class MarketServiceTest {
         Market market = new Market();
         market.setUserId(1L);
         market.setProductId(10L);
-        market.setPrice(25.0f);
+        market.setUnitPrice(25.0f);
         marketService.create(market);
 
         marketService.deleteByID(1L);

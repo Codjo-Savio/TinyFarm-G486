@@ -78,7 +78,8 @@ public class CowServiceTest {
             2000F, 
             false,
             null, 
-            1
+            1,
+            12
         );
 
         usr = userRepository.save(usr);
@@ -102,7 +103,7 @@ public class CowServiceTest {
 
         Cow created = cowService.create(cow);
 
-        cowService.grassCow(created.getId());
+        cowService.grassCow();
         assertEquals(true, cowService.findById(created.getId()).getFedToday());
     }
 
@@ -116,7 +117,8 @@ public class CowServiceTest {
             2000F, 
             false,
             null, 
-            1
+            1,
+            12
         );
 
         usr = userRepository.save(usr);
@@ -143,7 +145,8 @@ public class CowServiceTest {
             2000F, 
             false,
             null, 
-            1
+            1,
+            12
         );
 
         usr = userRepository.save(usr);
@@ -170,7 +173,8 @@ public class CowServiceTest {
             2000F, 
             false,
             null, 
-            1
+            1,
+            12
         );
 
         usr = userRepository.save(usr);
@@ -303,7 +307,8 @@ public class CowServiceTest {
             2000F, 
             false,
             null, 
-            1
+            1,
+            12
         );
         
         usr = userRepository.save(usr);

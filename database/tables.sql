@@ -1,96 +1,142 @@
 CREATE TABLE IF NOT EXISTS "user" (
-    uid INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    uid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name VARCHAR(20),
     email VARCHAR(100),
     gender VARCHAR(20) CHECK (gender IN ('M', 'F')),
-    ecus INTEGER,
+    ecus FLOAT DEFAULT 1500 CHECK (ecus >= 0),
     hibernation BOOLEAN DEFAULT FALSE,
     hibernation_date TIMESTAMP,
-    level INTEGER DEFAULT 1
+    level INTEGER DEFAULT 1 CHECK (level >= 1),
+    remaining_purchases INTEGER DEFAULT 12 CHECK (remaining_purchases BETWEEN 0 AND 12)
 );
 
 CREATE TABLE IF NOT EXISTS product (
-    product_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    product_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     description TEXT,
-    collection BOOLEAN,
-    price FLOAT,
-    coef INTEGER DEFAULT 1
-);
-
-CREATE TABLE IF NOT EXISTS transaction (
-    tid INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    seller INTEGER NOT NULL REFERENCES "user" (uid) ON DELETE CASCADE ON UPDATE CASCADE,
-    buyer INTEGER NOT NULL REFERENCES "user" (uid) ON DELETE CASCADE ON UPDATE CASCADE,
-    product INTEGER NOT NULL REFERENCES product (product_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    quantity INTEGER NOT NULL CHECK (quantity > 0),
-    total_price FLOAT NOT NULL CHECK (total_price >= 0),
-    transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CHECK (seller != buyer)
-);
-
-CREATE TABLE IF NOT EXISTS stock (
-    uid INTEGER NOT NULL REFERENCES "user" (uid) ON DELETE CASCADE ON UPDATE CASCADE,
-    product_id INTEGER NOT NULL REFERENCES product (product_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    quantity INTEGER DEFAULT 0 CHECK (quantity >= 0),
-    collectible BOOLEAN DEFAULT FALSE,
-    PRIMARY KEY (uid, product_id)
+    collection BOOLEAN DEFAULT FALSE,
+    price FLOAT CHECK (price >= 0),
+    coef INTEGER DEFAULT 1 CHECK (coef >= 1)
 );
 
 CREATE TABLE IF NOT EXISTS animal (
-    aid INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    uid INTEGER NOT NULL REFERENCES "user" (uid) ON DELETE CASCADE ON UPDATE CASCADE,
+    aid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    uid BIGINT NOT NULL,
     clean BOOLEAN DEFAULT TRUE,
     healthy BOOLEAN DEFAULT TRUE,
-    age INTEGER,
-    weight FLOAT,
+    age INTEGER DEFAULT 0 CHECK (age >= 0),
+    weight FLOAT DEFAULT 1 CHECK (weight >= 0),
     fed_today BOOLEAN DEFAULT FALSE,
     watered_today BOOLEAN DEFAULT FALSE,
-    gender VARCHAR(20) CHECK (gender IN ('M', 'F'))
+    gender VARCHAR(20) CHECK (gender IN ('M', 'F')),
+    CONSTRAINT fk_animal_user
+        FOREIGN KEY (uid) REFERENCES "user" (uid)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS chicken (
-    aid INTEGER PRIMARY KEY REFERENCES animal (aid) ON DELETE CASCADE ON UPDATE CASCADE,
+    aid BIGINT PRIMARY KEY,
     name VARCHAR(50),
-    chicken_type VARCHAR(20) CHECK (chicken_type IN ('C', 'H', 'R', 'L', 'B')),
-    fasting BOOLEAN DEFAULT FALSE,
-    fasting_days INTEGER,
-    sick_days INTEGER
+    chicken_type VARCHAR(20) DEFAULT 'C' CHECK (chicken_type IN ('C', 'H', 'R', 'L', 'B')),
+    fasting_days INTEGER DEFAULT 0 CHECK (fasting_days >= 0),
+    sick_days INTEGER DEFAULT 0 CHECK (sick_days >= 0),
+    CONSTRAINT fk_chicken_animal
+        FOREIGN KEY (aid) REFERENCES animal (aid)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS rabbit (
-    aid INTEGER PRIMARY KEY REFERENCES animal (aid) ON DELETE CASCADE ON UPDATE CASCADE,
+    aid BIGINT PRIMARY KEY,
     name VARCHAR(50),
-    rabbit_type VARCHAR(20) CHECK (rabbit_type IN ('lapereau', 'lapin'))
+    rabbit_type VARCHAR(20) DEFAULT 'lapereau' CHECK (rabbit_type IN ('lapereau', 'lapin')),
+    CONSTRAINT fk_rabbit_animal
+        FOREIGN KEY (aid) REFERENCES animal (aid)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS cow (
-    aid INTEGER PRIMARY KEY REFERENCES animal (aid) ON DELETE CASCADE ON UPDATE CASCADE,
-    name VARCHAR(50),
-    cow_type VARCHAR(20) CHECK (cow_type IN ('D', 'C')),
+    aid BIGINT PRIMARY KEY,
+    name VARCHAR(20),
+    cow_type VARCHAR(20) DEFAULT 'C' CHECK (cow_type IN ('D', 'C')),
     hay_today BOOLEAN DEFAULT FALSE,
-    sick_days INTEGER,
-    milk INTEGER,
-    milking BOOLEAN DEFAULT FALSE
+    sick_days INTEGER DEFAULT 0 CHECK (sick_days >= 0),
+    milk INTEGER DEFAULT 0 CHECK (milk >= 0),
+    milking BOOLEAN DEFAULT FALSE,
+    CONSTRAINT fk_cow_animal
+        FOREIGN KEY (aid) REFERENCES animal (aid)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS event (
-    eid INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    uid INTEGER NOT NULL REFERENCES "user" (uid) ON DELETE CASCADE ON UPDATE CASCADE,
-    text VARCHAR(200) NOT NULL,
-    event_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE IF NOT EXISTS stock (
+    uid BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    quantity INTEGER DEFAULT 0 CHECK (quantity >= 0),
+    collectible BOOLEAN DEFAULT FALSE,
+    PRIMARY KEY (uid, product_id),
+    CONSTRAINT fk_stock_user
+        FOREIGN KEY (uid) REFERENCES "user" (uid)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_stock_product
+        FOREIGN KEY (product_id) REFERENCES product (product_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS market (
-    uid INTEGER NOT NULL REFERENCES "user" (uid) ON DELETE CASCADE ON UPDATE CASCADE,
-    product_id INTEGER NOT NULL REFERENCES product (product_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    price FLOAT NOT NULL,
-    quantity INTEGER,
-    PRIMARY KEY (uid, product_id)
+    uid BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    unit_price FLOAT NOT NULL CHECK (unit_price >= 0),
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
+    PRIMARY KEY (uid, product_id),
+    CONSTRAINT fk_market_user
+        FOREIGN KEY (uid) REFERENCES "user" (uid)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_market_product
+        FOREIGN KEY (product_id) REFERENCES product (product_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS cooperative (
-    uid INTEGER NOT NULL REFERENCES "user" (uid) ON DELETE CASCADE ON UPDATE CASCADE,
-    product_id INTEGER NOT NULL REFERENCES product (product_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    is_open BOOLEAN,
-    PRIMARY KEY (uid, product_id)
+    uid BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    price FLOAT CHECK (price >= 0),
+    quantity INTEGER NOT NULL DEFAULT 0 CHECK (quantity >= 0),
+    PRIMARY KEY (uid, product_id),
+    CONSTRAINT fk_cooperative_user
+        FOREIGN KEY (uid) REFERENCES "user" (uid)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_cooperative_product
+        FOREIGN KEY (product_id) REFERENCES product (product_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS transaction (
+    tid BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    seller BIGINT NOT NULL,
+    buyer BIGINT NOT NULL,
+    product BIGINT NOT NULL,
+    quantity INTEGER NOT NULL CHECK (quantity > 0),
+    total_price FLOAT NOT NULL CHECK (total_price >= 0),
+    transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_transaction_distinct_parties CHECK (seller <> buyer),
+    CONSTRAINT fk_transaction_seller
+        FOREIGN KEY (seller) REFERENCES "user" (uid)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_transaction_buyer
+        FOREIGN KEY (buyer) REFERENCES "user" (uid)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    CONSTRAINT fk_transaction_product
+        FOREIGN KEY (product) REFERENCES product (product_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );

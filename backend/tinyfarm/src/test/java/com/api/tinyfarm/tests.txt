@@ -1,16 +1,22 @@
-User
-    - tester le username
-    - tester le gain d'écus
-    - vérifier que le niveau soit
+- new endpoints
+    - In MarketController
+        @PostMapping("/buy") -> buyFromMarket in marketService
+        @PostMapping("/ad")  -> publishToMarket in stockService
 
-Product
-    -
+    - In cooperativeController
+         @PostMapping("/sell") -> sellToCooperative in cooperativeService
 
-Animal (chicken)
-    - tester le poids, l'âge et la santé
+    - In UserController
+         @GetMapping("/remainingPurchases/id/{id}" -> getRemainingPurchases in UserService
 
+- new files :
+    TradeService : buy, sell, executeTrade
 
+    DTOs : personalized object to simplify calls to the endpoints
+        - CooperativeSaleRequest
+        - MarketBuyRequest
+        - PublishProductToTradeRequest
 
-
-
-
+- added attributes :
+    Cooperative : quantity
+    User : remainingPurchases (reset every midnight to 12)

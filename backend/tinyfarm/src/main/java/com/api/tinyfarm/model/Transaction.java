@@ -1,5 +1,6 @@
 package com.api.tinyfarm.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -28,6 +29,36 @@ public class Transaction {
     @NotNull(message = "Product can not be null")
     @Column(name = "product")
     private Long product;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "seller",
+            referencedColumnName = "uid",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private User sellerUser;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "buyer",
+            referencedColumnName = "uid",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private User buyerUser;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "product",
+            referencedColumnName = "product_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Product productEntity;
 
     @NotNull(message = "Quantity can not be null")
     @Column(name = "quantity")

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,16 +19,8 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("")
-    public ResponseEntity<List<User>> getAll() {
-        try {
-            return ResponseEntity.ok(userService.findAll());
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
     @GetMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #id)")
     public ResponseEntity<User> getById(@PathVariable Long id) {
         try {
             User user = Objects.requireNonNull(userService.findById(id));
@@ -37,7 +30,18 @@ public class UserController {
         }
     }
 
+    @GetMapping("/remainingPurchases/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #id)")
+    public ResponseEntity<Integer> getRemainingPurchases(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(userService.getRemainingPurchases(id));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<User> create(@RequestBody User user) {
         try {
             return ResponseEntity.ok(userService.create(user));
@@ -50,6 +54,7 @@ public class UserController {
     }
 
     @PutMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #id)")
     public ResponseEntity<User> update(
             @PathVariable Long id,
             @RequestBody User user) {
@@ -61,6 +66,7 @@ public class UserController {
     }
 
     @PatchMapping("/hibernate/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #id)")
     public ResponseEntity<Void> hibernate(@PathVariable Long id) {
         try {
             userService.hibernate(id);
@@ -71,34 +77,11 @@ public class UserController {
     }
 
     @DeleteMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #id)")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
             userService.delete(id);
             return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    // PATCH /users/1/ecus?amount=8 → ajouter des écus (vente d'un oeuf)
-    @PatchMapping("/ecus/add/id/{id}")
-    public ResponseEntity<User> addEcus(
-            @PathVariable Long id,
-            @RequestParam Float amount) {
-        try {
-            return ResponseEntity.ok(userService.addEcus(id, amount));
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    // PATCH /users/1/ecus/retirer?amount=3 → retirer des écus (nourrir un animal)
-    @PatchMapping("/ecus/withdraw/id/{id}")
-    public ResponseEntity<User> withdrawEcus(
-            @PathVariable Long id,
-            @RequestParam Float amount) {
-        try {
-            return ResponseEntity.ok(userService.withdrawEcus(id, amount));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

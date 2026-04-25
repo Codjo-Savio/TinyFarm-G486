@@ -18,7 +18,6 @@ if (process.env.NODE_ENV === "development") {
         applyCSSLive: false,
     });
     liveReloadServer.watch("src");
-
     app.use(connectLiveReload());
 
     console.log("Development mode enabled, using hot reload");
