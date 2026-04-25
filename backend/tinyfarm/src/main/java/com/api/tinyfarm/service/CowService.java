@@ -89,7 +89,7 @@ public class CowService {
     /**
      * nouri la vache avec de l'herbe
      */
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "12 0 0 * * *")
     @Transactional
     public void grassCow() {
         List<Cow> cows = cowRepository.findAll();
