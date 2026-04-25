@@ -215,8 +215,10 @@ async function performAll(action) {
     } catch (error) {
         showInfo("Erreur", "Une erreur est survenue lors des actions groupées : " + error.message, "error");
     } finally {
-        btn.textContent = originalText;
         btn.disabled = false;
+        // setupDropdown() will be called by fetchInitialData() -> renderUI()
+        // but we call it here again to be sure the label is restored even on error
+        setupDropdown(); 
         document.getElementById("more-actions-content").classList.remove("grid");
     }
 }
