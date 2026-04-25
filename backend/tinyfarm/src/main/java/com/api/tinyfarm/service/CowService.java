@@ -3,7 +3,9 @@ package com.api.tinyfarm.service;
 import com.api.tinyfarm.model.Cow;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.CowRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -87,11 +89,14 @@ public class CowService {
     /**
      * nouri la vache avec de l'herbe
      */
-    public Cow grassCow(Long cowId) {
-        Cow cow = findById(cowId);
-
-        cow.setFedToday(true);
-        return cowRepository.save(cow);
+    @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
+    public void grassCow() {
+        List<Cow> cows = cowRepository.findAll();
+        for(Cow cow : cows){
+            cow.setFedToday(true);
+            cowRepository.save(cow);
+        }
     }
 
     /**
