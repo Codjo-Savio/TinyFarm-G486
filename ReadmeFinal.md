@@ -1,3 +1,4 @@
+A faire : ( sera retiré quand le fichier sera fini ).
 1 - Aider les profs à se retrouver das le projet ( Arboraissance )
 2 - Commandes à éxécutés pour faire fonctionner / tester le projet
 3 - Automatisé l'apparission du Readme dès le lancement de l'éditeur de texte
