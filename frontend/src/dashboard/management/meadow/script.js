@@ -195,6 +195,10 @@ async function callCowActionApi(cow, action) {
     }
 }
 
+function refreshUserData() {
+    window.dispatchEvent(new CustomEvent("refresh-user-data"));
+}
+
 async function applyActionToCow(cowId, action) {
     const cow = cows.find((item) => item.id === cowId);
     if (!cow) {
@@ -250,6 +254,7 @@ async function applyActionToCow(cowId, action) {
     }
 
     renderMeadow();
+    refreshUserData();
 }
 
 async function onCowActionClick(event) {
@@ -286,6 +291,7 @@ async function feedAll() {
         }
     }
     renderMeadow();
+    refreshUserData();
 }
 
 async function waterAll() {
@@ -307,6 +313,7 @@ async function waterAll() {
         }
     }
     renderMeadow();
+    refreshUserData();
 }
 
 async function healAll() {
@@ -325,6 +332,7 @@ async function healAll() {
         }
     }
     renderMeadow();
+    refreshUserData();
 }
 
 async function cleanAll() {
@@ -346,6 +354,7 @@ async function cleanAll() {
         }
     }
     renderMeadow();
+    refreshUserData();
 }
 
 initializeMeadow();
