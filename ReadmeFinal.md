@@ -1,45 +1,195 @@
-A faire : ( sera retiré quand le fichier sera fini ).
-1 - Aider les profs à se retrouver das le projet ( Arboraissance )
-2 - Commandes à éxécutés pour faire fonctionner / tester le projet
-3 - Automatisé l'apparission du Readme dès le lancement de l'éditeur de texte
+# TinyFarm - Project G486
 
+## About
 
-### Projet : TinyFarm
-# Made by Group 486
+**TinyFarm** is a website developed by students at the University of Nantes as part of the client-side web development course. This project enables students to apply the concepts they have studied throughout their Computer Science Bachelor's degree.
 
+The project is loosely based on the principles of the game *My e-Farm*.
 
-## Presentation of the project
-==============================
+## Quick Start
 
-TinyFarm is a website developed by students at the University of Nantes as part of the client-side web development course. It allows students to apply the concepts they have studied since the beginning of their Bachelor’s degree in Computer Science.
+### Requirements
 
-This project is loosely based on the principles of the game *My e-Farm*.
+- **Docker** (for deployment)
+- **JDK 21** (for backend development)
+- **Maven 3.8+** (dependency manager)
+- **Node.JS 22 & NPM** (for frontend)
 
-## Directory Structure
-======================
+### Launch for Development
 
-TinyFarm directory : 
-  | tinyfarm/backend  : ( includes all backend code.                                   )
-  | database          : ( includes some of database needed such as tables, functions...)
-  | frontend          : ( includes all frontend code.                                  )
-  | reunions          : ( includes all markdown files describing all our meetups.      )
-  | scratch           : ( others database functions.                                   )
-  | screens           : ( include frontend prototype.                                  )
-  |-------------------------------------------------------------------------------------
-  
-  
-  Backend directory :
-  | src/main/java/com/api/tinyfarm : ( includes all code directories ( Hibernate and needed files for Oath, Git login. ))
-  | src/main/resouces              : ( includes files needed for GitHub authentification.                               )
-  | src/test                       : ( includes all tests files.                                                        )
-  | target                         : ( includes all maven files needs.                                                  )
-  |----------------------------------------------------------------------------------------------------------------------
-  
-  src/main/java/com/api/tinyfarm directory :
-  | controller : ( link backend classes and frontend.                 )
-  | dto        : ()
-  | model      : ( define all JPA classes.                            )
-  | repository : ( define all functions signatures for JPA classes.   )
-  | security   : ( includes all authentifications files.              )
-  | service    : ( code all functions.                                )
-  |--------------------------------------------------------------------
+#### Backend
+
+```bash
+cd backend/tinyfarm
+
+# Install dependencies and compile
+mvn clean install
+
+# Run tests
+mvn test
+
+# Start the application
+mvn spring-boot:run
+```
+
+#### Frontend
+
+```bash
+cd frontend
+
+# Install packages
+npm i
+
+# Development mode with hot reload
+npm run dev
+
+# Or production mode
+npm run start
+```
+
+**Access the frontend**: `http://localhost:3000`
+
+---
+
+## Project Structure
+
+```
+TinyFarm-G486/
+│
+├── backend/tinyfarm/          # Backend code (Java/Spring Boot)
+│   ├── src/main/java/
+│   │   └── com/api/tinyfarm/
+│   │       ├── controller/    # REST Endpoints
+│   │       ├── model/         # JPA Classes/Entities
+│   │       ├── repository/    # Database Queries
+│   │       ├── service/       # Business Logic
+│   │       ├── dto/           # Data Transfer Objects
+│   │       └── security/      # OAuth Authentication
+│   ├── src/main/resources/    # Configuration Files
+│   ├── src/test/              # Unit & Integration Tests
+│   └── pom.xml                # Maven Configuration
+│
+├── frontend/                  # Frontend code (HTML/CSS/JS + Express)
+│   ├── public/                # Static Files
+│   ├── src/                   # JavaScript Source Code
+│   └── package.json           # Node Dependencies
+│
+├── database/                  # SQL Schemas & Functions
+├── reunions/                  # Meeting Notes
+├── screens/                   # UI/UX Prototypes (Figma)
+└── README.md                  # General Documentation
+
+```
+
+### Detailed Backend Structure
+
+```
+src/main/java/com/api/tinyfarm/
+│
+├── controller/                # REST Controllers
+│   ├── StockController.java
+│   ├── UserController.java
+│   ├── TransactionController.java
+│   └── ...
+│
+├── model/                     # JPA Entities
+│   ├── User.java
+│   ├── Stock.java
+│   ├── Transaction.java
+│   ├── StockId.java (composite key)
+│   └── ...
+│
+├── repository/               # JPA Interfaces
+│   ├── UserRepository.java
+│   ├── StockRepository.java
+│   ├── TransactionRepository.java
+│   └── ...
+│
+├── service/                  # Business Logic
+│   ├── StockService.java
+│   ├── UserService.java
+│   ├── TransactionService.java
+│   └── ...
+│
+├── security/                 # Authentication
+│   ├── JwtRequestFilter.java
+│   ├── SecurityConfig.java
+│   └── ...
+│
+└── dto/                      # Data Transfer Objects
+
+```
+
+## Technologies & Frameworks
+
+### Backend
+
+| Technology | Role |
+|---|---|
+| **Java 21** | Main Language |
+| **Spring Boot 3** | Web Framework & Dependency Injection |
+| **Maven** | Dependency Manager |
+| **JPA/Hibernate** | ORM - Object-Relational Mapping |
+| **PostgreSQL** | Relational Database |
+| **OAuth 2.0** | GitHub Authentication |
+| **JWT** | Authentication Tokens |
+
+### Frontend
+
+| Technology | Role |
+|---|---|
+| **HTML5** | Structure |
+| **CSS3** | Styling |
+| **JavaScript (Vanilla)** | Interactivity |
+| **Express.js** | Server & Routing |
+| **Node.js 22** | JavaScript Runtime |
+
+### Tools & Services
+
+| Tool | Usage |
+|---|---|
+| **Docker** | Containerization |
+| **Git** | Version Control |
+| **Maven** | Automated Build & Test |
+| **NPM** | Node Package Manager |
+
+---
+
+## Design
+
+### UI/UX Prototypes
+
+The page designs and user interface were created with **Figma**:
+- [View the Project on Figma](https://www.figma.com/design/nO4maMQfMmHhVG4KkLaVPc/TinyFarm)
+
+### Static Version
+
+A static version of the project (prototypes) is available in the `screens/` folder.
+This version was created before developing the interactive frontend.
+
+---
+
+## Additional Documentation
+
+- **Backend**: `backend/tinyfarm/README.md`
+- **Meetings**: `reunions/` (detailed meeting notes)
+- **Screens**: `screens/` (UI prototypes)
+- **Database**: `database/` (SQL schemas and functions)
+
+---
+
+## Testing
+
+### Run Backend Tests
+
+```bash
+cd backend/tinyfarm
+
+# All tests
+mvn test 
+```
+
+## Team
+
+**Group 486** - University of Nantes  
+Computer Science Bachelor's Degree - Web Development
