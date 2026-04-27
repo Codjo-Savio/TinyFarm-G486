@@ -22,10 +22,18 @@ import com.api.tinyfarm.repository.StockRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 
 @Service
 public class InitFarmService {
+    private static final Set<String> MARKET_AND_COOP_EXCLUDED_PRODUCTS = Set.of(
+        "Sac de nourriture",
+        "Seau d'eau",
+        "Savon",
+        "Seringue"
+    );
+
     private final MarketService marketService;
     private final StockService stockService;
     private final ProductService productService;
@@ -90,6 +98,10 @@ public class InitFarmService {
         products.put("Paille", ensureProduct("Paille"));
         products.put("Botte de foin", ensureProduct("Botte de foin"));
         products.put("Céréales", ensureProduct("Céréales"));
+        products.put("Sac de nourriture", ensureProduct("Sac de nourriture"));
+        products.put("Seau d'eau", ensureProduct("Seau d'eau"));
+        products.put("Savon", ensureProduct("Savon"));
+        products.put("Seringue", ensureProduct("Seringue"));
         return products;
     }
 
@@ -219,6 +231,9 @@ public class InitFarmService {
             if (marketRepository.existsById(id)) {
                 continue;
             }
+            if (MARKET_AND_COOP_EXCLUDED_PRODUCTS.contains(product.getDescription())) {
+                continue;
+            }
             Market market = new Market();
             market.setUserId(owner.getId());
             market.setProductId(product.getId());
@@ -232,6 +247,9 @@ public class InitFarmService {
         for (Product product : products.values()) {
             CooperativeID id = new CooperativeID(owner.getId(), product.getId());
             if (cooperativeRepository.existsById(id)) {
+                continue;
+            }
+            if (MARKET_AND_COOP_EXCLUDED_PRODUCTS.contains(product.getDescription())) {
                 continue;
             }
             Cooperative cooperative = new Cooperative();
