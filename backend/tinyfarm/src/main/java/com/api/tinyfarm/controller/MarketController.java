@@ -38,19 +38,19 @@ public class MarketController {
         }
     }
 
-    @GetMapping("/product/{productId}")
-    public ResponseEntity<Market> getAllExceptOneOfTheConnectedUser(@PathVariable Long productId) {
+    @GetMapping("/not")
+    public ResponseEntity<List<Market>> getAllExceptOneOfTheConnectedUser(@RequestParam Long uid) {
         try {
-            return ResponseEntity.ok(marketService.findByProductId(productId));
+            return ResponseEntity.ok(marketService.findAllExceptOnesOfTheConnectedUser(uid));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    @GetMapping("/not")
-    public ResponseEntity<List<Market>> getByProductId(@RequestParam Long uid) {
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<Market> getByProductId(@PathVariable Long productId) {
         try {
-            return ResponseEntity.ok(marketService.findAllExceptOnesOfTheConnectedUser(uid));
+            return ResponseEntity.ok(marketService.findByProductId(productId));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
