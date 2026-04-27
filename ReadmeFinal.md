@@ -15,6 +15,33 @@ The project is loosely based on the principles of the game *My e-Farm*.
 - **Maven 3.8+** (dependency manager)
 - **Node.JS 22 & NPM** (for frontend)
 
+### Setting up the environnement
+
+- **JDK 21**
+```bash
+cd backend/tinyfarm
+
+# Check the java version
+java --version
+
+# Install JDK 21 if the java version is different of 21
+sudo apt update
+sudo apt install openjdk-21-jdk
+```
+
+-  **Application Configurations**
+
+Go into main/ressources and create tree files named :
+- application-test.properties
+- application.properties
+- application-prod.properties
+
+and copy/paste the content of their respective .example; then 
+in the empty spaces, paste the secrets that are given in the secret.pdf
+in the rendering archive
+
+#### Warning : Without these files, the application will fail to start, and there will be lot of configuration errors
+
 ### Launch for Development
 
 #### Backend
@@ -47,7 +74,18 @@ npm run dev
 npm run start
 ```
 
-**Access the frontend**: `http://localhost:3000`
+### Launch for prod
+
+
+```bash
+cd backend/tinyfarm
+
+#build the docker
+
+docker compose up --build
+```
+
+**Access the application**: `https://tinyfarm486.app`
 
 ---
 
