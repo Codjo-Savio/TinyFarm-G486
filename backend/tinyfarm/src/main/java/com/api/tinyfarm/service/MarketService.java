@@ -69,6 +69,10 @@ public class MarketService {
         return marketRepository.findAll();
     }
 
+    public List<Market> findAllExceptOnesOfTheConnectedUser(Long id){
+        return marketRepository.findByMarketIdUserIdNot(id);
+    }
+
     public Market update(Long uid, Long productId, Market modifiedMarket) {
         MarketID marketID = new MarketID(uid, productId);
         Market existing = findById(marketID);
