@@ -48,8 +48,8 @@ class CooperativeServiceTest {
     void shouldReturnMediumPriceForMatchingProducts() {
         Cooperative firstCooperative = createCooperative(1L, 10L, 12.0f);
         Cooperative secondCooperative = createCooperative(2L, 11L, 18.0f);
-        Product firstProduct = createProduct(10L, "Milk", 12.0f);
-        Product secondProduct = createProduct(11L, "Milk", 18.0f);
+        Product firstProduct = createProduct(10L, "Milk");
+        Product secondProduct = createProduct(11L, "Milk");
 
         when(cooperativeRepository.findAll()).thenReturn(List.of(firstCooperative, secondCooperative));
         when(productRepository.findByDescription("Milk")).thenReturn(List.of(firstProduct, secondProduct));
@@ -90,7 +90,7 @@ class CooperativeServiceTest {
     @Test
     void shouldTransferEcusAndDeleteListingWhenMatchingProductExists() {
         Cooperative cooperative = createCooperative(1L, 10L, 12.0f);
-        Product product = createProduct(10L, "Milk", 12.0f);
+        Product product = createProduct(10L, "Milk");
         User seller = createUser(1L, 100.0f);
         User buyer = createUser(2L, 200.0f);
 
@@ -111,7 +111,7 @@ class CooperativeServiceTest {
     @Test
     void shouldNotDeleteListingWhenUsersCannotBeResolved() {
         Cooperative cooperative = createCooperative(1L, 10L, 12.0f);
-        Product product = createProduct(10L, "Milk", 12.0f);
+        Product product = createProduct(10L, "Milk");
 
         when(cooperativeRepository.findAll()).thenReturn(List.of(cooperative));
         when(productRepository.findByDescription("Milk")).thenReturn(List.of(product));
@@ -140,7 +140,7 @@ class CooperativeServiceTest {
         stock.setQuantity(4);
         stock.setCollectible(false);
 
-        Product product = createProduct(10L, "egg", 99.0f);
+        Product product = createProduct(10L, "egg");
         User seller = createUser(1L, 100.0f);
 
         when(stockRepository.findById(new StockId(1L, 10L))).thenReturn(Optional.of(stock));
@@ -164,11 +164,10 @@ class CooperativeServiceTest {
         return cooperative;
     }
 
-    private Product createProduct(Long id, String description, Float price) {
+    private Product createProduct(Long id, String description) {
         Product product = new Product();
         product.setId(id);
         product.setDescription(description);
-        product.setPrice(price);
         return product;
     }
 

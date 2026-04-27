@@ -26,7 +26,6 @@ public class ProductControllerTest extends AuthenticatedControllerTestSupport {
                     "id" : 1,
                      "description" : "foin",
                      "collection" : "false",
-                     "price" : "20",
                      "coefficient" : "1"
                 }
         """;
@@ -46,7 +45,6 @@ public class ProductControllerTest extends AuthenticatedControllerTestSupport {
                     "id" : 2,
                      "description" : "paille",
                      "collection" : "false",
-                     "price" : "20",
                      "coefficient" : "1"
                 }
         """;
@@ -84,7 +82,6 @@ public class ProductControllerTest extends AuthenticatedControllerTestSupport {
                     "id" : 4,
                      "description" : "blé",
                      "collection" : "false",
-                     "price" : "20",
                      "coefficient" : "1"
                 }
         """;

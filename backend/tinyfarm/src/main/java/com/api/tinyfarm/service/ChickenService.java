@@ -44,6 +44,15 @@ public class ChickenService{
     }
 
     public Chicken create(Chicken chicken) {
+        if (chicken == null) {
+            throw new IllegalArgumentException("Poulet manquant");
+        }
+        if (chicken.getName() == null || chicken.getName().isBlank()) {
+            throw new IllegalArgumentException("Nom du poulet manquant");
+        }
+        if (chicken.getId() != null && chickenRepository.existsById(chicken.getId())) {
+            throw new IllegalArgumentException("Poulet déjà existant : " + chicken.getId());
+        }
         if (chicken.getWeight() == null) {
             chicken.setWeight(0.05f); // Poids de naissance
         }

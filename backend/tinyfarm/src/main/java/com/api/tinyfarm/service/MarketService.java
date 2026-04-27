@@ -53,6 +53,9 @@ public class MarketService {
     }
 
     public Market create(Market market) {
+        if (market == null) {
+            throw new IllegalArgumentException("Offre marché manquante");
+        }
         Authentication authentication =
             SecurityContextHolder.getContext().getAuthentication();
         if (
@@ -61,7 +64,22 @@ public class MarketService {
         ) {
             market.setUserId(currentUser.getId());
         }
+        if (market.getUserId() == null) {
+            throw new IllegalArgumentException("userId manquant pour le marché");
+        }
+        if (market.getProductId() == null) {
+            throw new IllegalArgumentException("productId manquant pour le marché");
+        }
+        if (market.getQuantity() < 0) {
+            throw new IllegalArgumentException("Quantité marché invalide");
+        }
+        if (market.getUnitPrice() == null || market.getUnitPrice() < 0) {
+            throw new IllegalArgumentException("Prix unitaire marché invalide");
+        }
         syncMarketId(market);
+        if (marketRepository.existsById(market.getMarketId())) {
+            throw new IllegalArgumentException("Offre marché déjà existante pour cet utilisateur / produit");
+        }
         return marketRepository.save(market);
     }
 

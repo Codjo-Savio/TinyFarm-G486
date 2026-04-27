@@ -34,6 +34,12 @@ public class AnimalService {
     }
 
     public Animal create(Animal animal) {
+        if (animal == null) {
+            throw new IllegalArgumentException("Animal manquant");
+        }
+        if (animal.getId() != null && animalRepository.existsById(animal.getId())) {
+            throw new IllegalArgumentException("Animal déjà existant : " + animal.getId());
+        }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
             animal.setUserId(currentUser.getId());
