@@ -20,12 +20,9 @@ public class MarketService {
     @Autowired
     private TradeService tradeService;
 
-    public Market findByUserId(Long uid) {
+    public List<Market> findByUserId(Long uid) {
         return marketRepository
-            .findByUserId(uid)
-            .orElseThrow(() ->
-                new RuntimeException("Marché introuvable : " + uid)
-            );
+            .findByMarketIdUserId(uid);
     }
 
     public Market findById(MarketID id) {
@@ -33,36 +30,29 @@ public class MarketService {
                 .findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Marché introuvable pour l'utilisateur : " + id.getUserId()
-                         + " ou pour le produit : " + id.getProductID())
+                         + " ou pour le produit : " + id.getProductId())
                 );
     }
 
     public Market findByProductId(Long productID) {
         return marketRepository
-            .findByProductId(productID)
+            .findByMarketIdProductId(productID)
             .orElseThrow(() ->
                 new RuntimeException("Marché introuvable : " + productID)
             );
     }
 
-    public Market findByPrice(float price) {
+    public List<Market> findByPrice(float price) {
         return marketRepository
-            .findByPrice(price)
-            .orElseThrow(() ->
-                new RuntimeException("Marché introuvable : " + price)
-            );
+            .findByPrice(price);
     }
 
-    public Market findByQuantity(int quantity) {
+    public List<Market> findByQuantity(int quantity) {
         return marketRepository
-            .findByQuantity(quantity)
-            .orElseThrow(() ->
-                new RuntimeException("Marché introuvable : " + quantity)
-            );
+            .findByQuantity(quantity);
     }
 
     public Market create(Market market) {
-        syncMarketId(market);
         Authentication authentication =
             SecurityContextHolder.getContext().getAuthentication();
         if (
@@ -71,6 +61,7 @@ public class MarketService {
         ) {
             market.setUserId(currentUser.getId());
         }
+        syncMarketId(market);
         return marketRepository.save(market);
     }
 
@@ -78,8 +69,9 @@ public class MarketService {
         return marketRepository.findAll();
     }
 
-    public Market update(Long uid, Market modifiedMarket) {
-        Market existing = findByUserId(uid);
+    public Market update(Long uid, Long productId, Market modifiedMarket) {
+        MarketID marketID = new MarketID(uid, productId);
+        Market existing = findById(marketID);
         existing.setUserId(modifiedMarket.getUserId());
         existing.setProductId(modifiedMarket.getProductId());
         existing.setUnitPrice(modifiedMarket.getUnitPrice());
@@ -90,7 +82,7 @@ public class MarketService {
     @Transactional
     public void deleteProductById(Long userId, Long productId) {
         try {
-            marketRepository.deleteByUserIdAndProductId(userId, productId);
+            marketRepository.deleteByMarketIdUserIdAndMarketIdProductId(userId, productId);
         } catch (Exception e) {
             throw new RuntimeException(
                 "Impossible de retirer le produit du marché : " + e.getMessage()
@@ -100,7 +92,7 @@ public class MarketService {
 
     @Transactional
     public void deleteByID(Long uid) {
-        marketRepository.deleteByUserId(uid);
+        marketRepository.deleteByMarketIdUserId(uid);
     }
 
     private void syncMarketId(Market market) {

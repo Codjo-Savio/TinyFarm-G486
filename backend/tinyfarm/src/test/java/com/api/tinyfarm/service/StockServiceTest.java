@@ -6,12 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.api.tinyfarm.model.Stock;
 import com.api.tinyfarm.model.StockId;
-import com.api.tinyfarm.model.Transaction;
-import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.TransactionRepository;
 import com.api.tinyfarm.repository.UserRepository;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,14 +24,7 @@ public class StockServiceTest {
 
     private Stock testStock;
     private Long testUserId;
-    private Float testNbEcu;
     private Long testProductId;
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private TransactionService transactionService;
 
     @Autowired
     private UserRepository userRepository;
@@ -42,7 +32,6 @@ public class StockServiceTest {
     @Autowired
     private TransactionRepository transactionRepository;
 
-    private static final AtomicLong testCounter = new AtomicLong(0);
 
     @BeforeEach
     void setup() throws Exception {
@@ -53,7 +42,6 @@ public class StockServiceTest {
 
         testUserId = 1L;
         testProductId = 10L;
-        testNbEcu = 1500f;
 
         testStock = new Stock();
         testStock.setId(new StockId(testUserId, testProductId));
@@ -66,8 +54,8 @@ public class StockServiceTest {
     void shouldCreateStock() {
         assertNotNull(testStock);
         assertNotNull(testStock.getId());
-        assertEquals(testUserId, testStock.getId().getUid());
-        assertEquals(testProductId, testStock.getId().getProductID());
+        assertEquals(testUserId, testStock.getId().getUserId());
+        assertEquals(testProductId, testStock.getId().getProductId());
         assertEquals(1000, testStock.getQuantity());
         assertEquals(false, testStock.getCollectible());
     }
@@ -87,7 +75,7 @@ public class StockServiceTest {
 
         assertNotNull(stocks);
         assertEquals(1, stocks.size());
-        assertEquals(testStock.getId(), stocks.get(0).getId());
+        assertEquals(testStock.getId(), stocks.getFirst().getId());
     }
 
     @Test
@@ -96,7 +84,7 @@ public class StockServiceTest {
 
         assertNotNull(stocks);
         assertEquals(1, stocks.size());
-        assertEquals(testStock.getId(), stocks.get(0).getId());
+        assertEquals(testStock.getId(), stocks.getFirst().getId());
     }
 
     @Test

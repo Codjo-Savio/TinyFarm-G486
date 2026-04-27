@@ -7,6 +7,7 @@ import com.api.tinyfarm.service.CooperativeService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -40,6 +41,7 @@ public class CooperativeController {
     }
 
     @DeleteMapping("/{idBuyer}/{description}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #idBuyer)")
     public ResponseEntity<Integer> deleteByDescription(@PathVariable Long idBuyer, @PathVariable String description) {
         try {
             cooperativeService.deleteLessExpensiveWithDescription(idBuyer, description);
@@ -50,6 +52,7 @@ public class CooperativeController {
     }
 
     @PostMapping("/sell")
+    @PreAuthorize("@securityAuthorizationService.canSellToCooperative(authentication, #request)")
     public ResponseEntity<Float> sellToCooperative(
         @RequestBody CooperativeSaleRequest request
     ) {

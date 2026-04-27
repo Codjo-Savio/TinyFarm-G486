@@ -125,7 +125,7 @@ public class CooperativeService {
         userRepository.save(sellerUser);
         userRepository.save(buyerUser);
 
-        cooperativeRepository.deleteByUserIdAndProductId(uid, pid);
+        cooperativeRepository.deleteByCooperativeIdUserIdAndCooperativeIdProductId(uid, pid);
     }
 
     public Float sellToCooperative(Long sellerId, Long productId, Integer quantity) {
@@ -231,6 +231,15 @@ public class CooperativeService {
         ) {
             cooperative.setUserId(currentUser.getId());
         }
+        syncCooperativeId(cooperative);
         return cooperativeRepository.save(cooperative);
+    }
+
+    private void syncCooperativeId(Cooperative cooperative) {
+        if (cooperative.getUserId() == null || cooperative.getProductId() == null) {
+            return;
+        }
+        cooperative.setCooperativeId(
+                new CooperativeID(cooperative.getUserId(), cooperative.getProductId()));
     }
 }

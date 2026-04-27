@@ -103,7 +103,7 @@ public class CowServiceTest {
 
         Cow created = cowService.create(cow);
 
-        cowService.grassCow(created.getId());
+        cowService.grassCow();
         assertEquals(true, cowService.findById(created.getId()).getFedToday());
     }
 

@@ -8,7 +8,10 @@ import com.api.tinyfarm.service.StockService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/market")
@@ -20,9 +23,16 @@ public class MarketController {
     private StockService stockService;
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<Market> getByUserId(@PathVariable Long id) {
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #id)")
+    public ResponseEntity<List<Market>> getByUserId(@PathVariable Long id) {
         try {
-            return ResponseEntity.ok(marketService.findByUserId(id));
+            List<Market> markets = marketService.findByUserId(id);
+
+            if (markets.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            return ResponseEntity.ok(markets);
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
@@ -38,7 +48,7 @@ public class MarketController {
     }
 
     @GetMapping("/price/{price}")
-    public ResponseEntity<Market> getByPrice(@PathVariable float price) {
+    public ResponseEntity<List<Market>> getByPrice(@PathVariable float price) {
         try {
             return ResponseEntity.ok(marketService.findByPrice(price));
         } catch (Exception e) {
@@ -47,7 +57,7 @@ public class MarketController {
     }
 
     @GetMapping("/quantity/{quantity}")
-    public ResponseEntity<Market> getByQuantity(@PathVariable int quantity) {
+    public ResponseEntity<List<Market>> getByQuantity(@PathVariable int quantity) {
         try {
             return ResponseEntity.ok(marketService.findByQuantity(quantity));
         } catch (Exception e) {
@@ -56,6 +66,7 @@ public class MarketController {
     }
 
     @PostMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Market> create(@RequestBody Market market) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -71,6 +82,7 @@ public class MarketController {
     }
 
     @PostMapping("/buy")
+    @PreAuthorize("@securityAuthorizationService.canBuyFromMarket(authentication, #request)")
     public ResponseEntity<Void> buyFromMarket(@RequestBody MarketBuyRequest request) {
         try {
             marketService.buyFromMarket(
@@ -90,6 +102,7 @@ public class MarketController {
     }
 
     @PostMapping("/ad")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Market> publishToMarket(@RequestBody PublishProductToTradeRequest request) {
         try {
             Market market = stockService.publishToMarket(
@@ -105,19 +118,22 @@ public class MarketController {
         }
     }
 
-    @PutMapping("/id/{id}")
+    @PutMapping("/uid/{uid}/pid/{pid}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #id)")
     public ResponseEntity<Market> update(
-        @PathVariable Long id,
+        @PathVariable Long uid,
+        @PathVariable Long pid,
         @RequestBody Market market
     ) {
         try {
-            return ResponseEntity.ok(marketService.update(id, market));
+            return ResponseEntity.ok(marketService.update(uid, pid, market));
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/{userId}/{productId}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Void> deleteByProductId(
         @PathVariable Long userId,
         @PathVariable Long productId
@@ -131,6 +147,7 @@ public class MarketController {
     }
 
     @DeleteMapping("/id/{uid}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #uid)")
     public ResponseEntity<Void> deleteById(@PathVariable Long uid) {
         try {
             marketService.deleteByID(uid);
