@@ -19,6 +19,7 @@ import com.api.tinyfarm.service.StockService;
 import com.api.tinyfarm.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -142,7 +143,7 @@ public class MarketControllerTest extends AuthenticatedControllerTestSupport {
 
         mockMvc
             .perform(
-                put("/api/market/id/1")
+                put("/api/market/uid/1/pid/10")
                     .with(authenticated())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(updatedMarket))
@@ -215,12 +216,12 @@ public class MarketControllerTest extends AuthenticatedControllerTestSupport {
         User updatedBuyer = userService.findById(buyer.getId());
         Stock updatedSellerStock = stockService.findById(seller.getId(), 999L);
         Stock updatedBuyerStock = stockService.findById(buyer.getId(), 999L);
-        Market updatedListing = marketService.findByUserId(seller.getId());
+        List<Market> updatedListing = marketService.findByUserId(seller.getId());
 
         assertEquals(126.0f, updatedSeller.getEcus());
         assertEquals(174.0f, updatedBuyer.getEcus());
         assertEquals(8, updatedSellerStock.getQuantity());
         assertEquals(2, updatedBuyerStock.getQuantity());
-        assertEquals(5, updatedListing.getQuantity());
+        assertEquals(5, updatedListing.getFirst().getQuantity());
     }
 }

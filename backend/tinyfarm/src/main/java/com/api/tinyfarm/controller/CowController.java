@@ -1,5 +1,6 @@
 package com.api.tinyfarm.controller;
 
+import com.api.tinyfarm.model.Chicken;
 import com.api.tinyfarm.model.Cow;
 import com.api.tinyfarm.service.CowService;
 import org.springframework.http.HttpStatus;
@@ -86,6 +87,59 @@ public class CowController {
             cowService.deleteByName(name);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/{id}/hay")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
+    public ResponseEntity<Cow> hayCow(
+            @PathVariable Long id,
+            @RequestParam Long userId
+    ) {
+        try {
+            return ResponseEntity.ok(cowService.hayCow(id, userId));
+        }catch (Exception e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/{id}/heal")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
+    public ResponseEntity<Cow> healCow(
+            @PathVariable Long id,
+            @RequestParam Long userId
+    ) {
+        try {
+            return ResponseEntity.ok(cowService.healCow(id, userId));
+        }catch (Exception e){
+            return ResponseEntity.notFound().build();
+        }
+
+    }
+
+    @PostMapping("/{id}/water")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
+    public ResponseEntity<Cow> waterCow(
+            @PathVariable Long id,
+            @RequestParam Long userId
+    ) {
+        try{
+            return ResponseEntity.ok(cowService.waterCow(id, userId));
+        }catch (Exception e){
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/{id}/clean")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
+    public ResponseEntity<Cow> cleanCow(
+            @PathVariable Long id,
+            @RequestParam Long userId
+    ) {
+        try{
+            return ResponseEntity.ok(cowService.cleanCow(id, userId));
+        }catch (Exception e){
             return ResponseEntity.notFound().build();
         }
     }

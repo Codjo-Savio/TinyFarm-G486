@@ -1,7 +1,6 @@
 package com.api.tinyfarm.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -54,12 +53,10 @@ public class MarketRepositoryTest {
         market.setUnitPrice(25.0f);
         marketRepository.save(market);
 
-        Optional<Market> found = marketRepository.findByMarketIdUserId(
+       List<Market> found = marketRepository.findByMarketIdUserId(
             market.getUserId()
-        );
-
-        assertTrue(found.isPresent());
-        assertEquals(10L, found.get().getProductId());
+       );
+        assertEquals(10L, found.getFirst().getProductId());
     }
 
     @Test
@@ -88,12 +85,11 @@ public class MarketRepositoryTest {
         market.setUnitPrice(25.0f);
         marketRepository.save(market);
 
-        Optional<Market> found = marketRepository.findByPrice(
+        List<Market> found = marketRepository.findByPrice(
             market.getUnitPrice()
         );
 
-        assertTrue(found.isPresent());
-        assertEquals(10L, found.get().getProductId());
+        assertEquals(10L, found.getFirst().getProductId());
     }
 
     @Test
@@ -106,12 +102,11 @@ public class MarketRepositoryTest {
         market.setQuantity(100);
         marketRepository.save(market);
 
-        Optional<Market> found = marketRepository.findByQuantity(
+        List<Market> found = marketRepository.findByQuantity(
             market.getQuantity()
         );
 
-        assertTrue(found.isPresent());
-        assertEquals(100, found.get().getQuantity());
+        assertEquals(100, found.getFirst().getQuantity());
     }
 
     @Test
@@ -125,8 +120,8 @@ public class MarketRepositoryTest {
 
         marketRepository.deleteById(market.getMarketId());
 
-        Optional<Market> found = marketRepository.findByMarketIdUserId(1L);
-        assertFalse(found.isPresent());
+        List<Market> found = marketRepository.findByMarketIdUserId(1L);
+        assertEquals(0, found.size());
     }
 
     @Test

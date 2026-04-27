@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ChickenRepository extends JpaRepository<Chicken, Long> {
-    Optional<Chicken> findById(Long id);
     Optional<Chicken> findByName(String name);
     void deleteByName(String name);
 
