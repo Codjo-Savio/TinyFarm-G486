@@ -9,6 +9,7 @@
         <script src="/config.js"></script>
         <!-- Components -->
         <script type="module" src="/components/tf-app-bar.js"></script>
+        <script type="module" src="/components/tf-button.js"></script>
         <script type="module" src="/components/tf-bottom-actions.js"></script>
         <script type="module" src="/components/tf-layout.js"></script>
         <!-- Theme -->
@@ -46,7 +47,7 @@
                             <div class="cart-total-box">
                                 <div class="cart-icon-title">
                                     <span class="material-symbols-rounded">
-                                        sell
+                                        store
                                     </span>
                                     Total
                                 </div>
@@ -55,9 +56,13 @@
                                         class="total-price"
                                         id="totalPrice"
                                     ></span>
-                                    <button class="btn-sell">
-                                        Mettre en vente
-                                    </button>
+                                    <tf-button
+                                        variant="primary"
+                                        id="sellButton"
+                                        icon="sell"
+                                    >
+                                        Publier
+                                    </tf-button>
                                 </div>
                             </div>
 

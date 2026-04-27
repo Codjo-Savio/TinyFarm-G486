@@ -294,6 +294,40 @@ h2.category-title {
     min-width: 0;
 }
 
+.empty-state {
+    background-color: var(--color-surface-dark);
+    border-radius: var(--radius);
+    min-height: 280px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 30px;
+    color: var(--color-primary);
+}
+
+.empty-state-icon {
+    font-size: 52px;
+    margin-bottom: 10px;
+    color: var(--color-primary);
+    opacity: 0.85;
+}
+
+.empty-state-title {
+    font-family: "Amaranth", sans-serif;
+    font-size: var(--font-size-subtitle);
+    margin-bottom: 8px;
+}
+
+.empty-state-text {
+    max-width: 420px;
+    font-size: var(--font-size-body);
+    opacity: 0.85;
+    line-height: 1.35;
+}
+
 .product-row {
     background-color: var(--color-surface-dark);
     height: 90px;
@@ -310,6 +344,7 @@ h2.category-title {
     display: flex;
     align-items: center;
     gap: 20px;
+    min-width: 0;
 }
 
 .stock-badge {
@@ -328,6 +363,10 @@ h2.category-title {
     font-size: 22px;
     font-weight: 400;
     color: var(--color-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: min(44vw, 420px);
 }
 
 .seller {
@@ -343,22 +382,12 @@ h2.category-title {
     display: flex;
     align-items: center;
     gap: 30px;
+    flex-shrink: 0;
 }
 
 .price {
     font-weight: var(--font-weight-title);
     font-size: var(--font-size-body-large);
-}
-
-.btn-add {
-    background-color: var(--color-primary);
-    color: #f2d49f;
-    border: none;
-    padding: 10px 30px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: var(--font-size-body);
 }
 
 .timer-float {
@@ -458,6 +487,10 @@ svg {
         padding-top: 0;
         padding-bottom: 100px;
         padding-right: 0;
+    }
+
+    .empty-state {
+        min-height: 220px;
     }
 
     h1.page-title {
