@@ -6,7 +6,9 @@
         <title>Clapier - TinyFarm</title>
         <link rel="icon" href="/assets/logo-128-rounded.png" />
 
+        <!-- Config -->
         <script src="/config.js"></script>
+
         <!-- Components -->
         <script type="module" src="/components/tf-app-bar.js"></script>
         <script type="module" src="/components/tf-bottom-actions.js"></script>
@@ -16,9 +18,10 @@
         <script type="module" src="/components/tf-button.js"></script>
         <script type="module" src="/components/tf-progress-bar.js"></script>
         <script type="module" src="/components/tf-menu.js"></script>
-        <script type="module" src="/components/tf-snackbar.js"></script>
+
         <!-- Theme -->
         <link rel="stylesheet" href="/utils/theme.css" />
+
         <!-- Font -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,11 +29,11 @@
             href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap"
             rel="stylesheet"
         />
+
         <!-- Custom page style and script -->
         <link rel="stylesheet" href="style.css" />
         <script type="module" src="script.js"></script>
     </head>
-
     <body>
         <tf-layout>
             <tf-app-bar></tf-app-bar>
@@ -42,7 +45,6 @@
                         onclick="window.history.back()"
                         >Retour</tf-button
                     >
-
                     <div class="rabbits-stats">
                         <tf-pill icon="heart_broken"
                             >Malades : <span id="sick-count">0%</span></tf-pill
@@ -50,8 +52,8 @@
                         <tf-pill icon="mop"
                             >Sales : <span id="dirty-count">0%</span></tf-pill
                         >
-                        <span>
-                            <span class="material-symbols-rounded">pets</span>
+                        <span
+                            ><span class="material-symbols-rounded">pets</span>
                             <span id="rabbit-count">0</span>
                         </span>
                         <tf-button icon="sell" variant="secondary"
@@ -71,7 +73,7 @@
                                 <tf-menu-entry
                                     id="feed-btn"
                                     slot="entry"
-                                    icon="nutrition"
+                                    icon="wheat"
                                 >
                                     Nourrir
                                 </tf-menu-entry>
@@ -100,13 +102,10 @@
                         </tf-menu>
                     </div>
                 </div>
-
                 <h1 class="page-title">Clapier</h1>
-
                 <div class="game-grid" id="game-grid"></div>
             </main>
             <tf-bottom-actions size="small"></tf-bottom-actions>
-            <tf-snackbar id="hutch-snackbar"></tf-snackbar>
         </tf-layout>
     </body>
 </html>
