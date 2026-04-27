@@ -30,10 +30,10 @@ function setLoadingState(isLoading) {
  * @param {Array} users
  * users correspond aux 10 (ou moins) meilleurs utilisateurs à afficher, triés par rang décroissant.
  * users contient des objets avec les propriétés suivantes :
- * - rang: { current: number, max: number }
- * - nom: string
+ * - rank: integer
+ * - name: string
  * - production: number
- * - capacite: number
+ * - capacity: number
  * - ecus: number
  */
 function displayUsers(users) {
@@ -57,9 +57,9 @@ function displayUsers(users) {
         rowCells.forEach((cell) => cell.classList.remove("is-placeholder"));
 
         // Afficher le rang avec une icône de couronne pour les rangs 1 à 3, et une icône de premium pour les rangs 4 et plus
-        if (user.rang.current < 4) {
+        if (user.rank < 4) {
             rowCells[0].innerHTML =
-                user.rang.current +
+                user.rank +
                 ' <span class="material-symbols-rounded">crown</span>';
         } else {
             rowCells[0].innerHTML =
@@ -68,9 +68,9 @@ function displayUsers(users) {
         }
 
         // Afficher les autres données de l'utilisateur
-        rowCells[1].textContent = user.nom;
+        rowCells[1].textContent = user.name;
         rowCells[2].textContent = user.production;
-        rowCells[3].textContent = user.capacite;
+        rowCells[3].textContent = user.capacity;
         rowCells[4].textContent = user.ecus;
     }
 }
@@ -79,7 +79,7 @@ function displayUsers(users) {
  * Trie le tableau de classement par une colonne spécifique
  * @param {string} column
  * @param {number} order
- * column correspond à la colonne à trier : "rang", "nom", "production", "capacite" ou "ecus"
+ * column correspond à la colonne à trier : "rank", "name", "production", "capacity" ou "ecus"
  * order correspond à l'ordre de tri : 1 pour croissant, -1 pour décroissant
  */
 function sortTable(column, order) {
@@ -93,7 +93,7 @@ function sortTable(column, order) {
     activeButton?.setAttribute("active", "true");
 
     // Réinitialiser les autres boutons de tri
-    const columns = ["rang", "nom", "production", "capacite", "ecus"];
+    const columns = ["rank", "name", "production", "capacity", "ecus"];
     columns.forEach((col) => {
         if (col !== column) {
             const button = document.getElementById(col + "Button");
@@ -112,7 +112,7 @@ function sortTable(column, order) {
 
     // Trier les données des utilisateurs en fonction de la colonne et de l'ordre spécifiés
     usersData.sort((a, b) => {
-        // Pour la colonne "rang", on compare les propriétés "current" des objets "rang"
+        // Pour la colonne "rank", on compare les propriétés "current" des objets "rank"
         // Pour les autres colonnes, on compare directement les propriétés correspondantes
         const valA = column === "rang" ? a.rang.current : a[column];
         const valB = column === "rang" ? b.rang.current : b[column];
@@ -149,34 +149,32 @@ setRelease();
 
 // Au chargement de la page, récupérer les données des utilisateurs depuis l'API et les afficher dans le tableau de classement
 setLoadingState(true);
-fetchApiWithCredentials("/classement")
+fetchApiWithCredentials("/ranking")
     .then((response) => {
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }
         return response.json();
     })
-    // En cas d'erreur lors de la récupération des données depuis l'API, récupérer les données depuis le fichier de secours fakeapi/users.json
-    // (ici tant que l'API n'est pas fonctionnelle)
-    .catch((error) => {
-        console.error("Error fetching user data from api/classement:", error);
-        return fetch("/fakeapi/users.json").then((response) => {
-            if (!response.ok) {
-                throw new Error(`Fallback HTTP ${response.status}`);
-            }
-            return response.json();
-        });
-    })
-    // Si la récupération des données depuis l'API ou le fichier de secours réussit, stocker les données dans usersData et les afficher dans le tableau de classement
+    // Si la récupération des données depuis l'API réussit, stocker les données dans usersData et les afficher dans le tableau de classement
     .then((data) => {
         usersData = Array.isArray(data) ? data : [];
         displayUsers(usersData);
     })
-    // Si la récupération des données depuis le fichier de secours échoue également, afficher un tableau vide et afficher une erreur dans la console
-    .catch((fallbackError) => {
-        console.error("Error fetching fallback users.json:", fallbackError);
-        usersData = [];
-        displayUsers(usersData);
+    // Si la récupération des données depuis l'API échoue
+    .catch((error) => {
+        for (let i = 0; i < 10; i++) {
+            // Récupérer les cellules de la ligne i (0 à 4) sous la forme "i-col"
+            const rowCells = [0, 1, 2, 3, 4].map((col) =>
+                document.getElementById(i + "-" + col),
+            );
+
+            // Afficher des cellules vides avec un style de placeholder
+                rowCells.forEach((cell) => {
+                    cell.textContent = "";
+                    cell.classList.add("is-placeholder");
+                });
+        }
     })
     // Quel que soit le résultat de la récupération des données, désactiver l'état de chargement du tableau de classement
     .finally(() => {
