@@ -36,6 +36,15 @@ public class CowService {
     }
 
     public Cow create(Cow cow) {
+        if (cow == null) {
+            throw new IllegalArgumentException("Vache manquante");
+        }
+        if (cow.getName() == null || cow.getName().isBlank()) {
+            throw new IllegalArgumentException("Nom de la vache manquant");
+        }
+        if (cow.getId() != null && cowRepository.existsById(cow.getId())) {
+            throw new IllegalArgumentException("Vache déjà existante : " + cow.getId());
+        }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
             cow.setUserId(currentUser.getId());

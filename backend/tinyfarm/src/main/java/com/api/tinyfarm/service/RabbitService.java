@@ -42,6 +42,15 @@ public class RabbitService {
     }
 
     public Rabbit create(Rabbit rabbit) {
+        if (rabbit == null) {
+            throw new IllegalArgumentException("Lapin manquant");
+        }
+        if (rabbit.getName() == null || rabbit.getName().isBlank()) {
+            throw new IllegalArgumentException("Nom du lapin manquant");
+        }
+        if (rabbit.getId() != null && rabbitRepository.existsById(rabbit.getId())) {
+            throw new IllegalArgumentException("Lapin déjà existant : " + rabbit.getId());
+        }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
             rabbit.setUserId(currentUser.getId());

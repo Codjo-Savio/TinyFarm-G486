@@ -72,6 +72,12 @@ public class UserService {
     }
 
     public User create(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("Utilisateur manquant");
+        }
+        if (user.getId() != null && userRepository.existsById(user.getId())) {
+            throw new IllegalArgumentException("Utilisateur déjà existant : " + user.getId());
+        }
         return userRepository.save(user);
     }
 

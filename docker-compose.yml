@@ -9,6 +9,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./database/database.sql:/docker-entrypoint-initdb.d/00-database.sql:ro
       - ./database/tables.sql:/docker-entrypoint-initdb.d/01-tables.sql:ro
     networks:
       - internal

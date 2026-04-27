@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS product (
     product_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     description TEXT,
     collection BOOLEAN DEFAULT FALSE,
-    price FLOAT CHECK (price >= 0),
     coef INTEGER DEFAULT 1 CHECK (coef >= 1)
 );
 

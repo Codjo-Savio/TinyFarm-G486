@@ -33,23 +33,25 @@ public class CooperativeService {
     private StockRepository stockRepository;
 
     public Integer getMediumPriceForProduct(String description) {
-        List<Product> products = new ArrayList<>();
+        List<Float> prices = new ArrayList<>();
 
         for (Cooperative coop : cooperativeRepository.findAll()) {
             for (Product product : productRepository.findByDescription(description)) {
                 if (product.getId().equals(coop.getProductId())) {
-                    products.add(product);
+                    if (coop.getPrice() != null) {
+                        prices.add(coop.getPrice());
+                    }
                 }
             }
         }
-        if (products.isEmpty()) {
-            return null; // No products with the given description
+        if (prices.isEmpty()) {
+            return null;
         }
         Float totalPrices = 0f;
-        for (Product product : products) {
-            totalPrices += product.getPrice();
+        for (Float price : prices) {
+            totalPrices += price;
         }
-        return (int) (totalPrices / products.size());
+        return (int) (totalPrices / prices.size());
     }
 
     public HashMap<Long, Float> getAvailableProducts() {
@@ -182,10 +184,9 @@ public class CooperativeService {
         if (description.contains("milk") || description.contains("lait")) {
             return 2f;
         }
-        if (product.getPrice() == null) {
-            throw new IllegalArgumentException("Prix produit manquant");
-        }
-        return product.getPrice();
+        throw new IllegalArgumentException(
+            "Prix coopérative introuvable pour ce produit: configurez-le dans la coopérative"
+        );
     }
 
     // handling open or closen hours in AoE (UTC-12)
@@ -223,6 +224,9 @@ public class CooperativeService {
     }
 
     public Cooperative create(Cooperative cooperative) {
+        if (cooperative == null) {
+            throw new IllegalArgumentException("Offre coopérative manquante");
+        }
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
         if (
@@ -231,7 +235,22 @@ public class CooperativeService {
         ) {
             cooperative.setUserId(currentUser.getId());
         }
+        if (cooperative.getUserId() == null) {
+            throw new IllegalArgumentException("userId manquant pour la coopérative");
+        }
+        if (cooperative.getProductId() == null) {
+            throw new IllegalArgumentException("productId manquant pour la coopérative");
+        }
+        if (cooperative.getQuantity() < 0) {
+            throw new IllegalArgumentException("Quantité coopérative invalide");
+        }
+        if (cooperative.getPrice() != null && cooperative.getPrice() < 0) {
+            throw new IllegalArgumentException("Prix coopérative invalide");
+        }
         syncCooperativeId(cooperative);
+        if (cooperativeRepository.existsById(cooperative.getCooperativeId())) {
+            throw new IllegalArgumentException("Offre coopérative déjà existante pour cet utilisateur / produit");
+        }
         return cooperativeRepository.save(cooperative);
     }
 
