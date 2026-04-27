@@ -1,20 +1,11 @@
-/*DATABASE CREATION*/
-/*INDEPENDENT OF THE TABLES CREATION*/
+/*
+ * Executed by the Postgres Docker entrypoint during first initialization.
+ * NOTE: the database already exists at this step (POSTGRES_DB), so do not
+ * run CREATE DATABASE statements here.
+ */
 
-CREATE DATABASE tinyfarm
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'en_US.UTF-8'
-    LC_CTYPE = 'en_US.UTF-8'
-    IS_TEMPLATE = False
-    TEMPLATE = template0;
+-- Keep app objects in the default schema used by JPA.
+CREATE SCHEMA IF NOT EXISTS public;
 
-/*CREATE A SCHEMA FOR THE DATABASE*/
-CREATE SCHEMA IF NOT EXISTS tinyfarm;
-
-/*SET THE SEARCH PATH TO USE THE TINYFARM SCHEMA*/
-SET search_path TO tinyfarm;
-
-/*REVOKE ALL PRIVILEGES ON THE SCHEMA TO PUBLIC*/
-REVOKE ALL PRIVILEGES ON SCHEMA public FROM PUBLIC;
-REVOKE ALL PRIVILEGES ON SCHEMA tinyfarm FROM PUBLIC;
-REVOKE ALL PRIVILEGES ON DATABASE tinyfarm FROM PUBLIC;
+-- Optional DB-level defaults for new sessions.
+ALTER DATABASE tinyfarm SET search_path TO public;
