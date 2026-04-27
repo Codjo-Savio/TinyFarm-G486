@@ -40,6 +40,7 @@ public class SecurityConfig {
                         auth -> auth
                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                 .requestMatchers("/api/public/**").permitAll()
+                                .requestMatchers("/api/ranking/**").permitAll()
                                 .anyRequest().authenticated())
                 .oauth2Login(oauth -> oauth
                         .authorizationEndpoint(
