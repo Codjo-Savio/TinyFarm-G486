@@ -10,7 +10,9 @@ import java.util.*;
 import com.api.tinyfarm.model.*;
 import com.api.tinyfarm.repository.CooperativeRepository;
 import com.api.tinyfarm.repository.ProductRepository;
+import com.api.tinyfarm.repository.RabbitRepository;
 import com.api.tinyfarm.repository.StockRepository;
+import com.api.tinyfarm.utils.RandomNameProvider;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,8 @@ public class CooperativeService {
     private UserRepository userRepository;
     @Autowired
     private StockRepository stockRepository;
+    @Autowired
+    private RabbitRepository rabbitRepository;
 
     public Integer getMediumPriceForProduct(String description) {
         List<Float> prices = new ArrayList<>();
@@ -174,6 +178,108 @@ public class CooperativeService {
         return total;
     }
 
+    public void buyFromCooperative(
+        Long buyerId,
+        Long sellerId,
+        Long productId,
+        Integer quantity
+    ) {
+        if (quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException("Quantité invalide");
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
+            buyerId = currentUser.getId();
+        }
+
+        // handle cooperative ad
+        CooperativeID cooperativeID = new CooperativeID(sellerId, productId);
+        Cooperative offer = cooperativeRepository
+            .findById(cooperativeID)
+            .orElseThrow(() -> new RuntimeException("Offre coopérative introuvable"));
+
+        if (offer.getQuantity() < quantity) {
+            throw new RuntimeException("Quantité insuffisante dans l'offre coopérative");
+        }
+        if (offer.getPrice() == null || offer.getPrice() < 0) {
+            throw new RuntimeException("Prix coopérative invalide");
+        }
+
+        // handle seller
+        User seller = userRepository
+            .findById(sellerId)
+            .orElseThrow(() -> new RuntimeException("Vendeur introuvable"));
+        User buyer = userRepository
+            .findById(buyerId)
+            .orElseThrow(() -> new RuntimeException("Acheteur introuvable"));
+
+        float totalPrice = offer.getPrice() * quantity;
+        if (buyer.getEcus() - totalPrice < AUTHORIZED_OVERDRAFT_FLOOR) {
+            throw new RuntimeException("Écus insuffisants pour effectuer l'achat");
+        }
+
+        int remainingPurchases = buyer.getRemainingPurchases() == null
+            ? 12
+            : buyer.getRemainingPurchases();
+        if (remainingPurchases <= 0) {
+            throw new RuntimeException("Vous ne pouvez plus effectuer d'achat dans la journée");
+        }
+
+        // handle buyer
+        buyer.setEcus(buyer.getEcus() - totalPrice);
+        buyer.setRemainingPurchases(remainingPurchases - 1);
+        seller.setEcus(seller.getEcus() + totalPrice);
+        userRepository.save(buyer);
+        userRepository.save(seller);
+
+        offer.setQuantity(offer.getQuantity() - quantity);
+        if (offer.getQuantity() == 0) {
+            cooperativeRepository.delete(offer);
+        } else {
+            cooperativeRepository.save(offer);
+        }
+
+        Product product = productRepository
+            .findById(productId)
+            .orElseThrow(() -> new RuntimeException("Produit introuvable : " + productId));
+
+
+        // Handle rabbit selling case
+        if (isRabbitProduct(product)) {
+            // We suppose that the gender is null
+            Animal.AnimalGender gender = null;
+
+            // We check the content of the ad and set the gender according to it
+            if(product.getDescription().toLowerCase().contains("male")){
+                gender = Animal.AnimalGender.M;
+            }
+            else if(product.getDescription().toLowerCase().contains("female") || product.getDescription().toLowerCase().contains("femelle")){
+                gender = Animal.AnimalGender.F;
+            }
+            for (int i = 0; i < quantity; i++) {
+                Rabbit rabbit = getRabbit(buyerId, gender);
+                rabbitRepository.save(rabbit);
+            }
+        }
+    }
+
+    private static Rabbit getRabbit(Long buyerId, Animal.AnimalGender gender) {
+        Rabbit rabbit = new Rabbit();
+        rabbit.setUserId(buyerId);
+        rabbit.setRabbitType(Rabbit.RabbitTypeEnum.lapin);
+        rabbit.setAge(30);
+        rabbit.setGender(gender);
+
+        // Name the rabbit according to its gender
+        rabbit.setName(
+            gender == Animal.AnimalGender.M
+                ? RandomNameProvider.getRandomMaleName()
+                : RandomNameProvider.getRandomFemaleName()
+        );
+        return rabbit;
+    }
+
     private Float resolveCooperativeUnitPrice(Product product) {
         String description = product.getDescription() == null
             ? ""
@@ -191,6 +297,13 @@ public class CooperativeService {
         throw new IllegalArgumentException(
             "Prix coopérative introuvable pour ce produit: configurez-le dans la coopérative"
         );
+    }
+
+    private boolean isRabbitProduct(Product product) {
+        String description = product.getDescription() == null
+            ? ""
+            : product.getDescription().toLowerCase(Locale.ROOT);
+        return description.contains("rabbit") || description.contains("lapin");
     }
 
     // handling open or closen hours in AoE (UTC-12)

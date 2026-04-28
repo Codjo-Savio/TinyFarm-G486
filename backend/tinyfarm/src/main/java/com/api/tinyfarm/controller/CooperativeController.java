@@ -3,6 +3,7 @@ package com.api.tinyfarm.controller;
 import java.util.HashMap;
 
 import com.api.tinyfarm.dto.CooperativeSaleRequest;
+import com.api.tinyfarm.dto.CooperativeBuyRequest;
 import com.api.tinyfarm.service.CooperativeService;
 
 import org.springframework.http.HttpStatus;
@@ -63,6 +64,26 @@ public class CooperativeController {
                 request.getQuantity()
             );
             return ResponseEntity.ok(total);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/buy")
+    @PreAuthorize("@securityAuthorizationService.canBuyFromCooperative(authentication, #request)")
+    public ResponseEntity<Void> buyFromCooperative(
+        @RequestBody CooperativeBuyRequest request
+    ) {
+        try {
+            cooperativeService.buyFromCooperative(
+                request.getBuyerId(),
+                request.getSellerId(),
+                request.getProductId(),
+                request.getQuantity()
+            );
+            return ResponseEntity.ok().build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {

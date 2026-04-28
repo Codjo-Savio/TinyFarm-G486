@@ -1,6 +1,7 @@
 package com.api.tinyfarm.security;
 
 import com.api.tinyfarm.dto.CooperativeSaleRequest;
+import com.api.tinyfarm.dto.CooperativeBuyRequest;
 import com.api.tinyfarm.dto.MarketBuyRequest;
 import com.api.tinyfarm.model.Stock;
 import com.api.tinyfarm.model.Transaction;
@@ -88,6 +89,16 @@ public class SecurityAuthorizationService {
             return true;
         }
         return canAccessUser(authentication, request.getSellerId());
+    }
+
+    public boolean canBuyFromCooperative(Authentication authentication, CooperativeBuyRequest request) {
+        if (!isAuthenticated(authentication)) {
+            return false;
+        }
+        if (request == null || request.getBuyerId() == null) {
+            return true;
+        }
+        return canAccessUser(authentication, request.getBuyerId());
     }
 
     public boolean canAccessTransaction(Authentication authentication, Long transactionId) {

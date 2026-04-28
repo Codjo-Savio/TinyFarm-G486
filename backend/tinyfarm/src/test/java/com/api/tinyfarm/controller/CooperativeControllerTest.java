@@ -114,4 +114,34 @@ class CooperativeControllerTest extends AuthenticatedControllerTestSupport {
 
         verify(cooperativeService).sellToCooperative(1L, 10L, 2);
     }
+
+    @Test
+    void shouldBuyFromCooperative() throws Exception {
+        String body = objectMapper.writeValueAsString(
+            new java.util.HashMap<String, Object>() {
+                {
+                    put("buyerId", 2L);
+                    put("sellerId", 1L);
+                    put("productId", 10L);
+                    put("quantity", 1);
+                }
+            }
+        );
+
+        mockMvc
+            .perform(
+                post("/api/cooperative/buy")
+                    .with(authenticated())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(body)
+            )
+            .andExpect(status().isOk());
+
+        verify(cooperativeService).buyFromCooperative(
+            2L,
+            1L,
+            10L,
+            1
+        );
+    }
 }
