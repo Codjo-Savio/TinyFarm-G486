@@ -174,34 +174,18 @@ frontend/src/
 │ ├── style.css
 │ │
 │ ├── management/
-│ │ ├── assets/
-│ │ ├── chicken-coop/
-│ │ ├── hutch/
-│ │ └── meadow/
-│ │     └── (index.html, script.js, style.css)
+│ │ ├── assets/ (index.html, script.js, style.css)
+│ │ ├── chicken-coop/ (index.html, script.js, style.css)
+│ │ ├── hutch/ (index.html, script.js, style.css)
+│ │ └── meadow/ (index.html, script.js, style.css)
 │ │
 │ └── trade/
-│   ├── marketplace/
-│   └── cooperative/
-│       └── (index.html, script.js, style.css)
+│   ├── marketplace/ (index.html, script.js, style.css)
+│   └── cooperative/ (index.html, script.js, style.css)
 │
 ├── assets/
-│ ├── farmer-icon.png
-│ ├── landmark.png
-│ ├── logo-128-rounded.png
-│ └── teteVache.svg
-│
 ├── doc/
-│ ├── about/index.html
-│ └── rules/index.html
-│
 ├── fakeapi/
-│ ├── assets.json
-│ ├── chicken-coop.json
-│ ├── meadow.json
-│ ├── user.json
-│ └── ...
-│
 ├── utils/
 │ ├── fetch.js
 │ └── theme.css
