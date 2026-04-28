@@ -158,24 +158,57 @@ frontend/src/
 │
 ├── components/
 │ ├── tf-app-bar.js
+│ ├── tf-bottom-actions.js
 │ ├── tf-button.js
+│ ├── tf-card.js
 │ ├── tf-dialog.js
-│ └── ...
+│ ├── tf-layout.js
+│ ├── tf-menu.js
+│ ├── tf-pill.js
+│ ├── tf-progress-bar.js
+│ └── tf-snackbar.js
 │
 ├── dashboard/
+│ ├── index.html
+│ ├── script.js
+│ ├── style.css
+│ │
 │ ├── management/
+│ │ ├── assets/
 │ │ ├── chicken-coop/
 │ │ ├── hutch/
 │ │ └── meadow/
+│ │     └── (index.html, script.js, style.css)
+│ │
 │ └── trade/
 │   ├── marketplace/
 │   └── cooperative/
+│       └── (index.html, script.js, style.css)
 │
 ├── assets/
-├── utils/
-├── fakeapi/
+│ ├── farmer-icon.png
+│ ├── landmark.png
+│ ├── logo-128-rounded.png
+│ └── teteVache.svg
+│
 ├── doc/
-└── index.html
+│ ├── about/index.html
+│ └── rules/index.html
+│
+├── fakeapi/
+│ ├── assets.json
+│ ├── chicken-coop.json
+│ ├── meadow.json
+│ ├── user.json
+│ └── ...
+│
+├── utils/
+│ ├── fetch.js
+│ └── theme.css
+│
+├── index.html
+├── script.js
+└── style.css
 ```
 
 ## Technologies & Frameworks
