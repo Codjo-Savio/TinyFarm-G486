@@ -150,6 +150,34 @@ src/main/java/com/api/tinyfarm/
 └── dto/ # Data Transfer Objects
 ```
 
+### Detailed Frontend Structure
+
+```
+
+frontend/src/
+│
+├── components/
+│ ├── tf-app-bar.js
+│ ├── tf-button.js
+│ ├── tf-dialog.js
+│ └── ...
+│
+├── dashboard/
+│ ├── management/
+│ │ ├── chicken-coop/
+│ │ ├── hutch/
+│ │ └── meadow/
+│ └── trade/
+│   ├── marketplace/
+│   └── cooperative/
+│
+├── assets/
+├── utils/
+├── fakeapi/
+├── doc/
+└── index.html
+```
+
 ## Technologies & Frameworks
 
 ### Backend
