@@ -70,10 +70,10 @@ function renderRabbitCard(rabbit) {
                     </div>
                 </div>
                 <div class="animal-actions">
-                    <tf-button data-action="feed" data-rabbit-id="${rabbit.id}" ${rabbit.fedToday ? "disabled=true" : ""}>Nourrir</tf-button>
-                    <tf-button data-action="water" data-rabbit-id="${rabbit.id}" ${rabbit.wateredToday ? "disabled=true" : ""}>Abreuver</tf-button>
-                    <tf-button data-action="heal" data-rabbit-id="${rabbit.id}" ${rabbit.healthy ? "disabled=true" : ""}>Soigner</tf-button>
-                    <tf-button data-action="clean" data-rabbit-id="${rabbit.id}" ${rabbit.clean ? "disabled=true" : ""}>Nettoyer</tf-button>
+                    <tf-button data-action="feed" data-rabbit-id="${rabbit.id}" ${rabbit.fedToday ? "disabled=true" : ""}>$5 Nourrir</tf-button>
+                    <tf-button data-action="water" data-rabbit-id="${rabbit.id}" ${rabbit.wateredToday ? "disabled=true" : ""}>$2 Abreuver</tf-button>
+                    <tf-button data-action="heal" data-rabbit-id="${rabbit.id}" ${rabbit.healthy ? "disabled=true" : ""}>$6 Soigner</tf-button>
+                    <tf-button data-action="clean" data-rabbit-id="${rabbit.id}" ${rabbit.clean ? "disabled=true" : ""}>$3 Nettoyer</tf-button>
                 </div>
             </div>
         </tf-card>
