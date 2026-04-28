@@ -77,7 +77,6 @@ body {
     gap: 20px;
 }
 
-.btn-back,
 .btn-sell {
     background-color: var(--color-secondary);
     border: none;
