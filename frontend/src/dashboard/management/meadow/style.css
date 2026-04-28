@@ -149,7 +149,7 @@ h2.category-title {
 
 .game-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
     flex: 1;
     min-height: 0;
@@ -286,8 +286,6 @@ h2.category-title {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
-    column-gap: clamp(8px, 1.6vw, 18px);
-    row-gap: clamp(8px, 1vw, 12px);
+    gap: 8px;
     margin-top: auto;
 }

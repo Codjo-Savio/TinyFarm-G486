@@ -104,10 +104,10 @@ function renderChickenCoop() {
                         </div>
                     </div>
                     <div class="animal-actions">
-                        ${createChickenActionButton("feed", chicken.id, "Nourrir", !isChickenFed(chicken))}
-                        ${createChickenActionButton("water", chicken.id, "Abreuver", !chicken.wateredToday)}
-                        ${createChickenActionButton("heal", chicken.id, "Soigner", !chicken.healthy)}
-                        ${createChickenActionButton("clean", chicken.id, "Nettoyer", !chicken.clean)}
+                        ${createChickenActionButton("feed", chicken.id, "$5 Nourrir", !isChickenFed(chicken))}
+                        ${createChickenActionButton("water", chicken.id, "$2 Abreuver", !chicken.wateredToday)}
+                        ${createChickenActionButton("heal", chicken.id, "$6 Soigner", !chicken.healthy)}
+                        ${createChickenActionButton("clean", chicken.id, "$3 Nettoyer", !chicken.clean)}
                     </div>
                 </div>
             </tf-card>`;
