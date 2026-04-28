@@ -286,8 +286,6 @@ h2.category-title {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
-    column-gap: clamp(8px, 1.6vw, 18px);
-    row-gap: clamp(8px, 1vw, 12px);
+    gap: 8px;
     margin-top: auto;
 }
