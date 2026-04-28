@@ -32,7 +32,7 @@ public class UserServiceTest {
         User created = userService.create(user);
 
         assertNotNull(created.getId());
-        assertEquals(1500, created.getEcus());
+        assertEquals(0, created.getEcus());
         assertEquals(1, created.getLevel());
     }
 

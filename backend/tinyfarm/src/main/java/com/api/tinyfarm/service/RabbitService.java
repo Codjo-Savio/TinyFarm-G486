@@ -98,7 +98,7 @@ public class RabbitService {
         Rabbit rabbit = findById(rabbitId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 5) {
+        if (user.getEcus() >= -1495) {
             user.setEcus(user.getEcus() - 5);
             userService.update(user.getId(), user);
 
@@ -115,7 +115,7 @@ public class RabbitService {
         Rabbit rabbit = findById(rabbitId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 2) {
+        if (user.getEcus() >= -1498) {
             user.setEcus(user.getEcus() - 2);
             userService.update(user.getId(), user);
 
@@ -132,7 +132,7 @@ public class RabbitService {
         Rabbit rabbit = findById(rabbitId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 3) {
+        if (user.getEcus() >= -1497) {
             user.setEcus(user.getEcus() - 3);
             userService.update(user.getId(), user);
 
@@ -149,7 +149,7 @@ public class RabbitService {
         Rabbit rabbit = findById(rabbitId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 6) {
+        if (user.getEcus() >= -1494) {
             user.setEcus(user.getEcus() - 6);
             userService.update(user.getId(), user);
 

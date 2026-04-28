@@ -61,5 +61,8 @@ public class Chicken extends Animal {
         if (this.chickenType == null) {
             this.chickenType = ChickenType.C;
         }
+        if(this.chickenType == ChickenType.H || this.chickenType == ChickenType.R || this.chickenType == ChickenType.L) {
+            this.setWeight(2.5f);
+        }
     }
 }

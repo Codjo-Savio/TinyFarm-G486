@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TradeService {
+    private static final float AUTHORIZED_OVERDRAFT_FLOOR = -1500f;
 
     @Autowired
     private StockRepository stockRepository;
@@ -78,7 +79,7 @@ public class TradeService {
             .orElseThrow(() -> new RuntimeException("Acheteur introuvable"));
 
         float totalPrice = price*quantity;
-        if (buyer.getEcus() < totalPrice) {
+        if (buyer.getEcus() - totalPrice < AUTHORIZED_OVERDRAFT_FLOOR) {
             throw new RuntimeException("Écus insuffisants pour effectuer l'achat");
         }
 

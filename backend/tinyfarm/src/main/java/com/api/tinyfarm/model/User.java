@@ -64,7 +64,7 @@ public class User {
     @PrePersist
     public void prePersist() {
         if (this.ecus == null) {
-            this.ecus = 1500F;
+            this.ecus = 0F;
         }
 
         if (this.hibernation == null) {

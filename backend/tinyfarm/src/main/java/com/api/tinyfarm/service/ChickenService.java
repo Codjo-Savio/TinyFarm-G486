@@ -101,7 +101,7 @@ public class ChickenService{
         Chicken chicken = findById(chickenId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 3) {
+        if (user.getEcus() >= -1497) {
             user.setEcus(user.getEcus() - 3);
             userService.update(user.getId(), user);
 
@@ -118,7 +118,7 @@ public class ChickenService{
         Chicken chicken = findById(chickenId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 1) {
+        if (user.getEcus() >= -1499) {
             user.setEcus(user.getEcus() - 1);
             userService.update(user.getId(), user);
 
@@ -135,7 +135,7 @@ public class ChickenService{
         Chicken chicken = findById(chickenId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 3) {
+        if (user.getEcus() >= -1497) {
             user.setEcus(user.getEcus() - 3);
             userService.update(user.getId(), user);
 
@@ -152,7 +152,7 @@ public class ChickenService{
         Chicken chicken = findById(chickenId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 6) {
+        if (user.getEcus() >= -1494) {
             user.setEcus(user.getEcus() - 6);
             userService.update(user.getId(), user);
 

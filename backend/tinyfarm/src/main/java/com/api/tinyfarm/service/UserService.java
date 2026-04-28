@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
+    private static final float AUTHORIZED_OVERDRAFT_FLOOR = -1500f;
     private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
@@ -63,6 +64,11 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Utilisateur introuvable : " + email));
     }
 
+    public Boolean existsByName(String name) {
+        return userRepository
+                .existsByName(name);
+    }
+
     public Integer getRemainingPurchases(Long id) {
         return findById(id).getRemainingPurchases();
     }
@@ -103,7 +109,7 @@ public class UserService {
 
     public User withdrawEcus(Long id, Float amount) {
         User user = findById(id);
-        if (user.getEcus() < amount) {
+        if (user.getEcus() - amount < AUTHORIZED_OVERDRAFT_FLOOR) {
             throw new RuntimeException("Pas assez d'écus !");
         }
         user.setEcus(user.getEcus() - amount);

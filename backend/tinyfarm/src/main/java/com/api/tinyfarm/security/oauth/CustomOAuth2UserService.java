@@ -37,7 +37,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationException("Aucun email GitHub accessible");
         }
 
-        boolean userAlreadyExists = userService.existsByEmail(email);
+        boolean userAlreadyExists = userService.existsByName(name);
         User user = userService.findOrCreateOAuthUser(email, name, null);
         if (!userAlreadyExists) {
             initFarmService.initializeFarmForUser(user);

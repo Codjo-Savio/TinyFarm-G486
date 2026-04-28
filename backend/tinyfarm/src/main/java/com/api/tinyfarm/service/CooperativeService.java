@@ -22,6 +22,7 @@ import com.api.tinyfarm.repository.UserRepository;
 
 @Service
 public class CooperativeService {
+    private static final float AUTHORIZED_OVERDRAFT_FLOOR = -1500f;
 
     @Autowired
     private CooperativeRepository cooperativeRepository;
@@ -116,13 +117,16 @@ public class CooperativeService {
         if (sellerUser == null || buyerUser == null)
             return;
 
-        sellerUser.setEcus(
-                sellerUser.getEcus() +
-                        getMediumPriceForProduct(description));
+        Integer mediumPrice = getMediumPriceForProduct(description);
+        if (mediumPrice == null) {
+            return;
+        }
+        if (buyerUser.getEcus() - mediumPrice < AUTHORIZED_OVERDRAFT_FLOOR) {
+            throw new RuntimeException("Écus insuffisants pour effectuer l'achat");
+        }
 
-        buyerUser.setEcus(
-                buyerUser.getEcus() -
-                        getMediumPriceForProduct(description));
+        sellerUser.setEcus(sellerUser.getEcus() + mediumPrice);
+        buyerUser.setEcus(buyerUser.getEcus() - mediumPrice);
 
         userRepository.save(sellerUser);
         userRepository.save(buyerUser);
