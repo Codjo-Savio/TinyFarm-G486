@@ -5,10 +5,10 @@ import { fetchApiWithCredentials, API_URL } from "/utils/fetch.js";
 // usersData est un tableau qui stocke les données des utilisateurs récupérées depuis l'API ou le fichier de secours.
 // c'est une variable globale.
 // Chaque élément de usersData est un objet représentant un utilisateur, avec les propriétés suivantes :
-// - rang: { current: number, max: number }
-// - nom: string
+// - rank: integer
+// - name: string
 // - production: number
-// - capacite: number
+// - capacity: number
 // - ecus: number
 let usersData = [];
 const rankingTable = document.querySelector(".rankingTableContent");
