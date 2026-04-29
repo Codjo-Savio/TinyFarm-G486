@@ -1,5 +1,6 @@
 package com.api.tinyfarm.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -15,39 +17,47 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 public class ProductControllerTest extends AuthenticatedControllerTestSupport {
+
     @Autowired
     MockMvc mockMvc;
 
+    private Long productId;
+
     // setup
     @BeforeEach
-    void setup() throws  Exception{
+    void setup() throws Exception {
         String json = """
                 {
-                    "id" : 1,
                      "description" : "foin",
-                     "collection" : "false",
-                     "coefficient" : "1"
+                     "collectible" : false,
+                     "coefficient" : 1
                 }
         """;
-        mockMvc.perform(
+
+        String response = mockMvc.perform(
                 post("/api/products")
                         .with(authenticated())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json)
-        );
+        ).andReturn().getResponse().getContentAsString();
+
+        productId = new ObjectMapper()
+                .readTree(response)
+                .get("id")
+                .asLong();
     }
 
     // tests of the POST
     @Test
-    void shouldCreateProduct() throws Exception{
+    void shouldCreateProduct() throws Exception {
         String json = """
                 {
-                    "id" : 2,
                      "description" : "paille",
-                     "collection" : "false",
-                     "coefficient" : "1"
+                     "collectible" : false,
+                     "coefficient" : 1
                 }
         """;
+
         mockMvc.perform(post("/api/products")
                         .with(authenticated())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -57,41 +67,27 @@ public class ProductControllerTest extends AuthenticatedControllerTestSupport {
 
     // tests of the GET
     @Test
-    void shouldReturnAllProducts() throws  Exception{
+    void shouldReturnAllProducts() throws Exception {
         mockMvc.perform(get("/api/products").with(authenticated()))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void shouldReturnProductById() throws  Exception{
-        mockMvc.perform(get("/api/products/id/1").with(authenticated()))
+    void shouldReturnProductById() throws Exception {
+        mockMvc.perform(get("/api/products/id/" + productId).with(authenticated()))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void productShouldNotBeFoundById() throws  Exception{
-         mockMvc.perform(get("/api/products/id/3").with(authenticated()))
+    void productShouldNotBeFoundById() throws Exception {
+        mockMvc.perform(get("/api/products/id/999").with(authenticated()))
                 .andExpect(status().isNotFound());
     }
 
     // test of the DELETE
     @Test
-    void shouldDeleteProductById() throws  Exception{
-        String json = """
-                {
-                    "id" : 4,
-                     "description" : "blé",
-                     "collection" : "false",
-                     "coefficient" : "1"
-                }
-        """;
-        mockMvc.perform(
-                post("/api/products")
-                        .with(authenticated())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json)
-        );
-        mockMvc.perform(delete("/api/products/id/4").with(authenticated()))
+    void shouldDeleteProductById() throws Exception {
+        mockMvc.perform(delete("/api/products/id/" + productId).with(authenticated()))
                 .andExpect(status().isNoContent());
     }
 }

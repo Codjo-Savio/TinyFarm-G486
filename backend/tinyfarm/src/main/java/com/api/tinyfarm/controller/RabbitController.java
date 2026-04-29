@@ -131,7 +131,7 @@ public class RabbitController {
         try {
             return ResponseEntity.ok(rabbitService.feedRabbit(id, userId));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // Ex: pas assez d'argent
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // Example: insufficient funds
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

@@ -11,11 +11,13 @@ import static org.mockito.Mockito.when;
 
 import com.api.tinyfarm.model.Cooperative;
 import com.api.tinyfarm.model.Product;
+import com.api.tinyfarm.model.Rabbit;
 import com.api.tinyfarm.model.Stock;
 import com.api.tinyfarm.model.StockId;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.CooperativeRepository;
 import com.api.tinyfarm.repository.ProductRepository;
+import com.api.tinyfarm.repository.RabbitRepository;
 import com.api.tinyfarm.repository.StockRepository;
 import com.api.tinyfarm.repository.UserRepository;
 import java.util.HashMap;
@@ -40,6 +42,8 @@ class CooperativeServiceTest {
     private UserRepository userRepository;
     @Mock
     private StockRepository stockRepository;
+    @Mock
+    private RabbitRepository rabbitRepository;
 
     @InjectMocks
     private CooperativeService cooperativeService;
@@ -154,6 +158,41 @@ class CooperativeServiceTest {
         assertEquals(116.0f, seller.getEcus());
         verify(stockRepository).save(stock);
         verify(userRepository).save(seller);
+    }
+
+    @Test
+    void shouldBuyRabbitFromCooperativeWithRequestedGender() {
+        Cooperative cheapOffer = createCooperative(1L, 10L, 2.0f);
+        cheapOffer.setQuantity(1);
+        Cooperative expensiveOffer = createCooperative(3L, 10L, 7.0f);
+        expensiveOffer.setQuantity(2);
+        Product product = createProduct(10L, "Lapin Male");
+        User cheapSeller = createUser(1L, 100.0f);
+        User expensiveSeller = createUser(3L, 200.0f);
+        User buyer = createUser(2L, 0.0f);
+        buyer.setRemainingPurchases(12);
+
+        when(cooperativeRepository.findAllByCooperativeIdProductId(10L))
+            .thenReturn(List.of(cheapOffer, expensiveOffer));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(cheapSeller));
+        when(userRepository.findById(3L)).thenReturn(Optional.of(expensiveSeller));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(buyer));
+        when(productRepository.findById(10L)).thenReturn(Optional.of(product));
+
+        cooperativeService.buyFromCooperative(2L, 1L, 10L, 2);
+
+        assertEquals(-9.0f, buyer.getEcus());
+        assertEquals(11, buyer.getRemainingPurchases());
+        assertEquals(104.5f, cheapSeller.getEcus());
+        assertEquals(204.5f, expensiveSeller.getEcus());
+        verify(userRepository).save(buyer);
+        verify(userRepository).save(cheapSeller);
+        verify(userRepository).save(expensiveSeller);
+        assertEquals(0, cheapOffer.getQuantity());
+        assertEquals(1, expensiveOffer.getQuantity());
+        verify(cooperativeRepository).delete(cheapOffer);
+        verify(cooperativeRepository).save(expensiveOffer);
+        verify(rabbitRepository, org.mockito.Mockito.times(2)).save(org.mockito.ArgumentMatchers.any(Rabbit.class));
     }
 
     private Cooperative createCooperative(Long userId, Long productId, Float price) {

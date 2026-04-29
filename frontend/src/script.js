@@ -5,13 +5,32 @@ import { fetchApiWithCredentials, API_URL } from "/utils/fetch.js";
 // usersData est un tableau qui stocke les données des utilisateurs récupérées depuis l'API ou le fichier de secours.
 // c'est une variable globale.
 // Chaque élément de usersData est un objet représentant un utilisateur, avec les propriétés suivantes :
-// - rang: { current: number, max: number }
-// - nom: string
+// - rank: integer
+// - name: string
 // - production: number
-// - capacite: number
+// - capacity: number
 // - ecus: number
 let usersData = [];
 const rankingTable = document.querySelector(".rankingTableContent");
+
+const COLUMN_ALIASES = {
+    rang: "rank",
+    rank: "rank",
+    nom: "name",
+    name: "name",
+    production: "production",
+    capacite: "capacity",
+    capacity: "capacity",
+    ecus: "ecus",
+};
+
+const BUTTON_IDS = {
+    rank: "rangButton",
+    name: "nomButton",
+    production: "productionButton",
+    capacity: "capaciteButton",
+    ecus: "ecusButton",
+};
 
 /**
  * Met à jour l'état de chargement du tableau de classement
@@ -63,7 +82,7 @@ function displayUsers(users) {
                 ' <span class="material-symbols-rounded">crown</span>';
         } else {
             rowCells[0].innerHTML =
-                user.rang.current +
+                user.rank +
                 ' <span class="material-symbols-rounded">workspace_premium</span>';
         }
 
@@ -83,8 +102,10 @@ function displayUsers(users) {
  * order correspond à l'ordre de tri : 1 pour croissant, -1 pour décroissant
  */
 function sortTable(column, order) {
+    const normalizedColumn = COLUMN_ALIASES[column] || column;
+
     // Mettre à jour l'icône du bouton de tri actif sans modifier le libellé du champ
-    const activeButton = document.getElementById(column + "Button");
+    const activeButton = document.getElementById(BUTTON_IDS[normalizedColumn]);
     const activeIcon = activeButton?.querySelector(".material-symbols-rounded");
     if (activeIcon) {
         activeIcon.textContent =
@@ -95,8 +116,8 @@ function sortTable(column, order) {
     // Réinitialiser les autres boutons de tri
     const columns = ["rank", "name", "production", "capacity", "ecus"];
     columns.forEach((col) => {
-        if (col !== column) {
-            const button = document.getElementById(col + "Button");
+        if (col !== normalizedColumn) {
+            const button = document.getElementById(BUTTON_IDS[col]);
             const icon = button?.querySelector(".material-symbols-rounded");
             if (icon) {
                 icon.textContent = "unfold_more";
@@ -112,16 +133,19 @@ function sortTable(column, order) {
 
     // Trier les données des utilisateurs en fonction de la colonne et de l'ordre spécifiés
     usersData.sort((a, b) => {
-        // Pour la colonne "rank", on compare les propriétés "current" des objets "rank"
-        // Pour les autres colonnes, on compare directement les propriétés correspondantes
-        const valA = column === "rang" ? a.rang.current : a[column];
-        const valB = column === "rang" ? b.rang.current : b[column];
+        const valA = a[normalizedColumn];
+        const valB = b[normalizedColumn];
+
+        if (normalizedColumn === "name") {
+            return order * String(valA).localeCompare(String(valB), "fr", {
+                sensitivity: "base",
+            });
+        }
+
         if (valA < valB) {
-            // Pour le tri par rang, on veut que les rangs plus petits (meilleurs) soient en haut, donc on inverse l'ordre
             return order;
         }
         if (valA > valB) {
-            // Pour le tri par rang, on veut que les rangs plus petits (meilleurs) soient en haut, donc on inverse l'ordre
             return -order;
         }
         return 0;
@@ -144,6 +168,9 @@ function setRelease() {
     releaseElmt.textContent = `${window.release.name} • ${prettyReleaseDate}`;
     releaseElmt.parentElement.href = window.release.url;
 }
+
+// Le script est chargé en module; on expose la fonction pour les onclick inline du HTML.
+window.sortTable = sortTable;
 
 setRelease();
 

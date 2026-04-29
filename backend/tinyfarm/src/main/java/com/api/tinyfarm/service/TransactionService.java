@@ -46,6 +46,7 @@ public class TransactionService {
     }
 
     public Transaction create(Transaction transaction) {
+        // A transaction must represent a real exchange between two distinct users.
         if (transaction == null) {
             throw new IllegalArgumentException("Transaction manquante");
         }

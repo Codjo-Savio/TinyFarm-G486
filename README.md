@@ -150,6 +150,51 @@ src/main/java/com/api/tinyfarm/
 └── dto/ # Data Transfer Objects
 ```
 
+### Detailed Frontend Structure
+
+```
+
+frontend/src/
+│
+├── components/
+│ ├── tf-app-bar.js
+│ ├── tf-bottom-actions.js
+│ ├── tf-button.js
+│ ├── tf-card.js
+│ ├── tf-dialog.js
+│ ├── tf-layout.js
+│ ├── tf-menu.js
+│ ├── tf-pill.js
+│ ├── tf-progress-bar.js
+│ └── tf-snackbar.js
+│
+├── dashboard/
+│ ├── index.html
+│ ├── script.js
+│ ├── style.css
+│ │
+│ ├── management/
+│ │ ├── assets/ (index.html, script.js, style.css)
+│ │ ├── chicken-coop/ (index.html, script.js, style.css)
+│ │ ├── hutch/ (index.html, script.js, style.css)
+│ │ └── meadow/ (index.html, script.js, style.css)
+│ │
+│ └── trade/
+│   ├── marketplace/ (index.html, script.js, style.css)
+│   └── cooperative/ (index.html, script.js, style.css)
+│
+├── assets/
+├── doc/
+├── fakeapi/
+├── utils/
+│ ├── fetch.js
+│ └── theme.css
+│
+├── index.html
+├── script.js
+└── style.css
+```
+
 ## Technologies & Frameworks
 
 ### Backend

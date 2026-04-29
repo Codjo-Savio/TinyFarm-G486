@@ -20,12 +20,14 @@ public class EndOfTheDayService {
     // process automatically the end of the day
     @Scheduled(cron = "0 0 0 * * *")
     public void processScheduled() {
+        // Daily batch applies end-of-day rules to every user account.
         for (User user : userService.findAll()) {
             process(user.getId());
         }
     }
 
     public void process(Long userId){
+        // End-of-day currently covers poultry and rabbits.
         chickenService.processEndOfDay(userId);
         rabbitService.processEndOfDay(userId);
     }

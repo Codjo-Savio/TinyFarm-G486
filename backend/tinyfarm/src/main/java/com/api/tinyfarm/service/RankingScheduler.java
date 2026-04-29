@@ -17,6 +17,7 @@ public class RankingScheduler {
 
     @Scheduled(fixedRate = 1800000) // 30 minutes
     public void refreshRanking() {
+        // Rankings are periodically recomputed from latest aggregated stats.
         List<Stats> stats = repository.getStats();
         service.updateRanking(stats);
     }

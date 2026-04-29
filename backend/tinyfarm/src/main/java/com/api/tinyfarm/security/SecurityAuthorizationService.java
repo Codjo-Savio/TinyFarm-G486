@@ -1,6 +1,7 @@
 package com.api.tinyfarm.security;
 
 import com.api.tinyfarm.dto.CooperativeSaleRequest;
+import com.api.tinyfarm.dto.CooperativeBuyRequest;
 import com.api.tinyfarm.dto.MarketBuyRequest;
 import com.api.tinyfarm.model.Stock;
 import com.api.tinyfarm.model.Transaction;
@@ -27,6 +28,7 @@ public class SecurityAuthorizationService {
     }
 
     public boolean canAccessUser(Authentication authentication, Long userId) {
+        // Authorization policy: admin bypasses ownership checks, regular users are scoped to their own uid.
         if (!isAuthenticated(authentication)) {
             return false;
         }
@@ -43,6 +45,7 @@ public class SecurityAuthorizationService {
     }
 
     public boolean ownsAnimal(Authentication authentication, Long animalId) {
+        // Animal access is ownership-based, with admin bypass.
         if (!isAuthenticated(authentication)) {
             return false;
         }
@@ -90,7 +93,18 @@ public class SecurityAuthorizationService {
         return canAccessUser(authentication, request.getSellerId());
     }
 
+    public boolean canBuyFromCooperative(Authentication authentication, CooperativeBuyRequest request) {
+        if (!isAuthenticated(authentication)) {
+            return false;
+        }
+        if (request == null || request.getBuyerId() == null) {
+            return true;
+        }
+        return canAccessUser(authentication, request.getBuyerId());
+    }
+
     public boolean canAccessTransaction(Authentication authentication, Long transactionId) {
+        // Transaction access is restricted to buyer/seller participants unless admin.
         if (!isAuthenticated(authentication)) {
             return false;
         }
