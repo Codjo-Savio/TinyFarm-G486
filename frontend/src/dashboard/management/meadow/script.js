@@ -136,7 +136,7 @@ async function fetchMeadowData() {
         return normalizeCowsPayload(await response.json());
     }
 
-    const response = await fetchApiWithCredentials("/cows");
+    const response = await fetchApiWithCredentials("/cows/me");
     if (!response.ok) {
         throw new Error(`Erreur HTTP : ${response.status}`);
     }

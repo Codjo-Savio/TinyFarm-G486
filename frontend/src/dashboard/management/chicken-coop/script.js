@@ -136,7 +136,7 @@ function renderChickenCoop() {
 }
 
 async function fetchChickenData() {
-    const response = await fetchApiWithCredentials("/chickens");
+    const response = await fetchApiWithCredentials("/chickens/me");
 
     if (!response.ok) {
         throw new Error(`Erreur HTTP : ${response.status}`);
