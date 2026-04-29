@@ -24,9 +24,10 @@ public class RankingService {
         this.cachedRanking = computeRanking(stats);
     }
 
-    // init the ranking before computing every 30 minutes
+    // Initialize ranking cache before periodic recomputation starts.
     @PostConstruct
     public void init() {
+        // Ranking cache is warm-started at boot to avoid an empty first response.
         try {
             refreshNow();
         } catch (Exception e) {
@@ -39,8 +40,9 @@ public class RankingService {
         this.cachedRanking = computeRanking(stats);
     }
 
-    // Compute the ranking
+    // Compute ranking from aggregated stats.
     public List<FarmerRankingRequest> computeRanking(List<Stats> stats){
+        // Composite score weights: production 50%, capacity 20%, ecus 30%.
         if (stats.isEmpty()){
             return List.of();
         }
@@ -94,6 +96,7 @@ public class RankingService {
     }
 
     private double safeRatio(Number value, double total) {
+        // Defensive ratio: null values or zero denominator contribute zero score.
         if (value == null || total == 0) return 0;
         return value.doubleValue() / total;
     }

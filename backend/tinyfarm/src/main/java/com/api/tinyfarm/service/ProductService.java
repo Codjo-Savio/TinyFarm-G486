@@ -27,6 +27,7 @@ public class ProductService {
     }
 
     public Product create(Product product) {
+        // Product descriptions are unique business keys in the catalog.
         if (product == null) {
             throw new IllegalArgumentException("Produit manquant");
         }

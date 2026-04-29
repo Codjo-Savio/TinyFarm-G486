@@ -38,54 +38,59 @@ public class TradeService {
                               Long productId,
                               Integer quantity,
                               Float price) {
+        Stock sellerStock = removeFromSellerStock(sellerId, productId, quantity);
+        addToBuyerStock(buyerId, productId, quantity, sellerStock.getCollectible());
 
+        User seller = getUserOrThrow(sellerId, "Vendeur introuvable");
+        User buyer = getUserOrThrow(buyerId, "Acheteur introuvable");
 
-        // handling the seller stock
-        StockId sellerStockId = new StockId(sellerId, productId);
+        float totalPrice = applyMoneyAndPurchaseLimit(seller, buyer, quantity, price);
+        saveTransaction(sellerId, buyerId, productId, quantity, totalPrice);
+    }
+
+    private Stock removeFromSellerStock(Long sellerId, Long productId, Integer quantity) {
         Stock sellerStock = stockRepository
-            .findById(sellerStockId)
-            .orElseThrow(() ->
-                new RuntimeException("Stock du vendeur non trouvé")
-            );
+            .findById(new StockId(sellerId, productId))
+            .orElseThrow(() -> new RuntimeException("Stock du vendeur non trouvé"));
         if (sellerStock.getQuantity() < quantity) {
             throw new RuntimeException("Quantité insuffisante dans le stock vendeur");
         }
         sellerStock.setQuantity(sellerStock.getQuantity() - quantity);
         stockRepository.save(sellerStock);
+        return sellerStock;
+    }
 
-        // handling the buyer stock
+    private void addToBuyerStock(Long buyerId, Long productId, Integer quantity, Boolean collectible) {
         StockId buyerStockId = new StockId(buyerId, productId);
         Optional<Stock> buyerStock = stockRepository.findById(buyerStockId);
         if (buyerStock.isPresent()) {
             Stock existingBuyerStock = buyerStock.get();
-            existingBuyerStock.setQuantity(
-                existingBuyerStock.getQuantity() + quantity
-            );
+            existingBuyerStock.setQuantity(existingBuyerStock.getQuantity() + quantity);
             stockRepository.save(existingBuyerStock);
-        } else {
-            Stock newBuyerStock = new Stock();
-            newBuyerStock.setId(buyerStockId);
-            newBuyerStock.setQuantity(quantity);
-            newBuyerStock.setCollectible(sellerStock.getCollectible());
-            stockRepository.save(newBuyerStock);
+            return;
         }
 
-        // Ecus handling
-        User seller = userRepository
-            .findById(sellerId)
-            .orElseThrow(() -> new RuntimeException("Vendeur introuvable"));
-        User buyer = userRepository
-            .findById(buyerId)
-            .orElseThrow(() -> new RuntimeException("Acheteur introuvable"));
+        Stock newBuyerStock = new Stock();
+        newBuyerStock.setId(buyerStockId);
+        newBuyerStock.setQuantity(quantity);
+        newBuyerStock.setCollectible(collectible);
+        stockRepository.save(newBuyerStock);
+    }
 
-        float totalPrice = price*quantity;
+    private User getUserOrThrow(Long userId, String errorMessage) {
+        return userRepository
+            .findById(userId)
+            .orElseThrow(() -> new RuntimeException(errorMessage));
+    }
+
+    private float applyMoneyAndPurchaseLimit(User seller, User buyer, Integer quantity, Float unitPrice) {
+        // Daily purchase cap is global and is consumed by both market and cooperative purchases.
+        float totalPrice = unitPrice * quantity;
         if (buyer.getEcus() - totalPrice < AUTHORIZED_OVERDRAFT_FLOOR) {
             throw new RuntimeException("Écus insuffisants pour effectuer l'achat");
         }
 
-        int remainingPurchases = buyer.getRemainingPurchases() == null
-            ? 12
-            : buyer.getRemainingPurchases();
+        int remainingPurchases = buyer.getRemainingPurchases() == null ? 12 : buyer.getRemainingPurchases();
         if (remainingPurchases <= 0) {
             throw new RuntimeException("Vous ne pouvez plus effectuer d'achat dans la journée");
         }
@@ -95,8 +100,10 @@ public class TradeService {
         seller.setEcus(seller.getEcus() + totalPrice);
         userRepository.save(buyer);
         userRepository.save(seller);
+        return totalPrice;
+    }
 
-        // creating the transaction
+    private void saveTransaction(Long sellerId, Long buyerId, Long productId, Integer quantity, float totalPrice) {
         Transaction transaction = new Transaction();
         transaction.setBuyer(buyerId);
         transaction.setSeller(sellerId);
@@ -104,6 +111,5 @@ public class TradeService {
         transaction.setQuantity(quantity);
         transaction.setTotalPrice(totalPrice);
         transactionRepository.save(transaction);
-
     }
 }

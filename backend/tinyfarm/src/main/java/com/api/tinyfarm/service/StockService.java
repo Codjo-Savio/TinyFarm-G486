@@ -112,6 +112,7 @@ public class StockService {
     }
 
     public Market publishToMarket(Long productId, Integer quantity, Float unitPrice){
+            // Publishing converts stock intent into a market offer; market service enforces trade constraints.
             Market market = new Market();
             market.setProductId(productId);
             market.setQuantity(quantity);

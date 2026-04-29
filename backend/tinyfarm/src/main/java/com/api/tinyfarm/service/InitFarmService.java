@@ -65,6 +65,7 @@ public class InitFarmService {
     }
 
     public void initializeFarmForUser(User owner) {
+        // User bootstrap creates mandatory products, starter animals and initial stock.
         if (owner == null || owner.getId() == null) {
             throw new IllegalArgumentException("Utilisateur invalide pour l'initialisation");
         }
@@ -109,6 +110,7 @@ public class InitFarmService {
     }
 
     private void ensureStarterRabbits(Long userId, List<Rabbit> rabbits) {
+        // Starter setup always injects a base population of lapereaux.
         Set<String> usedRabbitNames = rabbits.stream()
             .map(Rabbit::getName)
             .filter(name -> name != null && !name.isBlank())
@@ -125,6 +127,7 @@ public class InitFarmService {
     }
 
     private void ensureStarterChickens(Long userId, List<Chicken> chickens) {
+        // Starter flock guarantees one rooster breeder, one laying hen, and one chick.
         if (chickens.stream().noneMatch(c -> c.getChickenType() == Chicken.ChickenType.B)) {
             Chicken chicken = new Chicken();
             chicken.setUserId(userId);
@@ -168,6 +171,7 @@ public class InitFarmService {
     }
 
     private void ensureStarterStock(User owner, Map<String, Product> products) {
+        // Every starter product is initialized with quantity 100 if no stock entry exists yet.
         for (Product product : products.values()) {
             StockId id = new StockId(owner.getId(), product.getId());
             if (stockRepository.existsById(id)) {

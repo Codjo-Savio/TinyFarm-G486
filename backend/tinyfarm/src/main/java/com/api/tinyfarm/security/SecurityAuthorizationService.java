@@ -28,6 +28,7 @@ public class SecurityAuthorizationService {
     }
 
     public boolean canAccessUser(Authentication authentication, Long userId) {
+        // Authorization policy: admin bypasses ownership checks, regular users are scoped to their own uid.
         if (!isAuthenticated(authentication)) {
             return false;
         }
@@ -44,6 +45,7 @@ public class SecurityAuthorizationService {
     }
 
     public boolean ownsAnimal(Authentication authentication, Long animalId) {
+        // Animal access is ownership-based, with admin bypass.
         if (!isAuthenticated(authentication)) {
             return false;
         }
@@ -102,6 +104,7 @@ public class SecurityAuthorizationService {
     }
 
     public boolean canAccessTransaction(Authentication authentication, Long transactionId) {
+        // Transaction access is restricted to buyer/seller participants unless admin.
         if (!isAuthenticated(authentication)) {
             return false;
         }

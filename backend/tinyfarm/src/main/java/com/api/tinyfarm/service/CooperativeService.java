@@ -139,43 +139,16 @@ public class CooperativeService {
     }
 
     public Float sellToCooperative(Long sellerId, Long productId, Integer quantity) {
-        if (quantity == null || quantity <= 0) {
-            throw new IllegalArgumentException("Quantité invalide");
-        }
+        validatePositiveQuantity(quantity);
+        Stock sellerStock = getSellerStockOrThrow(sellerId, productId);
+        ensureStockQuantity(sellerStock, quantity);
 
-        StockId stockId = new StockId(sellerId, productId);
-        Stock sellerStock = stockRepository
-            .findById(stockId)
-            .orElseThrow(() ->
-                new RuntimeException("Stock vendeur introuvable")
-            );
+        Product product = getProductOrThrow(productId);
+        float totalPrice = resolveCooperativeUnitPrice(product) * quantity;
 
-        if (sellerStock.getQuantity() < quantity) {
-            throw new RuntimeException("Stock insuffisant");
-        }
-
-        Product product = productRepository
-            .findById(productId)
-            .orElseThrow(() ->
-                new RuntimeException("Produit introuvable : " + productId)
-            );
-
-        Float unitPrice = resolveCooperativeUnitPrice(product);
-        Float total = unitPrice * quantity;
-
-        User seller = userRepository
-            .findById(sellerId)
-            .orElseThrow(() ->
-                new RuntimeException("Utilisateur introuvable : " + sellerId)
-            );
-
-        sellerStock.setQuantity(sellerStock.getQuantity() - quantity);
-        seller.setEcus(seller.getEcus() + total);
-
-        stockRepository.save(sellerStock);
-        userRepository.save(seller);
-
-        return total;
+        User seller = getUserOrThrow(sellerId, "Utilisateur introuvable : " + sellerId);
+        debitOrCreditSellerStockAndEcus(sellerStock, seller, quantity, totalPrice);
+        return totalPrice;
     }
 
     public void buyFromCooperative(
@@ -184,84 +157,163 @@ public class CooperativeService {
         Long productId,
         Integer quantity
     ) {
+        validatePositiveQuantity(quantity);
+        Long resolvedBuyerId = resolveAuthenticatedBuyerId(buyerId);
+
+        List<Cooperative> offers = getSortedAvailableOffers(productId);
+        ensureRequestedQuantityAvailable(offers, quantity);
+        float averageUnitPrice = computeAverageUnitPrice(offers);
+
+        User buyer = getUserOrThrow(resolvedBuyerId, "Acheteur introuvable");
+        debitBuyerForCooperativePurchase(buyer, averageUnitPrice, quantity);
+
+        consumeOffersAndPaySellers(offers, averageUnitPrice, quantity);
+        addRabbitsIfNeeded(resolvedBuyerId, productId, quantity);
+    }
+
+    private void validatePositiveQuantity(Integer quantity) {
         if (quantity == null || quantity <= 0) {
             throw new IllegalArgumentException("Quantité invalide");
         }
+    }
 
+    private Stock getSellerStockOrThrow(Long sellerId, Long productId) {
+        return stockRepository
+            .findById(new StockId(sellerId, productId))
+            .orElseThrow(() -> new RuntimeException("Stock vendeur introuvable"));
+    }
+
+    private void ensureStockQuantity(Stock sellerStock, Integer quantity) {
+        if (sellerStock.getQuantity() < quantity) {
+            throw new RuntimeException("Stock insuffisant");
+        }
+    }
+
+    private Product getProductOrThrow(Long productId) {
+        return productRepository
+            .findById(productId)
+            .orElseThrow(() -> new RuntimeException("Produit introuvable : " + productId));
+    }
+
+    private User getUserOrThrow(Long userId, String errorMessage) {
+        return userRepository
+            .findById(userId)
+            .orElseThrow(() -> new RuntimeException(errorMessage));
+    }
+
+    private void debitOrCreditSellerStockAndEcus(Stock sellerStock, User seller, Integer quantity, float totalPrice) {
+        sellerStock.setQuantity(sellerStock.getQuantity() - quantity);
+        seller.setEcus(seller.getEcus() + totalPrice);
+        stockRepository.save(sellerStock);
+        userRepository.save(seller);
+    }
+
+    private Long resolveAuthenticatedBuyerId(Long buyerId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
-            buyerId = currentUser.getId();
+            return currentUser.getId();
         }
+        return buyerId;
+    }
 
-        // handle cooperative ad
-        CooperativeID cooperativeID = new CooperativeID(sellerId, productId);
-        Cooperative offer = cooperativeRepository
-            .findById(cooperativeID)
-            .orElseThrow(() -> new RuntimeException("Offre coopérative introuvable"));
-
-        if (offer.getQuantity() < quantity) {
-            throw new RuntimeException("Quantité insuffisante dans l'offre coopérative");
+    private List<Cooperative> getSortedAvailableOffers(Long productId) {
+        List<Cooperative> offers = cooperativeRepository
+            .findAllByCooperativeIdProductId(productId)
+            .stream()
+            .filter(offer -> offer.getQuantity() > 0 && offer.getPrice() != null && offer.getPrice() >= 0)
+            .sorted(Comparator.comparing(Cooperative::getPrice))
+            .toList();
+        if (offers.isEmpty()) {
+            throw new RuntimeException("Aucune offre coopérative disponible pour ce produit");
         }
-        if (offer.getPrice() == null || offer.getPrice() < 0) {
-            throw new RuntimeException("Prix coopérative invalide");
+        return offers;
+    }
+
+    private void ensureRequestedQuantityAvailable(List<Cooperative> offers, Integer requestedQuantity) {
+        // A cooperative purchase is allowed only if the global available quantity can satisfy the request.
+        int totalAvailableQuantity = offers.stream().mapToInt(Cooperative::getQuantity).sum();
+        if (totalAvailableQuantity < requestedQuantity) {
+            throw new RuntimeException("Quantité insuffisante dans les offres coopératives");
         }
+    }
 
-        // handle seller
-        User seller = userRepository
-            .findById(sellerId)
-            .orElseThrow(() -> new RuntimeException("Vendeur introuvable"));
-        User buyer = userRepository
-            .findById(buyerId)
-            .orElseThrow(() -> new RuntimeException("Acheteur introuvable"));
+    private float computeAverageUnitPrice(List<Cooperative> offers) {
+        // Business rule: all buyers pay one unique unit price, equal to the average listing price.
+        return (float) offers
+            .stream()
+            .mapToDouble(Cooperative::getPrice)
+            .average()
+            .orElseThrow(() -> new RuntimeException("Impossible de calculer le prix moyen"));
+    }
 
-        float totalPrice = offer.getPrice() * quantity;
+    private void debitBuyerForCooperativePurchase(User buyer, float averageUnitPrice, Integer quantity) {
+        // Daily purchase limit is shared by all trade channels (cooperative + market).
+        float totalPrice = averageUnitPrice * quantity;
         if (buyer.getEcus() - totalPrice < AUTHORIZED_OVERDRAFT_FLOOR) {
             throw new RuntimeException("Écus insuffisants pour effectuer l'achat");
         }
 
-        int remainingPurchases = buyer.getRemainingPurchases() == null
-            ? 12
-            : buyer.getRemainingPurchases();
+        int remainingPurchases = buyer.getRemainingPurchases() == null ? 12 : buyer.getRemainingPurchases();
         if (remainingPurchases <= 0) {
             throw new RuntimeException("Vous ne pouvez plus effectuer d'achat dans la journée");
         }
 
-        // handle buyer
         buyer.setEcus(buyer.getEcus() - totalPrice);
         buyer.setRemainingPurchases(remainingPurchases - 1);
-        seller.setEcus(seller.getEcus() + totalPrice);
         userRepository.save(buyer);
-        userRepository.save(seller);
+    }
 
-        offer.setQuantity(offer.getQuantity() - quantity);
-        if (offer.getQuantity() == 0) {
-            cooperativeRepository.delete(offer);
-        } else {
-            cooperativeRepository.save(offer);
+    private void consumeOffersAndPaySellers(List<Cooperative> offers, float averageUnitPrice, Integer requestedQuantity) {
+        // Business rule: cheapest offers are consumed first, then each selected seller is paid at average price.
+        int remainingToBuy = requestedQuantity;
+        for (Cooperative offer : offers) {
+            if (remainingToBuy == 0) {
+                break;
+            }
+
+            int soldQuantity = Math.min(offer.getQuantity(), remainingToBuy);
+            if (soldQuantity <= 0) {
+                continue;
+            }
+
+            User seller = getUserOrThrow(offer.getUserId(), "Vendeur introuvable");
+            seller.setEcus(seller.getEcus() + (averageUnitPrice * soldQuantity));
+            userRepository.save(seller);
+
+            offer.setQuantity(offer.getQuantity() - soldQuantity);
+            if (offer.getQuantity() == 0) {
+                cooperativeRepository.delete(offer);
+            } else {
+                cooperativeRepository.save(offer);
+            }
+            remainingToBuy -= soldQuantity;
+        }
+    }
+
+    private void addRabbitsIfNeeded(Long buyerId, Long productId, Integer quantity) {
+        // Buying rabbit products creates rabbit entities directly for the buyer.
+        Product product = getProductOrThrow(productId);
+        if (!isRabbitProduct(product)) {
+            return;
         }
 
-        Product product = productRepository
-            .findById(productId)
-            .orElseThrow(() -> new RuntimeException("Produit introuvable : " + productId));
-
-
-        // Handle rabbit selling case
-        if (isRabbitProduct(product)) {
-            // We suppose that the gender is null
-            Animal.AnimalGender gender = null;
-
-            // We check the content of the ad and set the gender according to it
-            if(product.getDescription().toLowerCase().contains("male")){
-                gender = Animal.AnimalGender.M;
-            }
-            else if(product.getDescription().toLowerCase().contains("female") || product.getDescription().toLowerCase().contains("femelle")){
-                gender = Animal.AnimalGender.F;
-            }
-            for (int i = 0; i < quantity; i++) {
-                Rabbit rabbit = getRabbit(buyerId, gender);
-                rabbitRepository.save(rabbit);
-            }
+        Animal.AnimalGender gender = resolveRabbitGender(product);
+        for (int i = 0; i < quantity; i++) {
+            rabbitRepository.save(getRabbit(buyerId, gender));
         }
+    }
+
+    private Animal.AnimalGender resolveRabbitGender(Product product) {
+        String description = product.getDescription() == null
+            ? ""
+            : product.getDescription().toLowerCase(Locale.ROOT);
+        if (description.contains("male")) {
+            return Animal.AnimalGender.M;
+        }
+        if (description.contains("female") || description.contains("femelle")) {
+            return Animal.AnimalGender.F;
+        }
+        return null;
     }
 
     private static Rabbit getRabbit(Long buyerId, Animal.AnimalGender gender) {
@@ -271,7 +323,7 @@ public class CooperativeService {
         rabbit.setAge(30);
         rabbit.setGender(gender);
 
-        // Name the rabbit according to its gender
+        // Assign a random rabbit name based on inferred gender.
         rabbit.setName(
             gender == Animal.AnimalGender.M
                 ? RandomNameProvider.getRandomMaleName()
@@ -281,6 +333,7 @@ public class CooperativeService {
     }
 
     private Float resolveCooperativeUnitPrice(Product product) {
+        // Cooperative sell-back prices are fixed by product family.
         String description = product.getDescription() == null
             ? ""
             : product.getDescription().toLowerCase(Locale.ROOT);
@@ -306,14 +359,14 @@ public class CooperativeService {
         return description.contains("rabbit") || description.contains("lapin");
     }
 
-    // handling open or closen hours in AoE (UTC-12)
+    // Cooperative opening hours are defined in AoE timezone (UTC-12).
     private static final ZoneId ZONE = ZoneOffset.ofHours(-12);
 
     private boolean isBetween(LocalTime t, LocalTime start, LocalTime end) {
         if (start.isBefore(end)) {
             return !t.isBefore(start) && t.isBefore(end);
         } else {
-            return !t.isBefore(start) || t.isBefore(end); // enjambe minuit
+            return !t.isBefore(start) || t.isBefore(end); // time range crosses midnight
         }
     }
 
@@ -333,6 +386,7 @@ public class CooperativeService {
     }
 
     public boolean isOpen() {
+        // Opening state is computed with AoE timezone (UTC-12), not the server local timezone.
         ZonedDateTime now = ZonedDateTime.now(ZONE);
         LocalTime time = now.toLocalTime();
         DayOfWeek day = now.getDayOfWeek();
