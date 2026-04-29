@@ -1,9 +1,14 @@
-import { API_URL, fetchApiWithCredentials, loadScriptIfNeeded } from "/utils/fetch.js";
+import {
+    API_URL,
+    fetchApiWithCredentials,
+    loadScriptIfNeeded,
+} from "/utils/fetch.js";
 
 /* =========================
  * Etat global
  * ========================= */
 
+const snackbarElement = document.querySelector("tf-snackbar");
 let inventaire = {
     products: [],
     stocks: [],
@@ -131,7 +136,9 @@ function demanderPrixViaDialogue(nomProduit, valeurInitiale) {
         const valider = () => {
             const prix = Math.round(Number.parseFloat(input.value) * 100) / 100;
             if (!Number.isFinite(prix) || prix < 0) {
-                window.alert("Prix invalide. Merci d'entrer un nombre positif.");
+                window.alert(
+                    "Prix invalide. Merci d'entrer un nombre positif.",
+                );
                 input.focus();
                 return;
             }
@@ -167,7 +174,10 @@ function demanderPrixViaDialogue(nomProduit, valeurInitiale) {
  * ========================= */
 
 async function chargerInventaireFake() {
-    const urlsCandidates = ["/fakeapi/assets.json", "../../../fakeapi/assets.json"];
+    const urlsCandidates = [
+        "/fakeapi/assets.json",
+        "../../../fakeapi/assets.json",
+    ];
 
     for (const url of urlsCandidates) {
         try {
@@ -204,7 +214,9 @@ async function chargerInventaireReel() {
 
     let stocks = [];
     if (idUtilisateurCourant) {
-        const stocksResponse = await fetchApiWithCredentials(`/stocks/user/${idUtilisateurCourant}`);
+        const stocksResponse = await fetchApiWithCredentials(
+            `/stocks/user/${idUtilisateurCourant}`,
+        );
         if (stocksResponse.ok) {
             const jsonStocks = await stocksResponse.json();
             stocks = Array.isArray(jsonStocks) ? jsonStocks : [];
@@ -226,9 +238,10 @@ function indexerInventaire(source) {
     const produitsParId = new Map();
     for (const produit of produits) {
         const idProduit = normaliserNombre(produit?.id);
-        const nomProduit = typeof produit?.description === "string"
-            ? produit.description.trim()
-            : "";
+        const nomProduit =
+            typeof produit?.description === "string"
+                ? produit.description.trim()
+                : "";
 
         if (!nomProduit || idProduit <= 0) {
             continue;
@@ -240,7 +253,9 @@ function indexerInventaire(source) {
 
     const stocks = normaliserListe(source, "stocks");
     for (const stock of stocks) {
-        const idProduit = normaliserNombre(stock?.productId ?? stock?.id?.productID);
+        const idProduit = normaliserNombre(
+            stock?.productId ?? stock?.id?.productID,
+        );
         const quantite = normaliserNombre(stock?.quantity);
 
         if (idProduit <= 0) {
@@ -248,9 +263,10 @@ function indexerInventaire(source) {
         }
 
         const produit = produitsParId.get(idProduit);
-        const nomProduit = typeof produit?.description === "string"
-            ? produit.description.trim()
-            : `Produit ${idProduit}`;
+        const nomProduit =
+            typeof produit?.description === "string"
+                ? produit.description.trim()
+                : `Produit ${idProduit}`;
 
         stockParNom.set(nomProduit.toLowerCase(), quantite);
 
@@ -281,7 +297,9 @@ async function initialiserBoutique() {
         const stockParId = new Map();
 
         for (const stock of stocks) {
-            const idProduit = normaliserNombre(stock?.productId ?? stock?.id?.productID);
+            const idProduit = normaliserNombre(
+                stock?.productId ?? stock?.id?.productID,
+            );
             if (idProduit <= 0) {
                 continue;
             }
@@ -291,13 +309,14 @@ async function initialiserBoutique() {
 
         conteneur.innerHTML = "";
 
-        const produitsAffichables = produits.length > 0
-            ? produits
-            : [...stockParId.keys()].map((idProduit) => ({
-                id: idProduit,
-                description: `Produit ${idProduit}`,
-                price: 0,
-            }));
+        const produitsAffichables =
+            produits.length > 0
+                ? produits
+                : [...stockParId.keys()].map((idProduit) => ({
+                      id: idProduit,
+                      description: `Produit ${idProduit}`,
+                      price: 0,
+                  }));
 
         inventaire.products = produitsAffichables;
 
@@ -314,9 +333,10 @@ async function initialiserBoutique() {
                 continue;
             }
 
-            const nomProduit = typeof produit?.description === "string"
-                ? produit.description.trim()
-                : `Produit ${idProduit}`;
+            const nomProduit =
+                typeof produit?.description === "string"
+                    ? produit.description.trim()
+                    : `Produit ${idProduit}`;
             const valeurs = {
                 quantity: stockParId.get(idProduit) ?? 0,
                 price: normaliserNombre(produit?.price),
@@ -371,9 +391,10 @@ async function chargerContextePublication() {
             const produits = await productsResponse.json();
             if (Array.isArray(produits)) {
                 for (const produit of produits) {
-                    const nom = typeof produit?.description === "string"
-                        ? produit.description.trim()
-                        : null;
+                    const nom =
+                        typeof produit?.description === "string"
+                            ? produit.description.trim()
+                            : null;
                     const productId = Number(produit?.id);
                     if (nom && Number.isFinite(productId)) {
                         idProduitParNom.set(nom, productId);
@@ -406,13 +427,17 @@ function obtenirIdProduitParNom(nomProduit) {
 }
 
 function trouverProduitDansInventaire(nomProduit) {
-    const produits = Array.isArray(inventaire.products) ? inventaire.products : [];
-    const trouve = produits.find((produit) => {
-           const description = typeof produit?.description === "string"
-            ? produit.description.trim().toLowerCase()
-            : "";
-        return description === nomProduit.trim().toLowerCase();
-    }) ?? null;
+    const produits = Array.isArray(inventaire.products)
+        ? inventaire.products
+        : [];
+    const trouve =
+        produits.find((produit) => {
+            const description =
+                typeof produit?.description === "string"
+                    ? produit.description.trim().toLowerCase()
+                    : "";
+            return description === nomProduit.trim().toLowerCase();
+        }) ?? null;
 
     if (trouve) {
         return trouve;
@@ -493,16 +518,20 @@ afficherPanier();
 
 async function ajouterAuPanier(nomProduit) {
     const produit = trouverProduitDansInventaire(nomProduit);
-    const stockDisponible = stockParNom.get(nomProduit.trim().toLowerCase()) ?? Infinity;
+    const stockDisponible =
+        stockParNom.get(nomProduit.trim().toLowerCase()) ?? Infinity;
 
     if (!produit) {
-        window.alert("Produit introuvable.");
+        snackbarElement.showSnackbar("Produit introuvable.", false);
         return;
     }
 
     if (panier[nomProduit]) {
         if (panier[nomProduit].quantite >= stockDisponible) {
-            window.alert("Stock insuffisant pour ajouter ce produit.");
+            snackbarElement.showSnackbar(
+                "Stock insuffisant pour ajouter ce produit.",
+                false,
+            );
             return;
         }
 
@@ -581,13 +610,19 @@ async function publierProduitAuMarche(payload) {
 
 async function mettrePanierEnVente() {
     if (utiliserModeFake()) {
-        window.alert("Mode fake actif: la publication vers le marche n'est pas disponible.");
+        snackbarElement.showSnackbar(
+            "Mode fake actif: la publication vers le marche n'est pas disponible.",
+            false,
+        );
         return;
     }
 
     const lignesPanier = Object.entries(panier);
     if (lignesPanier.length === 0) {
-        window.alert("Le panier est vide.");
+        snackbarElement.showSnackbar(
+            "Vous n'avez pas ajouté d'articles à mettre en vente.",
+            false,
+        );
         return;
     }
 
@@ -615,7 +650,9 @@ async function mettrePanierEnVente() {
         try {
             const response = await publierProduitAuMarche(payload);
             if (!response.ok) {
-                erreurs.push(`Echec publication ${nomProduit} (${response.status})`);
+                erreurs.push(
+                    `Echec publication ${nomProduit} (${response.status})`,
+                );
                 continue;
             }
 
@@ -629,21 +666,27 @@ async function mettrePanierEnVente() {
     afficherPanier();
 
     if (succes > 0 && erreurs.length === 0) {
-        window.alert("Produits publies au marche avec succes.");
-        return;
-    }
-
-    if (succes > 0 && erreurs.length > 0) {
-        window.alert(
-            `${succes} publication(s) reussie(s), ${erreurs.length} en echec.`,
+        snackbarElement.showSnackbar(
+            "Produits publiés au marché avec succès.",
+            false,
         );
         return;
     }
 
-    window.alert("Aucune publication n'a abouti.");
+    if (succes > 0 && erreurs.length > 0) {
+        snackbarElement.showSnackbar(
+            `${succes} publication(s) réussie(s), ${erreurs.length} en échec.`,
+            false,
+        );
+        return;
+    }
+
+    snackbarElement.showSnackbar("Aucune publication n'a abouti.", false);
 }
 
-const boutonVente = document.getElementById("sellButton") ?? document.querySelector(".btn-sell");
+const boutonVente =
+    document.getElementById("sellButton") ??
+    document.querySelector(".btn-sell");
 boutonVente?.addEventListener("click", () => {
     void mettrePanierEnVente();
 });

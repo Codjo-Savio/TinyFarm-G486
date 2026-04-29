@@ -1,13 +1,8 @@
 import { fetchApiWithCredentials } from "/utils/fetch.js";
 
+const snackbarElement = document.querySelector("tf-snackbar");
 let chickens = [];
 let currentUserId = null;
-
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-}
 
 async function fetchCurrentUserId() {
     if (currentUserId !== null) {
@@ -34,8 +29,10 @@ async function performChickenAction(chickenId, action) {
     );
 
     if (!response.ok) {
+        snackbarElement.showSnackbar(`Impossible d'appliquer l'action.`, false);
         throw new Error(`Action ${action} impossible (${response.status})`);
     }
+    snackbarElement.showSnackbar(`Action appliquée avec succès.`);
 }
 
 function createChickenActionButton(action, chickenId, label, isEnabled) {
@@ -104,8 +101,8 @@ function renderChickenCoop() {
                         </div>
                     </div>
                     <div class="animal-actions">
-                        ${createChickenActionButton("feed", chicken.id, "$5 Nourrir", !isChickenFed(chicken))}
-                        ${createChickenActionButton("water", chicken.id, "$2 Abreuver", !chicken.wateredToday)}
+                        ${createChickenActionButton("feed", chicken.id, "$3 Nourrir", !isChickenFed(chicken))}
+                        ${createChickenActionButton("water", chicken.id, "$1 Abreuver", !chicken.wateredToday)}
                         ${createChickenActionButton("heal", chicken.id, "$6 Soigner", !chicken.healthy)}
                         ${createChickenActionButton("clean", chicken.id, "$3 Nettoyer", !chicken.clean)}
                     </div>
@@ -159,11 +156,7 @@ async function initializeChickenCoop() {
 
     try {
         await fetchCurrentUserId();
-        const allChickens = await fetchChickenData();
-        chickens = allChickens
-            .filter((chicken) => chicken.userId === currentUserId)
-            .sort((left, right) => left.id - right.id);
-
+        chickens = await fetchChickenData();
         renderChickenCoop();
     } catch (error) {
         console.error("Impossible de charger le poulailler :", error);
@@ -193,9 +186,16 @@ function updateActionMenuCosts() {
     const dirtyChickens = chickens.filter((chicken) => !chicken.clean).length;
 
     feedBtn.textContent = `$${hungryChickens * 3} Nourrir`;
+    if (hungryChickens <= 0) feedBtn.setAttribute("disabled", "");
+
     waterBtn.textContent = `$${thirstyChickens * 1} Abreuver`;
+    if (thirstyChickens <= 0) waterBtn.setAttribute("disabled", "");
+
     healBtn.textContent = `$${unhealthyChickens * 6} Soigner`;
+    if (unhealthyChickens <= 0) healBtn.setAttribute("disabled", "");
+
     cleanBtn.textContent = `$${dirtyChickens * 3} Nettoyer`;
+    if (dirtyChickens <= 0) cleanBtn.setAttribute("disabled", "");
 }
 
 async function applyActionToChicken(chickenId, action) {
