@@ -5,6 +5,7 @@ let currentUserId = null;
 const snackbar = document.getElementById("hutch-snackbar");
 const appbarElement = document.querySelector("tf-app-bar");
 
+// L'id du joueur connecte est garde en memoire pour eviter de rappeler /auth/me.
 async function fetchCurrentUserId() {
     if (currentUserId !== null) {
         return currentUserId;
@@ -22,6 +23,7 @@ async function fetchCurrentUserId() {
     return currentUserId;
 }
 
+// Execute une action sur un lapin en passant aussi l'utilisateur courant.
 async function performRabbitAction(rabbitId, action) {
     const userId = await fetchCurrentUserId();
     const response = await fetchApiWithCredentials(
@@ -34,6 +36,7 @@ async function performRabbitAction(rabbitId, action) {
     }
 }
 
+// Applique une action a tous les lapins qui correspondent au filtre fourni.
 async function performBulkRabbitAction(action, predicate) {
     const targets = rabbits.filter(predicate);
 
@@ -49,6 +52,7 @@ async function performBulkRabbitAction(action, predicate) {
     await initializeHutch();
 }
 
+// Construit une carte lapin avec uniquement les actions encore utiles.
 function renderRabbitCard(rabbit) {
     const typeLabel = rabbit.rabbitType === "lapereau" ? "Lapereau" : "Lapin";
     const genderLabel = rabbit.gender === "F" ? "Femelle" : "Male";
@@ -143,10 +147,12 @@ function renderRabbitCard(rabbit) {
     `;
 }
 
+// Le backend renvoie tous les lapins; on limite l'affichage au joueur connecte.
 function getRabbitsForCurrentUser(allRabbits) {
     return allRabbits.filter((rabbit) => rabbit.userId === currentUserId);
 }
 
+// Met a jour les compteurs des actions groupees dans le menu.
 function updateActionMenuCounts() {
     const feedBtn = document.getElementById("feed-btn");
     const waterBtn = document.getElementById("water-btn");
@@ -170,6 +176,7 @@ function updateActionMenuCounts() {
     cleanBtn.textContent = `Nettoyer (${dirtyRabbits})`;
 }
 
+// Les cartes sont injectees en HTML, donc les listeners sont relies apres rendu.
 function bindIndividualActions() {
     const actionButtons = document.querySelectorAll(
         "tf-button[data-action][data-id]",
@@ -199,6 +206,7 @@ function bindIndividualActions() {
     }
 }
 
+// Rend la grille et les statistiques du clapier.
 function renderRabbits(rabbitsToRender) {
     const container = document.getElementById("game-grid");
     container.innerHTML = "";
@@ -249,6 +257,7 @@ function renderRabbits(rabbitsToRender) {
     updateActionMenuCounts();
 }
 
+// Charge les lapins depuis l'API et rafraichit la page.
 async function initializeHutch() {
     const container = document.getElementById("game-grid");
 

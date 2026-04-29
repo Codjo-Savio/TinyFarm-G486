@@ -18,6 +18,7 @@ public class MarketController {
         this.marketService = marketService;
     }
 
+    // Endpoint utilise par le frontend pour afficher toutes les offres du marche.
     @GetMapping("")
     public ResponseEntity<List<Market>> getAll() {
         try {

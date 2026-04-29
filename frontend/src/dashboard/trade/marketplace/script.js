@@ -4,6 +4,7 @@ const FAKE_MARKET_URL = "/fakeapi/trade/marketplace.json";
 const snackbarElement = document.querySelector("tf-snackbar");
 const appbarElement = document.querySelector("tf-app-bar");
 
+// Recupere toutes les offres disponibles sur le marche.
 async function fetchAllMarkets() {
     const response = await fetchApiWithCredentials("/market");
     if (!response.ok) {
@@ -13,6 +14,7 @@ async function fetchAllMarkets() {
     return Array.isArray(data) ? data : [];
 }
 
+// Donnees de previsualisation, utiles uniquement avec ?fake=1 ou ?mockData=1.
 async function fetchFakeMarkets() {
     const response = await fetch(FAKE_MARKET_URL);
     if (!response.ok) {
@@ -23,11 +25,13 @@ async function fetchFakeMarkets() {
     return Array.isArray(data) ? data : [];
 }
 
+// Permet de tester la page sans backend quand on force le mode mock.
 function shouldUseFakePreview() {
     const params = new URLSearchParams(window.location.search);
     return params.get("fake") === "1" || params.get("mockData") === "1";
 }
 
+// Recupere une offre de reference pour un produit donne.
 async function fetchMarketByProductId(productId) {
     const response = await fetchApiWithCredentials(
         `/market/product/${productId}`,
@@ -38,6 +42,7 @@ async function fetchMarketByProductId(productId) {
     return response.json();
 }
 
+// Trie les offres pour garder les memes produits groupes dans l'affichage.
 async function fetchMarketsGroupedByProduct(sourceMarkets) {
     const allMarkets = Array.isArray(sourceMarkets)
         ? sourceMarkets
@@ -100,6 +105,7 @@ function setTotalStock(totalStock) {
     `;
 }
 
+// Affiche un etat vide propre si aucune offre n'est disponible.
 function renderEmptyMarket(container) {
     container.innerHTML = `
         <div class="empty-market-state">
@@ -110,6 +116,7 @@ function renderEmptyMarket(container) {
     `;
 }
 
+// Charge les offres, construit les lignes produit et met a jour le stock total.
 async function initialiserBoutique() {
     const container = document.getElementById("shop-container");
 
@@ -170,10 +177,12 @@ initialiserBoutique();
 let markets = [];
 const panier = {};
 
+// Une ligne de panier depend du produit et du vendeur.
 function cartItemKey(productId, userId) {
     return `${productId}-${userId}`;
 }
 
+// Le panier est limite a 10 achats pour respecter la regle du marche.
 function getPanierTotalQuantity() {
     return Object.values(panier).reduce(
         (total, item) => total + item.quantity,
@@ -181,8 +190,8 @@ function getPanierTotalQuantity() {
     );
 }
 
+// Reconstruit le panier et son total apres chaque ajout/retrait.
 function displayPanier() {
-    // Logique pour afficher le contenu du panier
     let total = 0;
 
     for (const item of Object.values(panier)) {
@@ -225,6 +234,7 @@ function displayPanier() {
 displayPanier();
 
 function ajouterAuPanier(productId, userId) {
+    // On recupere l'offre exacte pour utiliser le bon prix et le bon stock.
     const market = markets.find(
         (m) =>
             Number(m.productId) === Number(productId) &&
@@ -271,7 +281,7 @@ function ajouterAuPanier(productId, userId) {
 }
 
 function retirerDuPanier(itemKey) {
-    // Logique pour retirer le produit du panier
+    // Si la quantite tombe a zero, on retire l'article du panier.
     if (panier[itemKey]) {
         panier[itemKey].quantity--;
         if (panier[itemKey].quantity <= 0) {
@@ -282,6 +292,7 @@ function retirerDuPanier(itemKey) {
     displayPanier();
 }
 
+// Cree les transactions, puis demande au backend d'executer les transferts.
 async function payerPanier() {
     // Récupérer l'ID de l'utilisateur courant (acheteur)
     const buyerId = localStorage.getItem("tinyfarm-user-id");

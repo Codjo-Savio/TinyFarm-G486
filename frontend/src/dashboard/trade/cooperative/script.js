@@ -1,7 +1,8 @@
 const API_URL = "http://localhost:8080/api";
 let inventaire = {};
-const nomsProduits = {}; // Nouveau dictionnaire pour stocker les noms
+const nomsProduits = {}; // Associe chaque id produit a son nom affichable.
 
+// Charge les produits de la cooperative et prepare leur affichage.
 async function initialiserBoutique() {
     const container = document.getElementById("shop-container");
 
@@ -10,7 +11,7 @@ async function initialiserBoutique() {
         const productsResponse = await fetch(`${API_URL}/products`);
         if (productsResponse.ok) {
             const productsList = await productsResponse.json();
-            // On remplit le dictionnaire : id -> description (ex: 1 -> "Botte de foin")
+            // Dictionnaire id -> description (ex: 1 -> "Botte de foin").
             productsList.forEach(p => {
                 nomsProduits[p.id] = p.description;
             });
@@ -65,12 +66,12 @@ document.addEventListener("DOMContentLoaded", initialiserBoutique);
 // Partie panier
 const panier = {};
 
+// Recalcule le total et reconstruit la liste visible du panier.
 function displayPanier() {
-    // Logique pour afficher le contenu du panier
     let total = 0;
 
     for (const [idProduit, quantite] of Object.entries(panier)) {
-        // 'inventaire[idProduit]' contient maintenant directement le prix (Float)
+        // inventaire[idProduit] contient directement le prix moyen du produit.
         const prix = inventaire[idProduit];
         if (prix !== undefined) {
             total += prix * quantite;
@@ -113,12 +114,12 @@ function displayPanier() {
 
 displayPanier();
 
+// Ajoute un produit au panier en respectant la limite de stock disponible.
 function ajouterAuPanier(nomProduit) {
     if (panier[nomProduit] == inventaire[nomProduit].stock) {
         alert("Limite de stock atteinte pour ce produit.");
         return;
     }
-    // Logique pour ajouter le produit au panier
     if (panier[nomProduit]) {
         panier[nomProduit]++;
     } else {
@@ -128,8 +129,8 @@ function ajouterAuPanier(nomProduit) {
     displayPanier();
 }
 
+// Retire une quantite, puis supprime la ligne si elle tombe a zero.
 function retirerDuPanier(nomProduit) {
-    // Logique pour retirer le produit du panier
     if (panier[nomProduit]) {
         panier[nomProduit]--;
         if (panier[nomProduit] <= 0) {

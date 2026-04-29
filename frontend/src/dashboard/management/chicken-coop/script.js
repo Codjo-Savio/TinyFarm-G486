@@ -5,6 +5,7 @@ let eggCount = 0;
 let currentUserId = null;
 let statusTimeout = null;
 
+// Lecture du cookie JWT pose par le backend apres la connexion GitHub.
 function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
@@ -21,6 +22,7 @@ function getJwtOrThrow() {
     return jwt;
 }
 
+// Centralise les headers pour tous les appels authentifies au backend.
 function getAuthHeaders(jwt) {
     return {
         "Content-Type": "application/json",
@@ -28,6 +30,7 @@ function getAuthHeaders(jwt) {
     };
 }
 
+// Affiche un message court sur la page puis le masque automatiquement.
 function setStatus(message, type = "info") {
     const el = document.getElementById("chicken-status");
     if (!el) {
@@ -47,6 +50,7 @@ function setStatus(message, type = "info") {
     }, 3000);
 }
 
+// L'id utilisateur est charge une seule fois, puis reutilise pour les actions.
 async function fetchCurrentUserId(jwt) {
     if (currentUserId !== null) {
         return currentUserId;
@@ -66,6 +70,7 @@ async function fetchCurrentUserId(jwt) {
     return currentUserId;
 }
 
+// Envoie une action journaliere au backend (nourrir, abreuver, soigner, nettoyer).
 async function performChickenAction(chickenId, action) {
     const jwt = getJwtOrThrow();
     const userId = await fetchCurrentUserId(jwt);
@@ -82,6 +87,7 @@ async function performChickenAction(chickenId, action) {
     }
 }
 
+// Construit le HTML d'une carte poule a partir des donnees API.
 function renderChickenCard(chicken) {
     return `
         <div class="grid-item">
@@ -130,10 +136,12 @@ function renderChickenCard(chicken) {
     `;
 }
 
+// Le backend renvoie toutes les poules; le front garde seulement celles du joueur.
 function getChickensForCurrentUser(allChickens) {
     return allChickens.filter((chicken) => chicken.userId === currentUserId);
 }
 
+// Charge les poules, met a jour les compteurs, puis rend la grille.
 async function initializeChickenCoop() {
     const container = document.querySelector(".grid-container");
 
@@ -181,6 +189,7 @@ async function initializeChickenCoop() {
     }
 }
 
+// Les fonctions suivantes sont exposees sur window car les boutons sont crees en HTML.
 async function feed(id) {
     try {
         await performChickenAction(id, "feed");
