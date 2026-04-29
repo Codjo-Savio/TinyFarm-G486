@@ -159,11 +159,7 @@ async function initializeChickenCoop() {
 
     try {
         await fetchCurrentUserId();
-        const allChickens = await fetchChickenData();
-        chickens = allChickens
-            .filter((chicken) => chicken.userId === currentUserId)
-            .sort((left, right) => left.id - right.id);
-
+        chickens = await fetchChickenData();
         renderChickenCoop();
     } catch (error) {
         console.error("Impossible de charger le poulailler :", error);
