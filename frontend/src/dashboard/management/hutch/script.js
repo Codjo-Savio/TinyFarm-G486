@@ -138,6 +138,7 @@ async function performRabbitAction(rabbitId, action) {
         `/rabbits/${rabbitId}/${action}?userId=${userId}`,
         "POST",
     );
+    window.dispatchEvent(new CustomEvent("refresh-user-data"));
 
     if (!response.ok) {
         throw new Error(`Action ${action} impossible (${response.status})`);
