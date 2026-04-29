@@ -1,6 +1,7 @@
 package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Cow;
+import com.api.tinyfarm.model.Rabbit;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.CowRepository;
 import jakarta.transaction.Transactional;
@@ -23,6 +24,14 @@ public class CowService {
     
     public List<Cow> findAll() {
         return cowRepository.findAll();
+    }
+
+    public List<Cow> findByConnectedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof User currentUser)) {
+            throw new RuntimeException("Utilisateur non authentifié");
+        }
+        return cowRepository.findByUserId(currentUser.getId());
     }
 
     public Cow findById(Long id) {

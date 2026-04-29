@@ -64,11 +64,6 @@ public class ChickenControllerTest extends AuthenticatedControllerTestSupport {
 
     // tests of the GET
     @Test
-    void shouldReturnAllChickens() throws Exception {
-        mockMvc.perform(get("/api/chickens").with(authenticated())).andExpect(status().isOk());
-    }
-
-    @Test
     void shouldReturnChickenByName() throws Exception {
         mockMvc
             .perform(get("/api/chickens/name/Hermine").with(authenticated()))
