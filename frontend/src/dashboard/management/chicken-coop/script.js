@@ -189,9 +189,16 @@ function updateActionMenuCosts() {
     const dirtyChickens = chickens.filter((chicken) => !chicken.clean).length;
 
     feedBtn.textContent = `$${hungryChickens * 3} Nourrir`;
+    if (hungryChickens <= 0) feedBtn.setAttribute("disabled", "");
+
     waterBtn.textContent = `$${thirstyChickens * 1} Abreuver`;
+    if (thirstyChickens <= 0) waterBtn.setAttribute("disabled", "");
+
     healBtn.textContent = `$${unhealthyChickens * 6} Soigner`;
+    if (unhealthyChickens <= 0) healBtn.setAttribute("disabled", "");
+
     cleanBtn.textContent = `$${dirtyChickens * 3} Nettoyer`;
+    if (dirtyChickens <= 0) cleanBtn.setAttribute("disabled", "");
 }
 
 async function applyActionToChicken(chickenId, action) {
