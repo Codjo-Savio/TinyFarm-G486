@@ -5,47 +5,44 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Coopérative - TinyFarm</title>
         <link rel="icon" href="/assets/logo-128-rounded.png" />
-        <!-- Config -->
         <script src="/config.js"></script>
-        <!-- Components -->
         <script type="module" src="/components/tf-app-bar.js"></script>
         <script type="module" src="/components/tf-bottom-actions.js"></script>
         <script type="module" src="/components/tf-layout.js"></script>
-        <!-- Theme -->
         <link rel="stylesheet" href="/utils/theme.css" />
-        <!-- Font -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
             href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap"
             rel="stylesheet"
         />
-        <!-- Custom page style and script -->
         <link rel="stylesheet" href="style.css" />
         <script type="module" src="script.js" defer></script>
     </head>
-
     <body>
         <tf-layout>
             <tf-app-bar></tf-app-bar>
             <main class="container">
                 <div class="sub-header">
-                    <a onclick="window.history.back()" class="btn-back"
-                        ><span class="material-symbols-rounded">
-                            keyboard_backspace
-                        </span>
-                        Retour</a
-                    >
+                    <a onclick="window.history.back()" class="btn-back">
+                        <span class="material-symbols-rounded"
+                            >keyboard_backspace</span
+                        >
+                        Retour
+                    </a>
                     <div class="market-stats">
-                        <span
-                            ><span class="material-symbols-rounded"
+                        <!-- Statut ouvert/fermé -->
+                        <span id="coop-status"></span>
+                        <span>
+                            <span class="material-symbols-rounded"
                                 >shopping_cart</span
                             >
-                            Achats restants : 10</span
-                        >
-                        <span class="stock-info"
-                            ><span class="material-symbols-rounded">store</span>
-                            En stock :
+                            Achats restants :
+                            <span id="remaining-purchases">-</span>
+                        </span>
+                        <span class="stock-info">
+                            <span class="material-symbols-rounded">store</span>
+                            En stock : <span id="stock-count">-</span>
                         </span>
                     </div>
                 </div>
@@ -57,25 +54,30 @@
                         <div class="cart-card">
                             <div class="cart-total-box">
                                 <div class="cart-icon-title">
-                                    <span class="material-symbols-rounded">
-                                        shopping_cart
-                                    </span>
+                                    <span class="material-symbols-rounded"
+                                        >shopping_cart</span
+                                    >
                                     Total
                                 </div>
                                 <div class="cart-actions">
-                                    <span
-                                        class="total-price"
-                                        id="totalPrice"
-                                    ></span>
-                                    <button class="btn-pay">Payer</button>
+                                    <span class="total-price" id="total-price"
+                                        >0 écus</span
+                                    >
+                                    <button class="btn-pay" id="btn-pay">
+                                        Payer
+                                    </button>
                                 </div>
                             </div>
-
-                            <div class="cart-list"></div>
+                            <!-- Liste des articles du panier -->
+                            <div class="cart-list" id="cart-list">
+                                <p class="empty-cart">Votre panier est vide</p>
+                            </div>
                         </div>
                     </aside>
 
-                    <section class="right-panel" id="shop-container"></section>
+                    <section class="right-panel" id="shop-container">
+                        <!-- Produits chargés dynamiquement -->
+                    </section>
                 </div>
             </main>
             <tf-bottom-actions
