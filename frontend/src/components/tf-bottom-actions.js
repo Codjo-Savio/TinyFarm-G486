@@ -1,5 +1,6 @@
+import { fetchApiWithCredentials } from "/utils/fetch.js";
+
 class TfBottomActions extends HTMLElement {
-    FAKE_API_URL = "/fakeapi";
     timeIntervalId;
 
     static get observedAttributes() {
@@ -26,9 +27,20 @@ class TfBottomActions extends HTMLElement {
         return this.getAttribute("variant") || "normal";
     }
 
+    async fetchUserId() {
+        const currentUserRes = await fetchApiWithCredentials("/auth/me");
+        return (await currentUserRes.json()).id;
+    }
+
     async fetchTradeOverview() {
-        const res = await fetch(this.FAKE_API_URL + "/trade/overview.json");
-        return await res.json();
+        const coopRes = await fetchApiWithCredentials("/cooperative");
+        const marketRes = await fetchApiWithCredentials(
+            `/market/not?uid=${await this.fetchUserId()}`,
+        );
+        return {
+            cooperativeStock: Object.keys(await coopRes.json()).length,
+            marketStock: (await marketRes.json()).length,
+        };
     }
 
     getAoeTime() {
@@ -282,8 +294,8 @@ class TfBottomActions extends HTMLElement {
         if (!this.overviewLoaded) {
             try {
                 const overview = await this.fetchTradeOverview();
-                this.coopInfosElement.textContent = `En stock : ${overview.cooperative.stock}`;
-                this.marketplaceInfosElement.textContent = `En stock : ${overview.marketplace.stock}`;
+                this.coopInfosElement.textContent = `En stock : ${overview.cooperativeStock}`;
+                this.marketplaceInfosElement.textContent = `En stock : ${overview.marketStock}`;
                 this.overviewLoaded = true;
             } finally {
                 this.bottomActionsElement.classList.add("ready");
