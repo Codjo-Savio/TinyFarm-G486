@@ -1,5 +1,6 @@
 import { fetchApiWithCredentials } from "/utils/fetch.js";
 
+const snackbarElement = document.querySelector("tf-snackbar");
 let rabbits = [];
 
 async function initializeHutch() {
@@ -145,11 +146,14 @@ async function performRabbitAction(rabbitId, action) {
         `/rabbits/${rabbitId}/${action}?userId=${userId}`,
         "POST",
     );
-    window.dispatchEvent(new CustomEvent("refresh-user-data"));
 
     if (!response.ok) {
+        snackbarElement.showSnackbar(`Impossible d'appliquer l'action.`, false);
         throw new Error(`Action ${action} impossible (${response.status})`);
     }
+
+    window.dispatchEvent(new CustomEvent("refresh-user-data"));
+    snackbarElement.showSnackbar(`Action appliquée avec succès.`);
 }
 
 async function fetchCurrentUserId() {

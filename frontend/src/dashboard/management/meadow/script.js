@@ -1,5 +1,6 @@
 import { fetchApiWithCredentials } from "/utils/fetch.js";
 
+const snackbarElement = document.querySelector("tf-snackbar");
 // Variables globales pour stocker les données des vaches et le lait
 let cows = [];
 let milk = 0;
@@ -264,8 +265,10 @@ async function applyActionToCow(cowId, action) {
             `Impossible d'appliquer l'action ${action} sur ${cow.id} :`,
             error,
         );
+        snackbarElement.showSnackbar(`Impossible d'appliquer l'action.`, false);
     }
 
+    snackbarElement.showSnackbar(`Action appliquée avec succès.`);
     renderMeadow();
     refreshUserData();
 }
@@ -300,7 +303,12 @@ async function feedAll() {
                     cow.fedToday = true;
                     cow.hayToday = true;
                 }
+                snackbarElement.showSnackbar(`Action appliquée avec succès.`);
             } catch (error) {
+                snackbarElement.showSnackbar(
+                    `Impossible d'appliquer l'action.`,
+                    false,
+                );
                 console.error(
                     `Impossible de nourrir la vache ${cow.id} :`,
                     error,
@@ -322,7 +330,12 @@ async function waterAll() {
                     await callCowActionApi(cow, "water");
                     cow.wateredToday = true;
                 }
+                snackbarElement.showSnackbar(`Action appliquée avec succès.`);
             } catch (error) {
+                snackbarElement.showSnackbar(
+                    `Impossible d'appliquer l'action.`,
+                    false,
+                );
                 console.error(
                     `Impossible d'abreuver la vache ${cow.id} :`,
                     error,
@@ -344,7 +357,12 @@ async function healAll() {
                     await callCowActionApi(cow, "heal");
                     cow.healthy = true;
                 }
+                snackbarElement.showSnackbar(`Action appliquée avec succès.`);
             } catch (error) {
+                snackbarElement.showSnackbar(
+                    `Impossible d'appliquer l'action.`,
+                    false,
+                );
                 console.error(
                     `Impossible de soigner la vache ${cow.id} :`,
                     error,
@@ -366,7 +384,12 @@ async function cleanAll() {
                     await callCowActionApi(cow, "clean");
                     cow.clean = true;
                 }
+                snackbarElement.showSnackbar(`Action appliquée avec succès.`);
             } catch (error) {
+                snackbarElement.showSnackbar(
+                    `Impossible d'appliquer l'action.`,
+                    false,
+                );
                 console.error(
                     `Impossible de nettoyer la vache ${cow.id} :`,
                     error,

@@ -1,13 +1,8 @@
 import { fetchApiWithCredentials } from "/utils/fetch.js";
 
+const snackbarElement = document.querySelector("tf-snackbar");
 let chickens = [];
 let currentUserId = null;
-
-function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-}
 
 async function fetchCurrentUserId() {
     if (currentUserId !== null) {
@@ -34,8 +29,10 @@ async function performChickenAction(chickenId, action) {
     );
 
     if (!response.ok) {
+        snackbarElement.showSnackbar(`Impossible d'appliquer l'action.`, false);
         throw new Error(`Action ${action} impossible (${response.status})`);
     }
+    snackbarElement.showSnackbar(`Action appliquée avec succès.`);
 }
 
 function createChickenActionButton(action, chickenId, label, isEnabled) {
