@@ -48,8 +48,7 @@ body {
 }
 
 .coop-status,
-.purchase-info,
-.stock-info {
+.purchase-info {
     display: flex;
     align-items: center;
     gap: 10px;

@@ -70,16 +70,6 @@ async function fetchCooperativeOpenState() {
     return Boolean(await response.json());
 }
 
-function setTotalStock(totalStock) {
-    const stockInfo = document.querySelector(".stock-info");
-    if (!stockInfo) return;
-
-    stockInfo.innerHTML = `
-        <span class="material-symbols-rounded">store</span>
-        En stock : ${totalStock}
-    `;
-}
-
 function setRemainingPurchases(remainingPurchases) {
     const purchaseInfo = document.querySelector(".purchase-info");
     if (!purchaseInfo) return;
@@ -177,7 +167,6 @@ function renderProducts() {
         );
 
     if (availableProducts.length === 0) {
-        setTotalStock(0);
         renderEmptyCooperative(
             container,
             "Aucun article disponible pour le moment.",
@@ -207,8 +196,6 @@ function renderProducts() {
 
         container.insertAdjacentHTML("beforeend", productHTML);
     });
-
-    setTotalStock(availableProducts.length);
 }
 
 function ajouterAuPanier(productId) {
@@ -270,7 +257,6 @@ async function initialiserCooperative() {
         setCooperativeStatus(isOpen);
 
         if (!isOpen) {
-            setTotalStock(0);
             renderEmptyCooperative(
                 container,
                 "La cooperative est fermee pour le moment.",
@@ -286,7 +272,6 @@ async function initialiserCooperative() {
         renderProducts();
     } catch (error) {
         console.error("Impossible de charger la cooperative :", error);
-        setTotalStock(0);
         renderEmptyCooperative(
             container,
             "Une erreur est survenue lors du chargement.",
