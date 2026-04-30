@@ -68,7 +68,6 @@ public class InitFarmService {
         ensureStarterStock(owner, products);
     }
 
-
     private void ensureStarterAnimals(User owner) {
         Long userId = owner.getId();
         List<Rabbit> rabbits = rabbitRepository.findByUserId(userId);
@@ -151,7 +150,7 @@ public class InitFarmService {
             Stock stock = new Stock();
             stock.setUserId(owner.getId());
             stock.setProductId(product.getId());
-            stock.setQuantity(50);
+            stock.setQuantity(4);
             try {
                 stockService.create(stock);
             } catch (Exception e) {
