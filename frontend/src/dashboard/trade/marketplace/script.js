@@ -51,17 +51,18 @@ async function normalizeMarkets(marketsRaw) {
     const normalizedMarkets = await Promise.all(
         (Array.isArray(marketsRaw) ? marketsRaw : []).map(async (market) => {
             const userId = Number(market?.userId ?? market?.marketId?.uid);
-            const productId = Number(
-                market?.productId ?? market?.marketId?.productID,
-            );
+            const productId = Number(market.productId);
             const userName = await getUserNameById(userId);
+            const productDetails = await (
+                await fetchApiWithCredentials(`/market/product/${productId}`)
+            ).json();
 
             return {
                 ...market,
                 userId,
                 userName,
                 productId,
-                description: market?.description,
+                description: productDetails.description,
                 quantity: Number(market?.quantity),
                 price: Number(market?.unitPrice ?? market?.price ?? 0),
             };
@@ -115,15 +116,7 @@ async function fetchMarketByProductId(productId) {
         return null;
     }
 
-    const productMarket = await response.json();
-    const pdResponse = await fetchApiWithCredentials(
-        `/products/id/${productMarket.productId}`,
-    );
-    if (pdResponse.ok) {
-        productMarket.description = (await pdResponse.json()).description;
-    }
-
-    return productMarket;
+    return response.json();
 }
 
 async function fetchMarketsFromProductEndpoints() {
