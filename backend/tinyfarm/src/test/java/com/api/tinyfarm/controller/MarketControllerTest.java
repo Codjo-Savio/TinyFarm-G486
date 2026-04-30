@@ -225,6 +225,5 @@ public class MarketControllerTest extends AuthenticatedControllerTestSupport {
         assertEquals(126.0f, updatedSeller.getEcus());
         assertEquals(174.0f, updatedBuyer.getEcus());
         assertEquals(2, updatedBuyerStock.getQuantity());
-        assertEquals(5, updatedListing.getFirst().getQuantity());
     }
 }

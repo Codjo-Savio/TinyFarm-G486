@@ -38,13 +38,16 @@ public class TradeService {
                               Long productId,
                               Integer quantity,
                               Float price) {
-        addToBuyerStock(buyerId, productId, quantity);
 
         User seller = getUserOrThrow(sellerId, "Vendeur introuvable");
         User buyer = getUserOrThrow(buyerId, "Acheteur introuvable");
 
         float totalPrice = applyMoneyAndPurchaseLimit(seller, buyer, quantity, price);
+
+        addToBuyerStock(buyerId, productId, quantity);
+
         saveTransaction(sellerId, buyerId, productId, quantity, totalPrice);
+
     }
 
     private void addToBuyerStock(Long buyerId, Long productId, Integer quantity) {

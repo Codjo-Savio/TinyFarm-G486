@@ -122,6 +122,9 @@ public class MarketService {
         Market market = findById(new MarketID(sellerId, productId));
         Long resolvedBuyerId = resolveAuthenticatedBuyerId(buyerId);
         tradeService.buy(sellerId, resolvedBuyerId, productId, quantity, market.getUnitPrice());
+
+        // deletion of the ad
+        marketRepository.deleteById(market.getMarketId());
     }
 
     private void applyAuthenticatedUserId(Market market) {
