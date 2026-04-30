@@ -155,6 +155,7 @@ public class CooperativeService {
         return totalPrice;
     }
 
+    @Transactional
     public void buyFromCooperative(
             Long buyerId,
             Long sellerId,
@@ -171,7 +172,7 @@ public class CooperativeService {
         debitBuyerForCooperativePurchase(buyer, averageUnitPrice, quantity);
 
         consumeOffersAndPaySellers(offers, averageUnitPrice, quantity);
-        addToBuyerStock(buyerId, productId, quantity);
+        addToBuyerStock(buyer.getId(), productId, quantity);
         
         Product product = getProductOrThrow(productId);
         if (isRabbitProduct(product)) {
