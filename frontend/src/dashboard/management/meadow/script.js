@@ -4,8 +4,6 @@ const snackbarElement = document.querySelector("tf-snackbar");
 // Variables globales pour stocker les données des vaches et le lait
 let cows = [];
 let milk = 0;
-const isFakeMode =
-    new URLSearchParams(window.location.search).get("fake") === "1";
 
 function createCowActionButton(action, cowId, label, isEnabled) {
     return `<tf-button data-action="${action}" data-cow-id="${cowId}"${isEnabled ? "" : " disabled=true"}>${label}</tf-button>`;
@@ -128,14 +126,6 @@ function normalizeCowsPayload(payload) {
 }
 
 async function fetchMeadowData() {
-    if (isFakeMode) {
-        const response = await fetchApiWithCredentials("/fakeapi/meadow.json");
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP (fake meadow) : ${response.status}`);
-        }
-        return normalizeCowsPayload(await response.json());
-    }
-
     const response = await fetchApiWithCredentials("/cows/me");
     if (!response.ok) {
         throw new Error(`Erreur HTTP : ${response.status}`);
@@ -188,10 +178,6 @@ function updateActionMenuCosts() {
 }
 
 async function callCowActionApi(cow, action) {
-    if (isFakeMode) {
-        return;
-    }
-
     const endpointAction = action === "feed" ? "hay" : action;
     const userIdQuery = cow.userId
         ? `?userId=${encodeURIComponent(cow.userId)}`
@@ -254,12 +240,8 @@ async function applyActionToCow(cowId, action) {
     }
 
     try {
-        if (isFakeMode) {
-            applyLocalState();
-        } else {
-            await callCowActionApi(cow, action);
-            applyLocalState();
-        }
+        await callCowActionApi(cow, action);
+        applyLocalState();
     } catch (error) {
         console.error(
             `Impossible d'appliquer l'action ${action} sur ${cow.id} :`,
@@ -295,14 +277,9 @@ async function feedAll() {
     for (const cow of cows) {
         if (!isCowFed(cow)) {
             try {
-                if (isFakeMode) {
-                    cow.fedToday = true;
-                    cow.hayToday = true;
-                } else {
-                    await callCowActionApi(cow, "feed");
-                    cow.fedToday = true;
-                    cow.hayToday = true;
-                }
+                await callCowActionApi(cow, "feed");
+                cow.fedToday = true;
+                cow.hayToday = true;
                 snackbarElement.showSnackbar(`Action appliquée avec succès.`);
             } catch (error) {
                 snackbarElement.showSnackbar(
@@ -324,12 +301,8 @@ async function waterAll() {
     for (const cow of cows) {
         if (!cow.wateredToday) {
             try {
-                if (isFakeMode) {
-                    cow.wateredToday = true;
-                } else {
-                    await callCowActionApi(cow, "water");
-                    cow.wateredToday = true;
-                }
+                await callCowActionApi(cow, "water");
+                cow.wateredToday = true;
                 snackbarElement.showSnackbar(`Action appliquée avec succès.`);
             } catch (error) {
                 snackbarElement.showSnackbar(
@@ -351,12 +324,8 @@ async function healAll() {
     for (const cow of cows) {
         if (!cow.healthy) {
             try {
-                if (isFakeMode) {
-                    cow.healthy = true;
-                } else {
-                    await callCowActionApi(cow, "heal");
-                    cow.healthy = true;
-                }
+                await callCowActionApi(cow, "heal");
+                cow.healthy = true;
                 snackbarElement.showSnackbar(`Action appliquée avec succès.`);
             } catch (error) {
                 snackbarElement.showSnackbar(
@@ -378,12 +347,8 @@ async function cleanAll() {
     for (const cow of cows) {
         if (!cow.clean) {
             try {
-                if (isFakeMode) {
-                    cow.clean = true;
-                } else {
-                    await callCowActionApi(cow, "clean");
-                    cow.clean = true;
-                }
+                await callCowActionApi(cow, "clean");
+                cow.clean = true;
                 snackbarElement.showSnackbar(`Action appliquée avec succès.`);
             } catch (error) {
                 snackbarElement.showSnackbar(
