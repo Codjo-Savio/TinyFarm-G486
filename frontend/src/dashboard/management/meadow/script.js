@@ -140,8 +140,6 @@ async function initializeMeadow() {
 
     try {
         cows = await fetchMeadowData();
-
-        console.log("Données des vaches reçues de l'API :", cows);
         renderMeadow();
     } catch (error) {
         console.error("Impossible de charger le pré :", error);

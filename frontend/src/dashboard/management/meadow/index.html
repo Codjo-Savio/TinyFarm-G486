@@ -60,9 +60,16 @@
                             >
                             <span id="milk-count"></span>
                         </span>
-                        <tf-button icon="sell" variant="secondary"
-                            >Vendre</tf-button
+                        <tf-button
+                            icon="sell"
+                            variant="secondary"
+                            onclick="
+                                window.location.href =
+                                    '/dashboard/management/assets'
+                            "
                         >
+                            Vendre
+                        </tf-button>
                         <tf-menu id="actions-menu" offset-x="-233" offset-y="8">
                             <tf-button
                                 slot="menu-target"
