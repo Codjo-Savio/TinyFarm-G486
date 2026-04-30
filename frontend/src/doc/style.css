@@ -50,6 +50,14 @@ p {
     min-width: 1px;
 }
 
+.footer-msg {
+    margin-top: 60px;
+    text-align: center;
+    font-style: italic;
+    color: var(--color-primary);
+    font-size: 1.1em;
+}
+
 a {
     color: var(--color-primary);
     text-decoration: none;
