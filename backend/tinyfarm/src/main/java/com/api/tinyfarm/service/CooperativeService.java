@@ -15,6 +15,7 @@ import com.api.tinyfarm.repository.StockRepository;
 import com.api.tinyfarm.utils.RandomNameProvider;
 
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -138,6 +139,7 @@ public class CooperativeService {
         cooperativeRepository.deleteByCooperativeIdUserIdAndCooperativeIdProductId(uid, pid);
     }
 
+    @Transactional
     public Float sellToCooperative(Long sellerId, Long productId, Integer quantity) {
         validatePositiveQuantity(quantity);
         Stock sellerStock = getSellerStockOrThrow(sellerId, productId);
@@ -151,6 +153,7 @@ public class CooperativeService {
         return totalPrice;
     }
 
+    @Transactional
     public void buyFromCooperative(
         Long buyerId,
         Long sellerId,
