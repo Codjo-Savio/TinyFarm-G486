@@ -43,6 +43,11 @@ class TfBottomActions extends HTMLElement {
         };
     }
 
+    async isCooperativeOpen() {
+        const coopRes = await fetchApiWithCredentials("/cooperative/isOpen");
+        return (await coopRes.text()) === "true";
+    }
+
     getAoeTime() {
         // AoE time = UTC-12
         const currentTime = new Date();
@@ -133,6 +138,17 @@ class TfBottomActions extends HTMLElement {
                 transform: translateY(-4px);
             }
 
+            .links > #coop.closed,
+            .links > #coop.closed:hover {
+                color: var(--color-secondary);
+                background-color: var(--color-surface-dark);
+                cursor: not-allowed;
+            }
+
+            .bottom-actions:not(.small) .links > #coop.closed:hover {
+                transform: none;
+            }
+
             .bottom-actions.small .links > a {
                 padding: 12px;
                 padding-left: 60px;
@@ -151,6 +167,10 @@ class TfBottomActions extends HTMLElement {
                 opacity: 0;
                 transition: opacity .3s;
                 pointer-events: none;
+            }
+
+            .bottom-actions.small .links > #coop.closed > .small-legend {
+                background-color: var(--color-surface-dark);
             }
 
             .bottom-actions .links > a > .small-legend {
@@ -296,6 +316,13 @@ class TfBottomActions extends HTMLElement {
                 const overview = await this.fetchTradeOverview();
                 this.coopInfosElement.textContent = `En stock : ${overview.cooperativeStock}`;
                 this.marketplaceInfosElement.textContent = `En stock : ${overview.marketStock}`;
+                if (!(await this.isCooperativeOpen())) {
+                    this.coopLink.classList.add("closed");
+                    this.coopLink.removeAttribute("href");
+                    this.coopLink.querySelector(".small-legend").textContent =
+                        "Coopérative fermée";
+                    this.coopInfosElement.textContent = "Fermée";
+                }
                 this.overviewLoaded = true;
             } finally {
                 this.bottomActionsElement.classList.add("ready");
