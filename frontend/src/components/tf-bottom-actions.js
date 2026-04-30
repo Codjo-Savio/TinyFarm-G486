@@ -34,9 +34,7 @@ class TfBottomActions extends HTMLElement {
 
     async fetchTradeOverview() {
         const coopRes = await fetchApiWithCredentials("/cooperative");
-        const marketRes = await fetchApiWithCredentials(
-            `/market/not?uid=${await this.fetchUserId()}`,
-        );
+        const marketRes = await fetchApiWithCredentials("/market/not/me");
         return {
             cooperativeStock: Object.keys(await coopRes.json()).length,
             marketStock: (await marketRes.json()).length,
