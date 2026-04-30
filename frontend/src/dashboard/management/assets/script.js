@@ -666,10 +666,7 @@ async function mettrePanierEnVente() {
     afficherPanier();
 
     if (succes > 0 && erreurs.length === 0) {
-        snackbarElement.showSnackbar(
-            "Produits publiés au marché avec succès.",
-            false,
-        );
+        snackbarElement.showSnackbar("Produits publiés au marché avec succès.");
         return;
     }
 

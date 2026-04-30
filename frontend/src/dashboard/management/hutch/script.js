@@ -52,9 +52,9 @@ function renderRabbitCard(rabbit) {
                         </div>
                     </div>
                     <div class="animal-gender">
-                        <span class="material-symbols-rounded">${rabbit.gender === "F" ? "female" : "male"}</span>
+                        <span class="material-symbols-rounded">${typeLabel !== "Lapereau" ? (rabbit.gender === "F" ? "female" : "male") : "question_mark"}</span>
                         <div class="animal-gender-text">
-                            <p>${genderLabel}</p>
+                            <p>${typeLabel !== "Lapereau" ? genderLabel : "Sexe inconnu"}</p>
                         </div>
                     </div>
                     <div class="animal-weight">

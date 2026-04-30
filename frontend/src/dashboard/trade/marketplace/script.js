@@ -4,8 +4,20 @@ const FAKE_MARKET_URL = "/fakeapi/trade/marketplace.json";
 const snackbarElement = document.querySelector("tf-snackbar");
 const appbarElement = document.querySelector("tf-app-bar");
 
+async function getCurrentUserId() {
+    const response = await fetchApiWithCredentials("/auth/me");
+
+    if (!response.ok) {
+        throw new Error("Impossible de récuperer l'utilisateur connecté");
+    }
+
+    return (await response.json()).id;
+}
+
 async function fetchAllMarkets() {
-    const response = await fetchApiWithCredentials("/market");
+    const response = await fetchApiWithCredentials(
+        `/market/not?uid=${await getCurrentUserId()}`,
+    );
     if (!response.ok) {
         throw new Error(`Erreur HTTP : ${response.status}`);
     }
