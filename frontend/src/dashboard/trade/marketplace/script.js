@@ -90,12 +90,20 @@ async function fetchRemainingPurchases(userId) {
 }
 
 async function fetchMarketByProductId(productId) {
-    const response = await fetchApiWithCredentials(`/products/id/${productId}`);
+    const response = await fetchApiWithCredentials(
+        `/market/product/${productId}`,
+    );
     if (!response.ok) {
         return null;
     }
 
-    return response.json();
+    const productMarket = response.json();
+    const pdResponse = await fetchApiWithCredentials(
+        `/products/id/${productMarket.userId}`,
+    );
+    productMarket.description = (await pdResponse.json()).description;
+
+    return productMarket;
 }
 
 async function fetchMarketsFromProductEndpoints() {
