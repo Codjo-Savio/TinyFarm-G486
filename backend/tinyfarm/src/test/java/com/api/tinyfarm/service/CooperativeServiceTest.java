@@ -11,11 +11,13 @@ import static org.mockito.Mockito.when;
 
 import com.api.tinyfarm.model.Cooperative;
 import com.api.tinyfarm.model.Product;
+import com.api.tinyfarm.model.Rabbit;
 import com.api.tinyfarm.model.Stock;
 import com.api.tinyfarm.model.StockId;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.CooperativeRepository;
 import com.api.tinyfarm.repository.ProductRepository;
+import com.api.tinyfarm.repository.RabbitRepository;
 import com.api.tinyfarm.repository.StockRepository;
 import com.api.tinyfarm.repository.UserRepository;
 import java.util.HashMap;
@@ -40,6 +42,8 @@ class CooperativeServiceTest {
     private UserRepository userRepository;
     @Mock
     private StockRepository stockRepository;
+    @Mock
+    private RabbitRepository rabbitRepository;
 
     @InjectMocks
     private CooperativeService cooperativeService;
@@ -48,8 +52,8 @@ class CooperativeServiceTest {
     void shouldReturnMediumPriceForMatchingProducts() {
         Cooperative firstCooperative = createCooperative(1L, 10L, 12.0f);
         Cooperative secondCooperative = createCooperative(2L, 11L, 18.0f);
-        Product firstProduct = createProduct(10L, "Milk", 12.0f);
-        Product secondProduct = createProduct(11L, "Milk", 18.0f);
+        Product firstProduct = createProduct(10L, "Milk");
+        Product secondProduct = createProduct(11L, "Milk");
 
         when(cooperativeRepository.findAll()).thenReturn(List.of(firstCooperative, secondCooperative));
         when(productRepository.findByDescription("Milk")).thenReturn(List.of(firstProduct, secondProduct));
@@ -90,7 +94,7 @@ class CooperativeServiceTest {
     @Test
     void shouldTransferEcusAndDeleteListingWhenMatchingProductExists() {
         Cooperative cooperative = createCooperative(1L, 10L, 12.0f);
-        Product product = createProduct(10L, "Milk", 12.0f);
+        Product product = createProduct(10L, "Milk");
         User seller = createUser(1L, 100.0f);
         User buyer = createUser(2L, 200.0f);
 
@@ -105,13 +109,13 @@ class CooperativeServiceTest {
         assertEquals(188.0f, buyer.getEcus());
         verify(userRepository).save(seller);
         verify(userRepository).save(buyer);
-        verify(cooperativeRepository).deleteByUserIdAndProductId(1L, 10L);
+        verify(cooperativeRepository).deleteByCooperativeIdUserIdAndCooperativeIdProductId(1L, 10L);
     }
 
     @Test
     void shouldNotDeleteListingWhenUsersCannotBeResolved() {
         Cooperative cooperative = createCooperative(1L, 10L, 12.0f);
-        Product product = createProduct(10L, "Milk", 12.0f);
+        Product product = createProduct(10L, "Milk");
 
         when(cooperativeRepository.findAll()).thenReturn(List.of(cooperative));
         when(productRepository.findByDescription("Milk")).thenReturn(List.of(product));
@@ -121,7 +125,8 @@ class CooperativeServiceTest {
         cooperativeService.deleteLessExpensiveWithDescription(2L, "Milk");
 
         verify(userRepository, never()).save(org.mockito.ArgumentMatchers.any(User.class));
-        verify(cooperativeRepository, never()).deleteByUserIdAndProductId(1L, 10L);
+        verify(cooperativeRepository, never())
+                .deleteByCooperativeIdUserIdAndCooperativeIdProductId(1L, 10L);
     }
 
     @Test
@@ -139,7 +144,7 @@ class CooperativeServiceTest {
         stock.setQuantity(4);
         stock.setCollectible(false);
 
-        Product product = createProduct(10L, "egg", 99.0f);
+        Product product = createProduct(10L, "egg");
         User seller = createUser(1L, 100.0f);
 
         when(stockRepository.findById(new StockId(1L, 10L))).thenReturn(Optional.of(stock));
@@ -155,6 +160,41 @@ class CooperativeServiceTest {
         verify(userRepository).save(seller);
     }
 
+    @Test
+    void shouldBuyRabbitFromCooperativeWithRequestedGender() {
+        Cooperative cheapOffer = createCooperative(1L, 10L, 2.0f);
+        cheapOffer.setQuantity(1);
+        Cooperative expensiveOffer = createCooperative(3L, 10L, 7.0f);
+        expensiveOffer.setQuantity(2);
+        Product product = createProduct(10L, "Lapin Male");
+        User cheapSeller = createUser(1L, 100.0f);
+        User expensiveSeller = createUser(3L, 200.0f);
+        User buyer = createUser(2L, 0.0f);
+        buyer.setRemainingPurchases(12);
+
+        when(cooperativeRepository.findAllByCooperativeIdProductId(10L))
+            .thenReturn(List.of(cheapOffer, expensiveOffer));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(cheapSeller));
+        when(userRepository.findById(3L)).thenReturn(Optional.of(expensiveSeller));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(buyer));
+        when(productRepository.findById(10L)).thenReturn(Optional.of(product));
+
+        cooperativeService.buyFromCooperative(2L, 1L, 10L, 2);
+
+        assertEquals(-9.0f, buyer.getEcus());
+        assertEquals(11, buyer.getRemainingPurchases());
+        assertEquals(104.5f, cheapSeller.getEcus());
+        assertEquals(204.5f, expensiveSeller.getEcus());
+        verify(userRepository).save(buyer);
+        verify(userRepository).save(cheapSeller);
+        verify(userRepository).save(expensiveSeller);
+        assertEquals(0, cheapOffer.getQuantity());
+        assertEquals(1, expensiveOffer.getQuantity());
+        verify(cooperativeRepository).delete(cheapOffer);
+        verify(cooperativeRepository).save(expensiveOffer);
+        verify(rabbitRepository, org.mockito.Mockito.times(2)).save(org.mockito.ArgumentMatchers.any(Rabbit.class));
+    }
+
     private Cooperative createCooperative(Long userId, Long productId, Float price) {
         Cooperative cooperative = new Cooperative();
         cooperative.setUserId(userId);
@@ -163,11 +203,10 @@ class CooperativeServiceTest {
         return cooperative;
     }
 
-    private Product createProduct(Long id, String description, Float price) {
+    private Product createProduct(Long id, String description) {
         Product product = new Product();
         product.setId(id);
         product.setDescription(description);
-        product.setPrice(price);
         return product;
     }
 

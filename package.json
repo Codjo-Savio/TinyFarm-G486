@@ -1,0 +1,8 @@
+{
+  "name": "TinyFarm-G486",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "github:stats": "node tools/generate-github-stats.js"
+  }
+}

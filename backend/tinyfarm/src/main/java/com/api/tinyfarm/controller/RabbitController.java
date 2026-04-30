@@ -5,6 +5,7 @@ import com.api.tinyfarm.service.RabbitService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,19 +19,17 @@ public class RabbitController {
     }
 
     // --- CRUD Operations ---
-
-    @GetMapping
-    public ResponseEntity<List<Rabbit>> getAll() {
+    @GetMapping("/me")
+    public ResponseEntity<List<Rabbit>> getByUserId() {
         try {
-            return ResponseEntity.ok(rabbitService.findAll());
+            return ResponseEntity.ok(rabbitService.findByConnectedUserId());
         } catch (Exception e) {
-            return ResponseEntity.status(
-                HttpStatus.INTERNAL_SERVER_ERROR
-            ).build();
+            return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id)")
     public ResponseEntity<Rabbit> getById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(rabbitService.findById(id));
@@ -40,6 +39,7 @@ public class RabbitController {
     }
 
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Rabbit> create(@RequestBody Rabbit rabbit) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -55,6 +55,7 @@ public class RabbitController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id)")
     public ResponseEntity<Rabbit> update(
         @PathVariable Long id,
         @RequestBody Rabbit rabbit
@@ -67,6 +68,7 @@ public class RabbitController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id)")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
             rabbitService.delete(id);
@@ -77,6 +79,7 @@ public class RabbitController {
     }
 
     @DeleteMapping("/all")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> deleteAll() {
         try {
             rabbitService.deleteAllRabbits();
@@ -117,6 +120,7 @@ public class RabbitController {
     // --- Actions ---
 
     @PostMapping("/{id}/feed")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Rabbit> feedRabbit(
         @PathVariable Long id,
         @RequestParam Long userId
@@ -124,13 +128,14 @@ public class RabbitController {
         try {
             return ResponseEntity.ok(rabbitService.feedRabbit(id, userId));
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // Ex: pas assez d'argent
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // Example: insufficient funds
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping("/{id}/water")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Rabbit> waterRabbit(
         @PathVariable Long id,
         @RequestParam Long userId
@@ -145,6 +150,7 @@ public class RabbitController {
     }
 
     @PostMapping("/{id}/clean")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Rabbit> cleanRabbit(
         @PathVariable Long id,
         @RequestParam Long userId
@@ -159,6 +165,7 @@ public class RabbitController {
     }
 
     @PostMapping("/{id}/heal")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Rabbit> healRabbit(
         @PathVariable Long id,
         @RequestParam Long userId
@@ -173,6 +180,7 @@ public class RabbitController {
     }
 
     @PostMapping("/endOfDay")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Void> processEndOfDay(@RequestParam Long userId) {
         try {
             rabbitService.processEndOfDay(userId);

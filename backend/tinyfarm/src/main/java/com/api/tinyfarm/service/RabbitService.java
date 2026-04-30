@@ -1,6 +1,7 @@
 package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Animal;
+import com.api.tinyfarm.model.Cow;
 import com.api.tinyfarm.model.Rabbit;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.RabbitRepository;
@@ -29,6 +30,14 @@ public class RabbitService {
         return rabbitRepository.findAll();
     }
 
+    public List<Rabbit> findByConnectedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof User currentUser)) {
+            throw new RuntimeException("Utilisateur non authentifié");
+        }
+        return rabbitRepository.findByUserId(currentUser.getId());
+    }
+
     public void deleteAllRabbits() {
         rabbitRepository.deleteAll();
     }
@@ -42,6 +51,15 @@ public class RabbitService {
     }
 
     public Rabbit create(Rabbit rabbit) {
+        if (rabbit == null) {
+            throw new IllegalArgumentException("Lapin manquant");
+        }
+        if (rabbit.getName() == null || rabbit.getName().isBlank()) {
+            throw new IllegalArgumentException("Nom du lapin manquant");
+        }
+        if (rabbit.getId() != null && rabbitRepository.existsById(rabbit.getId())) {
+            throw new IllegalArgumentException("Lapin déjà existant : " + rabbit.getId());
+        }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
             rabbit.setUserId(currentUser.getId());
@@ -86,10 +104,11 @@ public class RabbitService {
     }
 
     public Rabbit feedRabbit(Long rabbitId, Long userId) {
+        // Feeding costs 3 ecus and is mandatory for survival at end of day.
         Rabbit rabbit = findById(rabbitId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 5) {
+        if (user.getEcus() >= -1495) {
             user.setEcus(user.getEcus() - 5);
             userService.update(user.getId(), user);
 
@@ -106,7 +125,7 @@ public class RabbitService {
         Rabbit rabbit = findById(rabbitId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 2) {
+        if (user.getEcus() >= -1498) {
             user.setEcus(user.getEcus() - 2);
             userService.update(user.getId(), user);
 
@@ -123,7 +142,7 @@ public class RabbitService {
         Rabbit rabbit = findById(rabbitId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 3) {
+        if (user.getEcus() >= -1497) {
             user.setEcus(user.getEcus() - 3);
             userService.update(user.getId(), user);
 
@@ -137,10 +156,11 @@ public class RabbitService {
     }
 
     public Rabbit healRabbit(Long rabbitId, Long userId) {
+        // Healing costs 6 ecus and immediately restores healthy state.
         Rabbit rabbit = findById(rabbitId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 6) {
+        if (user.getEcus() >= -1494) {
             user.setEcus(user.getEcus() - 6);
             userService.update(user.getId(), user);
 
@@ -154,77 +174,97 @@ public class RabbitService {
     }
 
     public void processEndOfDay(Long userId) {
+        // End-of-day enforces survival, growth to adulthood, and daily state reset rules.
         User user = userService.findById(userId);
-        if(user.getHibernation() == false){
-            List<Rabbit> userRabbits = rabbitRepository.findByUserId(userId);
-
-            long adultCount = userRabbits
-                    .stream()
-                    .filter(r -> r.getRabbitType() == Rabbit.RabbitTypeEnum.lapin)
-                    .count();
-            long babyCount = userRabbits
-                    .stream()
-                    .filter(r -> r.getRabbitType() == Rabbit.RabbitTypeEnum.lapereau)
-                    .count();
-
-            for (Rabbit rabbit : userRabbits) {
-                if (!rabbit.getClean() || !rabbit.getHealthy()) {
-                    if (Math.random() > 0.5) {
-                        rabbitRepository.delete(rabbit);
-                        if (
-                                rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapin
-                        ) adultCount--;
-                        else babyCount--;
-                        continue;
-                    }
-                }
-
-                if (!rabbit.getFedToday()) {
-                    rabbitRepository.delete(rabbit);
-                    if (
-                            rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapin
-                    ) adultCount--;
-                    else babyCount--;
-                    continue;
-                }
-
-                if (!rabbit.getWateredToday()) {
-                    continue;
-                } else {
-                    rabbit.setAge(rabbit.getAge() + 1);
-
-                    if (
-                            rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapereau &&
-                                    rabbit.getAge() >= 30
-                    ) {
-                        if (adultCount < 50) {
-                            rabbit.setRabbitType(Rabbit.RabbitTypeEnum.lapin);
-                            rabbit.setGender(
-                                    Math.random() > 0.5
-                                            ? Animal.AnimalGender.M
-                                            : Animal.AnimalGender.F
-                            );
-                            adultCount++;
-                            babyCount--;
-                        }
-                    }
-                }
-
-                rabbit.setFedToday(false);
-                rabbit.setWateredToday(false);
-                rabbit.setClean(false); // devient sale le lendemain
-
-                rabbitRepository.save(rabbit);
-            }
-            handleReproduction(userId, adultCount, babyCount);
+        if(Boolean.FALSE.equals(user.getHibernation())){
+            RabbitPopulationCounts counts = processAllRabbitsForEndOfDay(userId);
+            handleReproduction(userId, counts.adults(), counts.babies());
         }
     }
+
+    private RabbitPopulationCounts processAllRabbitsForEndOfDay(Long userId) {
+        // Apply rabbit daily lifecycle and keep population counters in sync for reproduction rules.
+        List<Rabbit> userRabbits = rabbitRepository.findByUserId(userId);
+        long adultCount = userRabbits.stream().filter(this::isAdultRabbit).count();
+        long babyCount = userRabbits.stream().filter(r -> !isAdultRabbit(r)).count();
+
+        for (Rabbit rabbit : userRabbits) {
+            if (isRabbitDeletedByHealthOrCleanliness(rabbit) || isRabbitDeletedByMissingFood(rabbit)) {
+                if (isAdultRabbit(rabbit)) {
+                    adultCount--;
+                } else {
+                    babyCount--;
+                }
+                continue;
+            }
+
+            if (rabbit.getWateredToday()) {
+                rabbit.setAge(rabbit.getAge() + 1);
+                if (tryPromoteBabyToAdult(rabbit, adultCount)) {
+                    adultCount++;
+                    babyCount--;
+                }
+            } else {
+                continue;
+            }
+
+            resetDailyRabbitState(rabbit);
+            rabbitRepository.save(rabbit);
+        }
+
+        return new RabbitPopulationCounts(adultCount, babyCount);
+    }
+
+    private boolean isRabbitDeletedByHealthOrCleanliness(Rabbit rabbit) {
+        // Unhealthy or dirty rabbits have a 50% chance to die at end of day.
+        if ((!rabbit.getClean() || !rabbit.getHealthy()) && Math.random() > 0.5) {
+            rabbitRepository.delete(rabbit);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isRabbitDeletedByMissingFood(Rabbit rabbit) {
+        // Not feeding a rabbit during the day always causes death.
+        if (!rabbit.getFedToday()) {
+            rabbitRepository.delete(rabbit);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean tryPromoteBabyToAdult(Rabbit rabbit, long adultCount) {
+        // Babies become adults at age 30 if adult capacity (50) is not exceeded.
+        if (rabbit.getRabbitType() != Rabbit.RabbitTypeEnum.lapereau || rabbit.getAge() < 30) {
+            return false;
+        }
+        if (adultCount >= 50) {
+            return false;
+        }
+        rabbit.setRabbitType(Rabbit.RabbitTypeEnum.lapin);
+        rabbit.setGender(Math.random() > 0.5 ? Animal.AnimalGender.M : Animal.AnimalGender.F);
+        return true;
+    }
+
+    private boolean isAdultRabbit(Rabbit rabbit) {
+        return rabbit.getRabbitType() == Rabbit.RabbitTypeEnum.lapin;
+    }
+
+    private void resetDailyRabbitState(Rabbit rabbit) {
+        // Daily action flags are reset for the next game day.
+        rabbit.setFedToday(false);
+        rabbit.setWateredToday(false);
+        rabbit.setClean(false);
+    }
+
+    private record RabbitPopulationCounts(long adults, long babies) {}
 
     private void handleReproduction(
         Long userId,
         long currentAdults,
         long currentBabies
     ) {
+        // Reproduction requires at least one adult male and female; each pair can generate 3 babies.
         List<Rabbit> adults = rabbitRepository.findByUserIdAndRabbitType(
             userId,
             Rabbit.RabbitTypeEnum.lapin

@@ -28,6 +28,13 @@ class TfLayout extends HTMLElement {
                 height: 100%;
                 min-height: 0;
             }
+
+            slot {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+                min-height: 0;
+            }
         `;
 
         const template = document.createElement("template");

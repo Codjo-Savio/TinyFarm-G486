@@ -1,10 +1,12 @@
 package com.api.tinyfarm.controller;
 
 import com.api.tinyfarm.model.Chicken;
+import com.api.tinyfarm.model.Rabbit;
 import com.api.tinyfarm.service.ChickenService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,16 +19,17 @@ public class ChickenController {
         this.chickenService = chickenService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<Chicken>> getAll() {
+    @GetMapping("/me")
+    public ResponseEntity<List<Chicken>> getByUserId() {
         try {
-            return ResponseEntity.ok(chickenService.findAll());
+            return ResponseEntity.ok(chickenService.findByConnectedUserId());
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id)")
     public ResponseEntity<Chicken> getById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(chickenService.findById(id));
@@ -45,6 +48,7 @@ public class ChickenController {
     }
 
     @PostMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Chicken> create(@RequestBody Chicken chicken) {
         try {
             return ResponseEntity.ok(chickenService.create(chicken));
@@ -58,6 +62,7 @@ public class ChickenController {
     }
 
     @PutMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id)")
     public ResponseEntity<Chicken> update(
         @PathVariable Long id,
         @RequestBody Chicken chicken
@@ -70,6 +75,7 @@ public class ChickenController {
     }
 
     @DeleteMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id)")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
             chickenService.delete(id);
@@ -92,6 +98,7 @@ public class ChickenController {
     // --- Actions ---
 
     @PostMapping("/{id}/feed")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Chicken> feedChicken(
         @PathVariable Long id,
         @RequestParam Long userId
@@ -100,6 +107,7 @@ public class ChickenController {
     }
 
     @PostMapping("/{id}/water")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Chicken> waterChicken(
         @PathVariable Long id,
         @RequestParam Long userId
@@ -108,6 +116,7 @@ public class ChickenController {
     }
 
     @PostMapping("/{id}/clean")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Chicken> cleanChicken(
         @PathVariable Long id,
         @RequestParam Long userId
@@ -116,6 +125,7 @@ public class ChickenController {
     }
 
     @PostMapping("/{id}/heal")
+    @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Chicken> healChicken(
         @PathVariable Long id,
         @RequestParam Long userId
@@ -124,6 +134,7 @@ public class ChickenController {
     }
 
     @PostMapping("/endOfDay")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Void> processEndOfDay(@RequestParam Long userId) {
         chickenService.processEndOfDay(userId);
         return ResponseEntity.ok().build();

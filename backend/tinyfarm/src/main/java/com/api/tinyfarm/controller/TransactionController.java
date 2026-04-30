@@ -4,6 +4,7 @@ import com.api.tinyfarm.model.Transaction;
 import com.api.tinyfarm.service.TransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,6 +20,7 @@ public class TransactionController {
     // GET
 
     @GetMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.canAccessTransaction(authentication, #id)")
     public ResponseEntity<Transaction> getById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(transactionService.findById(id));
@@ -28,6 +30,7 @@ public class TransactionController {
     }
 
     @GetMapping("/buyer/{buyer}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #buyer)")
     public ResponseEntity<Transaction> getByBuyer(@PathVariable Long buyer) {
         try {
             return ResponseEntity.ok(transactionService.findByBuyer(buyer));
@@ -37,6 +40,7 @@ public class TransactionController {
     }
 
     @GetMapping("/seller/{seller}")
+    @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #seller)")
     public ResponseEntity<Transaction> getBySeller(@PathVariable Long seller) {
         try {
             return ResponseEntity.ok(transactionService.findBySeller(seller));
@@ -59,6 +63,7 @@ public class TransactionController {
     // POST
 
     @PostMapping("")
+    @PreAuthorize("@securityAuthorizationService.canSubmitTransaction(authentication, #transaction)")
     public ResponseEntity<Transaction> create(
         @RequestBody Transaction transaction
     ) {
@@ -78,6 +83,7 @@ public class TransactionController {
     // PUT
 
     @PutMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.canAccessTransaction(authentication, #id)")
     public ResponseEntity<Transaction> update(
         @PathVariable Long id,
         @RequestBody Transaction transaction
@@ -94,6 +100,7 @@ public class TransactionController {
     // DELETE
 
     @DeleteMapping("/id/{id}")
+    @PreAuthorize("@securityAuthorizationService.canAccessTransaction(authentication, #id)")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         try {
             transactionService.deleteById(id);

@@ -1,8 +1,11 @@
 package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Animal;
+import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.AnimalRepository;
 import java.util.List;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,6 +34,16 @@ public class AnimalService {
     }
 
     public Animal create(Animal animal) {
+        if (animal == null) {
+            throw new IllegalArgumentException("Animal manquant");
+        }
+        if (animal.getId() != null && animalRepository.existsById(animal.getId())) {
+            throw new IllegalArgumentException("Animal déjà existant : " + animal.getId());
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
+            animal.setUserId(currentUser.getId());
+        }
         return animalRepository.save(animal);
     }
 

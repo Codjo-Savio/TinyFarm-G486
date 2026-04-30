@@ -1,5 +1,6 @@
 package com.api.tinyfarm.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,16 +15,30 @@ public class Stock {
 
     @EmbeddedId
     @AttributeOverrides({
-            @AttributeOverride(name = "uid", column = @Column(name = "uid", nullable = false)),
-            @AttributeOverride(name = "productID", column = @Column(name = "product_id", nullable = false))
+            @AttributeOverride(name = "userId", column = @Column(name = "uid", nullable = false)),
+            @AttributeOverride(name = "productId", column = @Column(name = "product_id", nullable = false))
     })
     private StockId id;
 
-    @Column(name = "uid", insertable = false, updatable = false)
-    private Long userId;
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "uid",
+            referencedColumnName = "uid",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private User user;
 
-    @Column(name = "product_id", insertable = false, updatable = false)
-    private Long productId;
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "product_id",
+            referencedColumnName = "product_id",
+            insertable = false,
+            updatable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private Product product;
 
     @Column(name = "quantity", nullable = false)
     private Integer quantity = 0;
@@ -38,6 +53,32 @@ public class Stock {
         }
         if (collectible == null) {
             collectible = false;
+        }
+    }
+
+    @Transient
+    public Long getUserId() {
+        return id == null ? null : id.getUserId();
+    }
+
+    public void setUserId(Long userId) {
+        ensureId();
+        id.setUserId(userId);
+    }
+
+    @Transient
+    public Long getProductId() {
+        return id == null ? null : id.getProductId();
+    }
+
+    public void setProductId(Long productId) {
+        ensureId();
+        id.setProductId(productId);
+    }
+
+    private void ensureId() {
+        if (id == null) {
+            id = new StockId();
         }
     }
 }

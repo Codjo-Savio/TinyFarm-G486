@@ -1,4 +1,6 @@
 {
+  "workbench.startupEditor": "readme",
+  "window.restoreWindows": "none",
   "java.compile.nullAnalysis.mode": "automatic",
   "java.configuration.updateBuildConfiguration": "interactive",
   "editor.formatOnSave": true,

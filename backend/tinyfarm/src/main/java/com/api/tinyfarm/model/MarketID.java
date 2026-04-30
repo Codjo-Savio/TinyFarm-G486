@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 public class MarketID implements Serializable {
 
     private Long userId;
-    private Long productID;
+    private Long productId;
 }

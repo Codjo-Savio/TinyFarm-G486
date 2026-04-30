@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,7 +37,7 @@ public class StockService {
         return stockRepository
             .findAll()
             .stream()
-            .filter(stock -> stock.getId().getUid().equals(userId))
+            .filter(stock -> stock.getId().getUserId().equals(userId))
             .collect(Collectors.toList());
     }
 
@@ -43,24 +45,33 @@ public class StockService {
         return stockRepository
             .findAll()
             .stream()
-            .filter(stock -> stock.getId().getProductID().equals(productId))
+            .filter(stock -> stock.getId().getProductId().equals(productId))
             .collect(Collectors.toList());
     }
 
     public Stock create(Stock stock) throws Exception {
-        if (stock == null || stock.getId() == null) {
-            throw new IllegalArgumentException("Stock invalide");
+        if (stock == null) {
+            throw new IllegalArgumentException("Stock manquant");
+        }
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+        if (
+                authentication != null &&
+                        authentication.getPrincipal() instanceof User currentUser
+        ) {
+            stock.setUserId(currentUser.getId());
+        }
+        if (stock.getUserId() == null) {
+            throw new IllegalArgumentException("userId manquant pour le stock");
+        }
+        if (stock.getProductId() == null) {
+            throw new IllegalArgumentException("productId manquant pour le stock");
+        }
+        if (stock.getQuantity() == null || stock.getQuantity() < 0) {
+            throw new IllegalArgumentException("Quantité de stock invalide");
         }
 
-        StockId id = stock.getId();
-        Long userId = id.getUid();
-        Long productId = id.getProductID();
-        if (userId == null || productId == null) {
-            throw new IllegalArgumentException(
-                "Clé composite manquante dans stock"
-            );
-        }
-
+        StockId id = new StockId(stock.getUserId(), stock.getProductId());
         if (stockRepository.existsById(id)) {
             throw new IllegalArgumentException(
                 "Stock déjà existant pour cet utilisateur / produit"
@@ -101,6 +112,7 @@ public class StockService {
     }
 
     public Market publishToMarket(Long productId, Integer quantity, Float unitPrice){
+            // Publishing converts stock intent into a market offer; market service enforces trade constraints.
             Market market = new Market();
             market.setProductId(productId);
             market.setQuantity(quantity);

@@ -27,7 +27,6 @@ public class ProductRepositoryTest {
         // ARRANGE
         Product product = new Product();
         product.setDescription("Sac de grains");
-        product.setPrice(3.0f);
         product.setCollectible(false);
 
         // ACT
@@ -36,7 +35,6 @@ public class ProductRepositoryTest {
         // ASSERT
         assertNotNull(saved.getId()); // PK = productID
         assertEquals("Sac de grains", saved.getDescription());
-        assertEquals(3.0f, saved.getPrice());
         assertFalse(saved.getCollectible());
     }
 
@@ -45,7 +43,6 @@ public class ProductRepositoryTest {
         // ARRANGE
         Product product = new Product();
         product.setDescription("Seringue");
-        product.setPrice(6.0f);
         productRepository.save(product);
 
         // ACT
@@ -76,19 +73,18 @@ public class ProductRepositoryTest {
     }
 
     @Test
-    void shouldUpdateProductPrice() {
+    void shouldUpdateProductDescription() {
         // ARRANGE
         Product product = new Product();
         product.setDescription("Foin");
-        product.setPrice(5.0f);
         productRepository.save(product);
 
         // ACT
-        product.setPrice(10.0f);
+        product.setDescription("Foin premium");
         Product updated = productRepository.save(product);
 
         // ASSERT
-        assertEquals(10.0f, updated.getPrice());
+        assertEquals("Foin premium", updated.getDescription());
     }
 
     @Test

@@ -9,8 +9,10 @@
         <script src="/config.js"></script>
         <!-- Components -->
         <script type="module" src="/components/tf-app-bar.js"></script>
+        <script type="module" src="/components/tf-button.js"></script>
         <script type="module" src="/components/tf-bottom-actions.js"></script>
         <script type="module" src="/components/tf-layout.js"></script>
+        <script type="module" src="/components/tf-snackbar.js"></script>
         <!-- Theme -->
         <link rel="stylesheet" href="/utils/theme.css" />
         <!-- Font -->
@@ -28,13 +30,14 @@
     <body>
         <tf-layout>
             <tf-app-bar></tf-app-bar>
+            <tf-snackbar></tf-snackbar>
             <main class="container">
                 <div class="sub-header">
-                    <a onclick="window.history.back()" class="btn-back"
-                        ><span class="material-symbols-rounded">
-                            keyboard_backspace
-                        </span>
-                        Retour</a
+                    <tf-button
+                        icon="keyboard_backspace"
+                        variant="secondary"
+                        onclick="window.history.back()"
+                        >Retour</tf-button
                     >
                 </div>
 
@@ -46,7 +49,7 @@
                             <div class="cart-total-box">
                                 <div class="cart-icon-title">
                                     <span class="material-symbols-rounded">
-                                        sell
+                                        store
                                     </span>
                                     Total
                                 </div>
@@ -55,9 +58,13 @@
                                         class="total-price"
                                         id="totalPrice"
                                     ></span>
-                                    <button class="btn-sell">
-                                        Mettre en vente
-                                    </button>
+                                    <tf-button
+                                        variant="primary"
+                                        id="sellButton"
+                                        icon="sell"
+                                    >
+                                        Publier
+                                    </tf-button>
                                 </div>
                             </div>
 

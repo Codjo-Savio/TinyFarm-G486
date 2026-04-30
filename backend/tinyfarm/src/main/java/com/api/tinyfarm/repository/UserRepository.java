@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findById(Long id);
     Optional<User> findByEmail(String email);
     void deleteByHibernationTrueAndHibernationDateBefore(LocalDateTime date);
+    Boolean existsByName(String name);
 }

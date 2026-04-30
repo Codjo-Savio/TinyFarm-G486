@@ -51,20 +51,20 @@ public class User {
     @Column(name = "hibernation")
     private Boolean hibernation;
 
-    @Column(name = "hibernationDate")
+    @Column(name = "hibernation_date")
     private LocalDateTime hibernationDate;
 
     @Column(name = "level")
     private Integer level;
 
-    @Column(name = "remainingPurchases")
+    @Column(name = "remaining_purchases")
     private Integer remainingPurchases;
 
     // default values for ecus and level
     @PrePersist
     public void prePersist() {
         if (this.ecus == null) {
-            this.ecus = 1500F;
+            this.ecus = 0F;
         }
 
         if (this.hibernation == null) {

@@ -1,9 +1,12 @@
 package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Cow;
+import com.api.tinyfarm.model.Rabbit;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.CowRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,14 @@ public class CowService {
         return cowRepository.findAll();
     }
 
+    public List<Cow> findByConnectedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof User currentUser)) {
+            throw new RuntimeException("Utilisateur non authentifié");
+        }
+        return cowRepository.findByUserId(currentUser.getId());
+    }
+
     public Cow findById(Long id) {
         return cowRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vache introuvable : " + id));
@@ -34,6 +45,15 @@ public class CowService {
     }
 
     public Cow create(Cow cow) {
+        if (cow == null) {
+            throw new IllegalArgumentException("Vache manquante");
+        }
+        if (cow.getName() == null || cow.getName().isBlank()) {
+            throw new IllegalArgumentException("Nom de la vache manquant");
+        }
+        if (cow.getId() != null && cowRepository.existsById(cow.getId())) {
+            throw new IllegalArgumentException("Vache déjà existante : " + cow.getId());
+        }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof User currentUser) {
             cow.setUserId(currentUser.getId());
@@ -61,17 +81,16 @@ public class CowService {
         cowRepository.deleteAll();
     }
 
-    // --- Actions Journalières ---
+    // --- Daily Actions ---
 
     /**
-     * nourri une vache avec de la paille
-     * si impossible, elle sera nourrie avec de l'herbe
+     * Feeds a cow with hay.
      */
     public Cow hayCow(Long cowId, Long userId) {
         Cow cow = findById(cowId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 5) {
+        if (user.getEcus() >= -1495) {
             user.setEcus(user.getEcus() - 5);
             userService.update(userId, user);
 
@@ -85,23 +104,26 @@ public class CowService {
     }
 
     /**
-     * nouri la vache avec de l'herbe
+     * Daily fallback feeding with grass for all cows.
      */
-    public Cow grassCow(Long cowId) {
-        Cow cow = findById(cowId);
-
-        cow.setFedToday(true);
-        return cowRepository.save(cow);
+    @Scheduled(cron = "12 0 0 * * *")
+    @Transactional
+    public void grassCow() {
+        List<Cow> cows = cowRepository.findAll();
+        for(Cow cow : cows){
+            cow.setFedToday(true);
+            cowRepository.save(cow);
+        }
     }
 
     /**
-     * abreuve une vache
+     * Waters a cow.
      */
     public Cow waterCow(Long cowId, Long userId) {
         Cow cow = findById(cowId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 2) {
+        if (user.getEcus() >= -1498) {
             user.setEcus(user.getEcus() - 2);
             userService.update(userId, user);
 
@@ -114,13 +136,13 @@ public class CowService {
     }
 
     /**
-     * nettoie une vache
+     * Cleans a cow.
      */
     public Cow cleanCow(Long cowId, Long userId) {
         Cow cow = findById(cowId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 3) {
+        if (user.getEcus() >= -1497) {
             user.setEcus(user.getEcus() - 3);
             userService.update(userId, user);
 
@@ -133,13 +155,13 @@ public class CowService {
     }
 
     /**
-     * soigne une vache
+     * Heals a cow.
      */
     public Cow healCow(Long cowId, Long userId) {
         Cow cow = findById(cowId);
         User user = userService.findById(userId);
 
-        if (user.getEcus() >= 6) {
+        if (user.getEcus() >= -1494) {
             user.setEcus(user.getEcus() - 6);
             userService.update(userId, user);
 
@@ -152,14 +174,14 @@ public class CowService {
     }
 
     /**
-     * gère la quantité de lait produite par les vaches d'un utilisateur
+     * Updates milk quantity based on milking eligibility.
      */
     public void milking(Long cowId) {
         Cow cow = findById(cowId);
 
-        // si elle peut produire
+        // Milk production only happens while milking is allowed.
         if (cow.getMilking()) {
-            // et qu'elle a été traite (i.e. elle n'a pas de lait)
+            // First production tick starts from 8 liters, then +4 each day.
             if (cow.getMilk() == 0) {
                 cow.setMilk(8);
             } else {
@@ -175,34 +197,34 @@ public class CowService {
     }
 
     /**
-     * ajuste le poid de la vache en fonction de ce qu'elle a mangé dans la journée
+     * Adjusts cow weight from today's feeding and watering actions.
      */
     public Cow handleWeight(Long cowId) {
         Cow cow = findById(cowId);
 
         if (cow.getWateredToday()) {
             if (cow.getHayToday()) {
-                // paille herbe eau
+                // hay + grass + water
                 cow.setWeight(cow.getWeight() + 9);
             } else {
-                // herbe eau
+                // grass + water
                 cow.setWeight(cow.getWeight() + 6);
             }
 
         } else {
             if (cow.getHayToday()) {
-                // paille herbe
+                // hay + grass
                 cow.setWeight(cow.getWeight() + 8);
             } else {
-                // herbe
+                // grass only
                 cow.setWeight(cow.getWeight() + 5);
             }
 
         }
 
-        // eau seule ne fait rien
+        // Water alone has no direct weight effect.
 
-        // poids max = 750 kg
+        // Maximum weight cap: 750 kg.
         if (cow.getWeight() > 750.0f) {
             cow.setWeight(750.0f);
         }
@@ -211,9 +233,10 @@ public class CowService {
     }
 
     /**
-     * gère la santé d'une vache séléctionnée
+     * Updates health progression for one cow.
      */
     private Cow handleHealth(Long cowId) {
+        // A non-healthy cow accumulates sick days; healthy cows reset sick days and can produce milk.
         Cow cow = findById(cowId);
 
         if (cow.getHealthy() != null && !cow.getHealthy()) {
@@ -227,37 +250,43 @@ public class CowService {
     }
 
     /**
-     * gère la fin de journée
+     * Applies end-of-day lifecycle for all cows of a user.
      */
     public void processEndOfDay(Long userId) {
+        // End-of-day applies health/weight rules, daily resets, and random illness chance.
         List<Cow> userCows = cowRepository.findByUserId(userId);
-
         for (Cow cow : userCows) {
-            // 1. Santé
-            cow = handleHealth(cow.getId());
-
-            if (cow.getSickDays() == 4) {
-                cowRepository.delete(cow);
+            Cow processedCow = handleHealth(cow.getId());
+            if (shouldDeleteCowAfterHealth(processedCow)) {
+                cowRepository.delete(processedCow);
                 continue;
             }
+            processedCow = handleWeight(processedCow.getId());
+            applyDailyCowReset(processedCow);
+            applyRandomIllness(processedCow);
+            cowRepository.save(processedCow);
+        }
+    }
 
-            // 2. Poids
-            cow = handleWeight(cow.getId());
+    private boolean shouldDeleteCowAfterHealth(Cow cow) {
+        // Cows die when sickness reaches 4 consecutive days.
+        return cow.getSickDays() == 4;
+    }
 
-            // reset journaliers
-            cow.setFedToday(false);
-            cow.setHayToday(false);
-            cow.setWateredToday(false);
-            cow.setClean(false); // elle devient sale
-            cow.setMilking(false); // et ne peut donc plus faire de lait
+    private void applyDailyCowReset(Cow cow) {
+        // End-of-day resets clear all action flags and milk eligibility.
+        cow.setFedToday(false);
+        cow.setHayToday(false);
+        cow.setWateredToday(false);
+        cow.setClean(false);
+        cow.setMilking(false);
+    }
 
-            // 1 chance sur 5 de tomber malade
-            if (Math.random() < 0.2) {
-                cow.setHealthy(false);
-                cow.setMilking(false);
-            }
-
-            cowRepository.save(cow);
+    private void applyRandomIllness(Cow cow) {
+        // Base disease chance at end of day: 20%.
+        if (Math.random() < 0.2) {
+            cow.setHealthy(false);
+            cow.setMilking(false);
         }
     }
 
