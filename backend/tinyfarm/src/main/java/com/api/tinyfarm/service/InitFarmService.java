@@ -27,7 +27,6 @@ public class InitFarmService {
     private static final float MIN_LAYING_HEN_WEIGHT = 2.5f;
 
     private final StockService stockService;
-    private final ProductService productService;
     private final RabbitService rabbitService;
     private final ChickenService chickenService;
     private final CowService cowService;
@@ -39,7 +38,6 @@ public class InitFarmService {
 
     public InitFarmService(
             StockService stockService,
-            ProductService productService,
             RabbitService rabbitService,
             ChickenService chickenService,
             CowService cowService,
@@ -49,7 +47,6 @@ public class InitFarmService {
             ChickenRepository chickenRepository,
             CowRepository cowRepository) {
         this.stockService = stockService;
-        this.productService = productService;
         this.rabbitService = rabbitService;
         this.chickenService = chickenService;
         this.cowService = cowService;
@@ -66,33 +63,11 @@ public class InitFarmService {
             throw new IllegalArgumentException("Utilisateur invalide pour l'initialisation");
         }
 
-        Map<String, Product> products = ensureBaseProducts();
+        java.util.List<Product> products = productRepository.findAll();
         ensureStarterAnimals(owner);
         ensureStarterStock(owner, products);
     }
 
-    private Map<String, Product> ensureBaseProducts() {
-        Map<String, Product> products = new HashMap<>();
-        products.put("Paille", ensureProduct("Paille"));
-        products.put("Botte de foin", ensureProduct("Botte de foin"));
-        products.put("Céréales", ensureProduct("Céréales"));
-        products.put("Sac de nourriture", ensureProduct("Sac de nourriture"));
-        products.put("Seau d'eau", ensureProduct("Seau d'eau"));
-        products.put("Savon", ensureProduct("Savon"));
-        products.put("Seringue", ensureProduct("Seringue"));
-        return products;
-    }
-
-    private Product ensureProduct(String description) {
-        List<Product> existing = productRepository.findByDescription(description);
-        if (!existing.isEmpty()) {
-            return existing.getFirst();
-        }
-
-        Product product = new Product();
-        product.setDescription(description);
-        return productService.create(product);
-    }
 
     private void ensureStarterAnimals(User owner) {
         Long userId = owner.getId();
@@ -165,10 +140,10 @@ public class InitFarmService {
         }
     }
 
-    private void ensureStarterStock(User owner, Map<String, Product> products) {
+    private void ensureStarterStock(User owner, List<Product> products) {
         // Every starter product is initialized with quantity 100 if no stock entry
         // exists yet.
-        for (Product product : products.values()) {
+        for (Product product : products) {
             StockId id = new StockId(owner.getId(), product.getId());
             if (stockRepository.existsById(id)) {
                 continue;
@@ -176,7 +151,7 @@ public class InitFarmService {
             Stock stock = new Stock();
             stock.setUserId(owner.getId());
             stock.setProductId(product.getId());
-            stock.setQuantity(2);
+            stock.setQuantity(50);
             try {
                 stockService.create(stock);
             } catch (Exception e) {

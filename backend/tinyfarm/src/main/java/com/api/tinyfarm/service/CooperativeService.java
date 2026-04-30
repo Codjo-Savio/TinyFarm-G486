@@ -15,7 +15,9 @@ import com.api.tinyfarm.repository.ChickenRepository;
 import com.api.tinyfarm.repository.StockRepository;
 import com.api.tinyfarm.utils.RandomNameProvider;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -407,8 +409,9 @@ public class CooperativeService {
         if (description.contains("milk") || description.contains("lait")) {
             return 2f;
         }
-        throw new IllegalArgumentException(
-                "Prix coopérative introuvable pour ce produit: configurez-le dans la coopérative");
+        else {
+            return 5f; // default price for all the products
+        }
     }
 
     private boolean isRabbitProduct(Product product) {
@@ -499,5 +502,56 @@ public class CooperativeService {
         cooperative.setCooperativeId(
                 new CooperativeID(cooperative.getUserId(), cooperative.getProductId()));
     }
+
+    // reset coop stock and offer every day
+    @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
+    public void addProductsToCooperative() {
+        Long coopUserId = getCooperativeUserId();
+
+        // delete the ancient offers
+        cooperativeRepository.deleteByCooperativeIdUserId(coopUserId);
+
+      // reset of the stock
+        for (Product product : productRepository.findAll()) {
+
+            int defaultQuantity = 5000;
+
+            StockId stockId = new StockId(coopUserId, product.getId());
+
+            Stock stock = stockRepository.findById(stockId)
+                    .orElse(new Stock());
+
+            stock.setUserId(coopUserId);
+            stock.setProductId(product.getId());
+            stock.setQuantity(defaultQuantity);
+            stock.setCollectible(false);
+            stockRepository.save(stock);
+
+            // create the offer again
+            Cooperative coop = new Cooperative();
+            coop.setUserId(coopUserId);
+            coop.setProductId(product.getId());
+            coop.setQuantity(defaultQuantity);
+            coop.setPrice(resolveCooperativeUnitPrice(product));
+
+            cooperativeRepository.save(coop);
+        }
+
+    }
+
+    private Long getCooperativeUserId() {
+        return userRepository.findByEmail("cooperative@system.local")
+                .orElseGet(() -> {
+                    User coop = new User();
+                    coop.setName("Cooperative");
+                    coop.setEmail("cooperative@system.local");
+                    coop.setEcus(999999f);
+                    coop.setGender(User.Gender.M);
+                    return userRepository.save(coop);
+                })
+                .getId();
+    }
+
 
 }
