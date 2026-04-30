@@ -33,14 +33,27 @@ async function fetchAllMarkets() {
     return Array.isArray(data) ? data : [];
 }
 
+async function getUserNameById(id) {
+    const response = await fetchApiWithCredentials(`/users/name/id/${id}`);
+
+    if (!response.ok) {
+        throw new Error("Impossible de récuperer l'utilisateur connecté");
+    }
+
+    return await response.text();
+}
+
 function normalizeMarkets(marketsRaw) {
-    return (Array.isArray(marketsRaw) ? marketsRaw : []).map((market) => ({
-        ...market,
-        userId: Number(market.userId),
-        productId: Number(market.productId),
-        quantity: Number(market.quantity),
-        price: Number(market.unitPrice ?? market.price ?? 0),
-    }));
+    return (Array.isArray(marketsRaw) ? marketsRaw : []).map((market) => {
+        return getUserNameById(market.userId).then((userName) => ({
+            ...market,
+            userId: Number(market.userId),
+            userName,
+            productId: Number(market.description),
+            quantity: Number(market.quantity),
+            price: Number(market.unitPrice ?? market.price ?? 0),
+        }));
+    });
 }
 
 async function fetchProducts() {
@@ -77,9 +90,7 @@ async function fetchRemainingPurchases(userId) {
 }
 
 async function fetchMarketByProductId(productId) {
-    const response = await fetchApiWithCredentials(
-        `/market/product/${productId}`,
-    );
+    const response = await fetchApiWithCredentials(`/products/id/${productId}`);
     if (!response.ok) {
         return null;
     }
@@ -480,3 +491,4 @@ document.querySelector("#pay-btn").addEventListener("click", payerPanier);
 initialiserBoutique();
 displayPanier();
 window.ajouterAuPanier = ajouterAuPanier;
+window.retirerDuPanier = retirerDuPanier;
