@@ -60,9 +60,12 @@ public class MarketService {
         validateMarketOfferForCreate(market);
         ensureProductCanBeSoldOnMarket(market.getProductId());
         syncMarketId(market);
+        
+        // Si une offre existe déjà, la supprimer d'abord (mise à jour de l'offre)
         if (marketRepository.existsById(market.getMarketId())) {
-            throw new IllegalArgumentException("Offre marché déjà existante pour cet utilisateur / produit");
+            marketRepository.deleteById(market.getMarketId());
         }
+        
         return marketRepository.save(market);
     }
 
