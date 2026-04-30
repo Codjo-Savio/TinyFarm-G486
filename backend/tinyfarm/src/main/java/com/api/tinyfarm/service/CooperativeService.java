@@ -171,6 +171,7 @@ public class CooperativeService {
         debitBuyerForCooperativePurchase(buyer, averageUnitPrice, quantity);
 
         consumeOffersAndPaySellers(offers, averageUnitPrice, quantity);
+        addToBuyerStock(buyerId, productId, quantity);
         
         Product product = getProductOrThrow(productId);
         if (isRabbitProduct(product)) {
@@ -179,6 +180,22 @@ public class CooperativeService {
         if (isChickenProduct(product)) {
             addChickensIfNeeded(resolvedBuyerId, productId, quantity);
         }
+    }
+
+    private void addToBuyerStock(Long buyerId, Long productId, Integer quantity) {
+        StockId buyerStockId = new StockId(buyerId, productId);
+        Optional<Stock> buyerStock = stockRepository.findById(buyerStockId);
+        if (buyerStock.isPresent()) {
+            Stock existingBuyerStock = buyerStock.get();
+            existingBuyerStock.setQuantity(existingBuyerStock.getQuantity() + quantity);
+            stockRepository.save(existingBuyerStock);
+            return;
+        }
+
+        Stock newBuyerStock = new Stock();
+        newBuyerStock.setId(buyerStockId);
+        newBuyerStock.setQuantity(quantity);
+        stockRepository.save(newBuyerStock);
     }
 
     private void validatePositiveQuantity(Integer quantity) {
