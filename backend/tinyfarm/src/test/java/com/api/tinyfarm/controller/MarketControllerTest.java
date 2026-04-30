@@ -1,6 +1,7 @@
 package com.api.tinyfarm.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -225,6 +226,6 @@ public class MarketControllerTest extends AuthenticatedControllerTestSupport {
         assertEquals(126.0f, updatedSeller.getEcus());
         assertEquals(174.0f, updatedBuyer.getEcus());
         assertEquals(2, updatedBuyerStock.getQuantity());
-        assertEquals(5, updatedListing.getFirst().getQuantity());
+        assertTrue(updatedListing.isEmpty());
     }
 }

@@ -60,9 +60,12 @@ public class MarketService {
         validateMarketOfferForCreate(market);
         ensureProductCanBeSoldOnMarket(market.getProductId());
         syncMarketId(market);
+        
+        // Si une offre existe déjà, la supprimer d'abord (mise à jour de l'offre)
         if (marketRepository.existsById(market.getMarketId())) {
-            throw new IllegalArgumentException("Offre marché déjà existante pour cet utilisateur / produit");
+            marketRepository.deleteById(market.getMarketId());
         }
+        
         return marketRepository.save(market);
     }
 
@@ -122,6 +125,9 @@ public class MarketService {
         Market market = findById(new MarketID(sellerId, productId));
         Long resolvedBuyerId = resolveAuthenticatedBuyerId(buyerId);
         tradeService.buy(sellerId, resolvedBuyerId, productId, quantity, market.getUnitPrice());
+
+        // deletion of the ad
+        marketRepository.deleteById(market.getMarketId());
     }
 
     private void applyAuthenticatedUserId(Market market) {
