@@ -62,13 +62,7 @@ public class StockServiceTest {
 
     @Test
     void shouldFindById() {
-        Stock found = new Stock();
-        try {
-          found = stockService.findById(testUserId, testProductId);
-        }catch (Exception e) {
-            System.err.println(e.getMessage());
-        }
-
+        Stock found = stockService.findById(testUserId, testProductId);
         assertNotNull(found);
         assertEquals(testStock.getId(), found.getId());
         assertEquals(1000, found.getQuantity());
