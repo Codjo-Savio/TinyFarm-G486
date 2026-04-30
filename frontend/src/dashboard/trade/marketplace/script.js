@@ -275,8 +275,8 @@ async function initialiserBoutique() {
 
         markets.forEach((market) => {
             const stock = Number(market.quantity);
-            const productLabel = `Produit ${market.productId}`;
-            const sellerLabel = `Utilisateur ${market.userId}`;
+            const productLabel = market.description;
+            const sellerLabel = market.userName;
             const productHTML = `
                 <div class="product-row">
                     <div class="prod-info">
