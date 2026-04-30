@@ -24,7 +24,7 @@ async function getCurrentUserId() {
 }
 
 async function fetchAllMarkets() {
-    const response = await fetchApiWithCredentials(`/market/not/me`);
+    const response = await fetchApiWithCredentials("/market/not/me");
     if (!response.ok) {
         throw new Error(`Erreur HTTP : ${response.status}`);
     }
