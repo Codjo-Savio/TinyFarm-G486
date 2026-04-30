@@ -34,6 +34,10 @@ async function fetchAllMarkets() {
 }
 
 async function getUserNameById(id) {
+    if (id === null || id === undefined || Number.isNaN(Number(id))) {
+        return "Utilisateur inconnu";
+    }
+
     const response = await fetchApiWithCredentials(`/users/name/id/${id}`);
 
     if (!response.ok) {
@@ -43,17 +47,31 @@ async function getUserNameById(id) {
     return await response.text();
 }
 
-function normalizeMarkets(marketsRaw) {
-    return (Array.isArray(marketsRaw) ? marketsRaw : []).map((market) => {
-        return getUserNameById(market.userId).then((userName) => ({
-            ...market,
-            userId: Number(market.userId),
-            userName,
-            productId: Number(market.description),
-            quantity: Number(market.quantity),
-            price: Number(market.unitPrice ?? market.price ?? 0),
-        }));
-    });
+async function normalizeMarkets(marketsRaw) {
+    const normalizedMarkets = await Promise.all(
+        (Array.isArray(marketsRaw) ? marketsRaw : []).map(async (market) => {
+            const userId = Number(market?.userId ?? market?.marketId?.uid);
+            const productId = Number(
+                market?.productId ?? market?.marketId?.productID,
+            );
+            const userName = await getUserNameById(userId);
+
+            return {
+                ...market,
+                userId,
+                userName,
+                productId,
+                description: market?.description,
+                quantity: Number(market?.quantity),
+                price: Number(market?.unitPrice ?? market?.price ?? 0),
+            };
+        }),
+    );
+
+    return normalizedMarkets.filter(
+        (market) =>
+            Number.isFinite(market.userId) && Number.isFinite(market.productId),
+    );
 }
 
 async function fetchProducts() {
@@ -97,11 +115,13 @@ async function fetchMarketByProductId(productId) {
         return null;
     }
 
-    const productMarket = response.json();
+    const productMarket = await response.json();
     const pdResponse = await fetchApiWithCredentials(
-        `/products/id/${productMarket.userId}`,
+        `/products/id/${productMarket.productId}`,
     );
-    productMarket.description = (await pdResponse.json()).description;
+    if (pdResponse.ok) {
+        productMarket.description = (await pdResponse.json()).description;
+    }
 
     return productMarket;
 }
@@ -122,11 +142,11 @@ async function fetchMarketsFromProductEndpoints() {
         }),
     );
 
-    return normalizeMarkets(productMarkets.filter(Boolean));
+    return await normalizeMarkets(productMarkets.filter(Boolean));
 }
 
 async function fetchMarketsGroupedByProduct(sourceMarkets) {
-    const allMarkets = normalizeMarkets(
+    const allMarkets = await normalizeMarkets(
         Array.isArray(sourceMarkets) ? sourceMarkets : await fetchAllMarkets(),
     );
 
@@ -237,7 +257,7 @@ async function initialiserBoutique() {
         let rawMarkets = [];
 
         try {
-            rawMarkets = normalizeMarkets(await fetchAllMarkets());
+            rawMarkets = await normalizeMarkets(await fetchAllMarkets());
         } catch {
             rawMarkets = await fetchMarketsFromProductEndpoints();
         }
