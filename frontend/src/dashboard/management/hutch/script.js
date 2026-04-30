@@ -7,7 +7,7 @@ async function initializeHutch() {
     const container = document.getElementById("game-grid");
 
     try {
-        const response = await fetchApiWithCredentials("/rabbits");
+        const response = await fetchApiWithCredentials("/rabbits/me");
 
         if (!response.ok) {
             throw new Error(`Erreur API : ${response.status}`);
