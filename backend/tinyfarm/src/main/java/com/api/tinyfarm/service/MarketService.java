@@ -70,8 +70,12 @@ public class MarketService {
         return marketRepository.findAll();
     }
 
-    public List<Market> findAllExceptOnesOfTheConnectedUser(Long id){
-        return marketRepository.findByMarketIdUserIdNot(id);
+    public List<Market> findAllExceptOnesOfTheConnectedUser(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof User currentUser)) {
+            throw new RuntimeException("Utilisateur non authentifié");
+        }
+        return marketRepository.findByMarketIdUserIdNot(currentUser.getId());
     }
 
     public Market update(Long uid, Long productId, Market modifiedMarket) {

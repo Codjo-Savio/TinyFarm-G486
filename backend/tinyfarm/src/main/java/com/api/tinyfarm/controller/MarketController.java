@@ -38,10 +38,10 @@ public class MarketController {
         }
     }
 
-    @GetMapping("/not")
-    public ResponseEntity<List<Market>> getAllExceptOneOfTheConnectedUser(@RequestParam Long uid) {
+    @GetMapping("/not/me")
+    public ResponseEntity<List<Market>> getAllExceptOneOfTheConnectedUser() {
         try {
-            return ResponseEntity.ok(marketService.findAllExceptOnesOfTheConnectedUser(uid));
+            return ResponseEntity.ok(marketService.findAllExceptOnesOfTheConnectedUser());
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

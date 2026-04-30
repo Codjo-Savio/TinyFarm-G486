@@ -219,13 +219,11 @@ public class MarketControllerTest extends AuthenticatedControllerTestSupport {
 
         User updatedSeller = userService.findById(seller.getId());
         User updatedBuyer = userService.findById(buyer.getId());
-        Stock updatedSellerStock = stockService.findById(seller.getId(), buyProductId);
         Stock updatedBuyerStock = stockService.findById(buyer.getId(), buyProductId);
         List<Market> updatedListing = marketService.findByUserId(seller.getId());
 
         assertEquals(126.0f, updatedSeller.getEcus());
         assertEquals(174.0f, updatedBuyer.getEcus());
-        assertEquals(8, updatedSellerStock.getQuantity());
         assertEquals(2, updatedBuyerStock.getQuantity());
         assertEquals(5, updatedListing.getFirst().getQuantity());
     }

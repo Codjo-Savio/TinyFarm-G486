@@ -1,11 +1,14 @@
 package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.*;
+import com.api.tinyfarm.repository.MarketRepository;
 import com.api.tinyfarm.repository.StockRepository;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -17,12 +20,14 @@ public class StockService {
     private StockRepository stockRepository;
     @Autowired
     private MarketService marketService;
+    @Autowired
+    MarketRepository marketRepository;
    
     public List<Stock> findAll() {
         return stockRepository.findAll();
     }
 
-    public Stock findById(Long userId, Long productId) {
+    public Stock findById(Long userId, Long productId) throws ChangeSetPersister.NotFoundException {
         StockId id = new StockId(userId, productId);
         return stockRepository
             .findById(id)
@@ -82,14 +87,19 @@ public class StockService {
     }
 
     public Stock update(Long userId, Long productId, Stock stock) {
-        Stock existing = findById(userId, productId);
-        if (stock.getQuantity() != null) {
-            existing.setQuantity(stock.getQuantity());
+        try {
+            Stock existing = findById(userId, productId);
+            if (stock.getQuantity() != null) {
+                existing.setQuantity(stock.getQuantity());
+            }
+            if (stock.getCollectible() != null) {
+                existing.setCollectible(stock.getCollectible());
+            }
+            return stockRepository.save(existing);
+        }catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
         }
-        if (stock.getCollectible() != null) {
-            existing.setCollectible(stock.getCollectible());
-        }
-        return stockRepository.save(existing);
     }
 
     public void deleteAll() {
@@ -112,11 +122,29 @@ public class StockService {
     }
 
     public Market publishToMarket(Long productId, Integer quantity, Float unitPrice){
-            // Publishing converts stock intent into a market offer; market service enforces trade constraints.
-            Market market = new Market();
-            market.setProductId(productId);
-            market.setQuantity(quantity);
-            market.setUnitPrice(unitPrice);
-            return marketService.create(market);
+        // Publishing converts stock intent into a market offer; market service enforces trade constraints.
+        Market market = new Market();
+        market.setProductId(productId);
+        market.setQuantity(quantity);
+        market.setUnitPrice(unitPrice);
+        Market created = marketService.create(market);
+
+        // handle stock
+        try {
+            Stock stock = findById(created.getUserId(), created.getProductId());
+            if(Objects.equals(stock.getQuantity(), quantity)){
+                delete(created.getUserId(), created.getProductId());
+            }
+            else{
+                stock.setQuantity(stock.getQuantity()- quantity);
+                update(created.getUserId(), created.getProductId(), stock);
+            }
+        }catch (Exception e){
+            MarketID id = new MarketID(created.getUserId(), created.getProductId());
+            marketRepository.deleteById(id);
+        }
+
+
+        return market;
     }
 }
