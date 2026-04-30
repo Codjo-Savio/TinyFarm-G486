@@ -42,13 +42,10 @@ public class CooperativeInitializer {
                     "seau d'eau",
                     "botte de foin",
                     "botte de paille",
-                    "oeuf",
-                    "lait",
                     "seringue",
                     "savon",
                     "céréales",
-                    "sac de nourriture"
-            );
+                    "sac de nourriture");
 
             for (String description : defaultProducts) {
 

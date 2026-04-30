@@ -99,7 +99,7 @@ function renderEmptyCooperative(container, message) {
     container.innerHTML = `
         <div class="empty-market-state">
             <span class="material-symbols-rounded empty-market-icon">storefront</span>
-            <h2>Cooperative indisponible</h2>
+            <h2>Coopérative indisponible</h2>
             <p>${message}</p>
         </div>
     `;
@@ -259,7 +259,7 @@ async function initialiserCooperative() {
         if (!isOpen) {
             renderEmptyCooperative(
                 container,
-                "La cooperative est fermee pour le moment.",
+                "La coopérative est fermée pour le moment.",
             );
             return;
         }
@@ -271,7 +271,7 @@ async function initialiserCooperative() {
 
         renderProducts();
     } catch (error) {
-        console.error("Impossible de charger la cooperative :", error);
+        console.error("Impossible de charger la coopérative :", error);
         renderEmptyCooperative(
             container,
             "Une erreur est survenue lors du chargement.",
