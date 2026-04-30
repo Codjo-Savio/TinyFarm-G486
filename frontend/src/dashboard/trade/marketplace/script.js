@@ -1,4 +1,4 @@
-import { API_URL, fetchApiWithCredentials } from "/utils/fetch.js";
+import { fetchApiWithCredentials } from "/utils/fetch.js";
 
 // =========================
 // Constantes et état global
@@ -447,14 +447,11 @@ async function payerPanier() {
             };
 
             try {
-                const buyResponse = await fetch(`${API_URL}/market/buy`, {
-                    method: "POST",
-                    credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(requestBody),
-                });
+                const buyResponse = await fetchApiWithCredentials(
+                    "/market/buy",
+                    "POST",
+                    requestBody,
+                );
 
                 if (!buyResponse.ok) {
                     throw new Error(`Erreur buy: ${buyResponse.status}`);
