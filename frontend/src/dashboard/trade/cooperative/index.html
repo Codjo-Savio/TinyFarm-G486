@@ -5,48 +5,58 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Coopérative - TinyFarm</title>
         <link rel="icon" href="/assets/logo-128-rounded.png" />
-        <!-- Config -->
         <script src="/config.js"></script>
-        <!-- Components -->
         <script type="module" src="/components/tf-app-bar.js"></script>
         <script type="module" src="/components/tf-bottom-actions.js"></script>
         <script type="module" src="/components/tf-layout.js"></script>
-        <!-- Theme -->
+        <script type="module" src="/components/tf-button.js"></script>
+        <script type="module" src="/components/tf-snackbar.js"></script>
         <link rel="stylesheet" href="/utils/theme.css" />
-        <!-- Font -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
             href="https://fonts.googleapis.com/css2?family=Amaranth:ital,wght@0,400;0,700;1,400;1,700&display=swap"
             rel="stylesheet"
         />
-        <!-- Custom page style and script -->
         <link rel="stylesheet" href="style.css" />
         <script type="module" src="script.js" defer></script>
     </head>
-
     <body>
         <tf-layout>
             <tf-app-bar></tf-app-bar>
+            <tf-snackbar></tf-snackbar>
             <main class="container">
                 <div class="sub-header">
-                    <a onclick="window.history.back()" class="btn-back"
-                        ><span class="material-symbols-rounded">
-                            keyboard_backspace
-                        </span>
-                        Retour</a
+                    <tf-button
+                        icon="keyboard_backspace"
+                        variant="secondary"
+                        onclick="window.history.back()"
                     >
+                        Retour
+                    </tf-button>
                     <div class="market-stats">
-                        <span
+                        <span class="coop-status" id="coop-status"></span>
+                        <span class="purchase-info"
                             ><span class="material-symbols-rounded"
                                 >shopping_cart</span
                             >
-                            Achats restants : 10</span
+                            Achats restants :</span
                         >
                         <span class="stock-info"
                             ><span class="material-symbols-rounded">store</span>
-                            En stock :
-                        </span>
+                            En stock :</span
+                        >
+
+                        <tf-button
+                            icon="sell"
+                            variant="secondary"
+                            onclick="
+                                window.location.href =
+                                    '/dashboard/management/assets'
+                            "
+                        >
+                            Vendre
+                        </tf-button>
                     </div>
                 </div>
 
@@ -67,7 +77,13 @@
                                         class="total-price"
                                         id="totalPrice"
                                     ></span>
-                                    <button class="btn-pay">Payer</button>
+                                    <tf-button
+                                        id="pay-btn"
+                                        icon="payment"
+                                        variant="primary"
+                                    >
+                                        Payer
+                                    </tf-button>
                                 </div>
                             </div>
 

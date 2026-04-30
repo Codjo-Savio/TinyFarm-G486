@@ -335,7 +335,7 @@ function displayPanier() {
     for (const [cartItemKey, cartItem] of Object.entries(panier)) {
         const productHTML = `
             <div class="cart-item">
-                <span>Produit ${cartItem.description} • ${cartItem.seller}</span>
+                <span>${cartItem.description} • ${cartItem.seller}</span>
                 <div class="qty-control">
                     <button class="btn-qty" onclick="retirerDuPanier('${cartItemKey}')">
                         <span class="material-symbols-rounded">remove_circle</span>
@@ -387,7 +387,7 @@ function ajouterAuPanier(productId, userId) {
     } else {
         panier[itemKey] = {
             productId: Number(market.productId),
-            description: Number(market.description),
+            description: market.description,
             userId: Number(market.userId),
             seller: market.userName,
             price: Number(market.price) || 0,

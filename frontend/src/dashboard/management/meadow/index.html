@@ -50,26 +50,17 @@
                         <tf-pill icon="mop"
                             >Sales : <span id="dirty-count"></span
                         ></tf-pill>
-                        <span
+                        <span class="stat-text"
                             ><span class="material-symbols-rounded">pets</span>
                             <span id="cow-count"></span>
                         </span>
-                        <span
+                        <span class="stat-text"
                             ><span class="material-symbols-rounded"
                                 >water_full</span
                             >
                             <span id="milk-count"></span>
+                            <span class="infos">(vente auto.)</span>
                         </span>
-                        <tf-button
-                            icon="sell"
-                            variant="secondary"
-                            onclick="
-                                window.location.href =
-                                    '/dashboard/management/assets'
-                            "
-                        >
-                            Vendre
-                        </tf-button>
                         <tf-menu id="actions-menu" offset-x="-233" offset-y="8">
                             <tf-button
                                 slot="menu-target"
