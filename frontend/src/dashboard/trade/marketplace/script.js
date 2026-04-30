@@ -43,8 +43,19 @@ async function fetchProducts() {
     return Array.isArray(data) ? data : [];
 }
 
-function getCurrentBuyerId() {
-    return localStorage.getItem("tinyfarm-user-id");
+async function getCurrentBuyerId() {
+    if (currentUserId !== null) {
+        return currentUserId;
+    }
+
+    const response = await fetchApiWithCredentials("/auth/me");
+
+    if (!response.ok) {
+        throw new Error("Impossible de recuperer l'utilisateur connecte");
+    }
+
+    const user = await response.json();
+    return user.id;
 }
 
 async function fetchRemainingPurchases(userId) {
@@ -94,9 +105,9 @@ async function fetchMarketsGroupedByProduct(sourceMarkets) {
         Array.isArray(sourceMarkets) ? sourceMarkets : await fetchAllMarkets(),
     );
 
-    const marketProductIds = [...new Set(allMarkets.map((market) => market.productId))].sort(
-        (a, b) => a - b,
-    );
+    const marketProductIds = [
+        ...new Set(allMarkets.map((market) => market.productId)),
+    ].sort((a, b) => a - b);
 
     const referenceByProduct = new Map();
     await Promise.all(
@@ -126,7 +137,10 @@ async function fetchMarketsGroupedByProduct(sourceMarkets) {
             (market) =>
                 market.userId === referenceMarket.userId &&
                 market.productId === referenceMarket.productId &&
-                market.price === Number(referenceMarket.unitPrice ?? referenceMarket.price ?? 0) &&
+                market.price ===
+                    Number(
+                        referenceMarket.unitPrice ?? referenceMarket.price ?? 0,
+                    ) &&
                 market.quantity === referenceMarket.quantity,
         );
 
@@ -186,7 +200,7 @@ async function initialiserBoutique() {
     const container = document.getElementById("shop-container");
 
     try {
-        const buyerId = getCurrentBuyerId();
+        const buyerId = await getCurrentBuyerId();
 
         if (buyerId) {
             const remainingPurchases = await fetchRemainingPurchases(buyerId);
@@ -361,7 +375,7 @@ function retirerDuPanier(cartItemKey) {
 // =========================
 
 async function payerPanier() {
-    const buyerId = getCurrentBuyerId();
+    const buyerId = await getCurrentBuyerId();
     const payButton = document.querySelector(
         ".cart-actions tf-button[icon='payment']",
     );
