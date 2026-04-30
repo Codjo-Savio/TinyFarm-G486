@@ -30,6 +30,15 @@ public class UserController {
         }
     }
 
+    @GetMapping("/name/id/{id}")
+    public ResponseEntity<String> getNameById(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(userService.findById(id).getName());
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @GetMapping("/remainingPurchases/id/{id}")
     @PreAuthorize("@securityAuthorizationService.canAccessUser(authentication, #id)")
     public ResponseEntity<Integer> getRemainingPurchases(@PathVariable Long id) {
