@@ -103,7 +103,7 @@ function renderMeadow() {
     }
 
     document.getElementById("cow-count").textContent = cows.length;
-    document.getElementById("milk-count").textContent = milk;
+    document.getElementById("milk-count").textContent = `${milk}L`;
     document.getElementById("sick-count").textContent =
         (Math.round(((cows.length - healthyCount) / cows.length) * 100) || 0) +
         "%";

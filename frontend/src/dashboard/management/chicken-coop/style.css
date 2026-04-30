@@ -52,6 +52,12 @@ tf-menu#actions-menu {
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+.stat-text {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
 h1.page-title {
     font-family: "Amaranth", sans-serif;
     font-size: var(--font-size-title);
