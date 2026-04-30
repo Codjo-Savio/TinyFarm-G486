@@ -1,6 +1,7 @@
 package com.api.tinyfarm.controller;
 
 import com.api.tinyfarm.model.Chicken;
+import com.api.tinyfarm.model.Rabbit;
 import com.api.tinyfarm.service.ChickenService;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -18,10 +19,10 @@ public class ChickenController {
         this.chickenService = chickenService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<Chicken>> getAll() {
+    @GetMapping("/me")
+    public ResponseEntity<List<Chicken>> getByUserId() {
         try {
-            return ResponseEntity.ok(chickenService.findAll());
+            return ResponseEntity.ok(chickenService.findByConnectedUserId());
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

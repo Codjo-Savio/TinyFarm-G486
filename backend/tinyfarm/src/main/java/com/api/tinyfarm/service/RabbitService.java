@@ -1,6 +1,7 @@
 package com.api.tinyfarm.service;
 
 import com.api.tinyfarm.model.Animal;
+import com.api.tinyfarm.model.Cow;
 import com.api.tinyfarm.model.Rabbit;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.RabbitRepository;
@@ -27,6 +28,14 @@ public class RabbitService {
 
     public List<Rabbit> findAll() {
         return rabbitRepository.findAll();
+    }
+
+    public List<Rabbit> findByConnectedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof User currentUser)) {
+            throw new RuntimeException("Utilisateur non authentifié");
+        }
+        return rabbitRepository.findByUserId(currentUser.getId());
     }
 
     public void deleteAllRabbits() {

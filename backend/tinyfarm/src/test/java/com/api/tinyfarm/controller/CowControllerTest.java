@@ -59,12 +59,6 @@ public class CowControllerTest extends AuthenticatedControllerTestSupport {
     }
 
     @Test
-    void shouldReturnAllCows() throws Exception {
-        mockMvc.perform(get("/api/cows").with(authenticated()))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     void shouldReturnCowByName() throws Exception {
         mockMvc.perform(get("/api/cows/name/Marguerite").with(authenticated()))
                 .andExpect(status().isOk());

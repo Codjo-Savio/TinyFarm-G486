@@ -14,7 +14,7 @@ import com.api.tinyfarm.service.UserService;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -66,6 +66,13 @@ public class UserControllerTest extends AuthenticatedControllerTestSupport {
     void shouldReturnUserById() throws Exception {
         mockMvc.perform(get("/api/users/id/" + createdUserId).with(authenticated()))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturnUserNameByIdWithoutAccessRestriction() throws Exception {
+        mockMvc.perform(get("/api/users/name/id/" + createdUserId).with(authenticated()))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Eldoraldo"));
     }
 
     @Test

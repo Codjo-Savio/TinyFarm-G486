@@ -20,14 +20,28 @@ class TfAppBar extends HTMLElement {
             const currentUserRes = await fetchApiWithCredentials("/auth/me");
             if (currentUserRes.status !== 200) throw new Error();
             const authUser = await currentUserRes.json();
-            
-            const fullUserRes = await fetchApiWithCredentials(`/users/id/${authUser.id}`);
+
+            const fullUserRes = await fetchApiWithCredentials(
+                `/users/id/${authUser.id}`,
+            );
             if (fullUserRes.status !== 200) throw new Error();
             return fullUserRes.json();
         } catch (e) {
             window.location.href = "/";
             return null;
         }
+    }
+
+    async fetchUserRank() {
+        if (!this.user) return;
+
+        const rankRes = await fetchApiWithCredentials("/ranking");
+        const ranking = await rankRes.json();
+
+        return {
+            user: ranking.find((user) => user.uid === this.user.id).rank,
+            total: ranking.length,
+        };
     }
 
     async logout() {
@@ -105,10 +119,12 @@ class TfAppBar extends HTMLElement {
                 gap: 24px;
             }
 
-            .appbar > .infos-left > div {
+            .appbar > .infos-left > * {
                 display: flex;
                 align-items: center;
                 gap: 12px;
+                text-decoration: none;
+                color: var(--color-surface);
             }
 
             .appbar > .infos-right {
@@ -158,10 +174,10 @@ class TfAppBar extends HTMLElement {
                     <tf-button class="confirm" slot="confirm-button">Confirmer et me déconnecter</tf-button>
                 </tf-dialog>
                 <div class="infos-left">
-                    <div>
+                    <a href="/">
                         <span class="material-symbols-rounded">leaderboard</span>
                         <span id="rank">-/-</span>
-                    </div>
+                    </a>
                     <div>
                         <span class="material-symbols-rounded">stars</span>
                         <span id="level"></span>
@@ -240,7 +256,12 @@ class TfAppBar extends HTMLElement {
         this.levelElement.textContent = `Niveau ${this.user.level}`;
         this.usernameElement.textContent = this.user.name;
         this.moneyLevelElement.textContent = this.user.ecus;
-        this.appbarElement.classList.add("ready");
+        try {
+            const rankInfos = await this.fetchUserRank();
+            this.rankElement.textContent = `${rankInfos.user}/${rankInfos.total}`;
+        } finally {
+            this.appbarElement.classList.add("ready");
+        }
     }
 
     setupEventListeners() {

@@ -19,15 +19,12 @@ public class RabbitController {
     }
 
     // --- CRUD Operations ---
-
-    @GetMapping
-    public ResponseEntity<List<Rabbit>> getAll() {
+    @GetMapping("/me")
+    public ResponseEntity<List<Rabbit>> getByUserId() {
         try {
-            return ResponseEntity.ok(rabbitService.findAll());
+            return ResponseEntity.ok(rabbitService.findByConnectedUserId());
         } catch (Exception e) {
-            return ResponseEntity.status(
-                HttpStatus.INTERNAL_SERVER_ERROR
-            ).build();
+            return ResponseEntity.notFound().build();
         }
     }
 

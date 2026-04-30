@@ -57,3 +57,12 @@ p {
     color: var(--color-primary);
     font-size: 1.1em;
 }
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
