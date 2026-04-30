@@ -13,11 +13,8 @@ import com.api.tinyfarm.repository.CowRepository;
 import com.api.tinyfarm.repository.ProductRepository;
 import com.api.tinyfarm.repository.RabbitRepository;
 import com.api.tinyfarm.repository.StockRepository;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.api.tinyfarm.utils.RandomNameProvider;
@@ -115,7 +112,6 @@ public class InitFarmService {
             .map(Rabbit::getName)
             .filter(name -> name != null && !name.isBlank())
             .collect(Collectors.toCollection(HashSet::new));
-
         for (int i = 0 ; i < STARTER_LAPEREAU_COUNT; i++) {
             Rabbit rabbit = new Rabbit();
             rabbit.setUserId(userId);

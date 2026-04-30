@@ -25,34 +25,30 @@ public class MarketService {
 
     public List<Market> findByUserId(Long uid) {
         return marketRepository
-            .findByMarketIdUserId(uid);
+                .findByMarketIdUserId(uid);
     }
 
     public Market findById(MarketID id) {
         return marketRepository
                 .findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Marché introuvable pour l'utilisateur : " + id.getUserId()
-                         + " ou pour le produit : " + id.getProductId())
-                );
+                .orElseThrow(() -> new RuntimeException("Marché introuvable pour l'utilisateur : " + id.getUserId()
+                        + " ou pour le produit : " + id.getProductId()));
     }
 
     public Market findByProductId(Long productID) {
         return marketRepository
-            .findByMarketIdProductId(productID)
-            .orElseThrow(() ->
-                new RuntimeException("Marché introuvable : " + productID)
-            );
+                .findByMarketIdProductId(productID)
+                .orElseThrow(() -> new RuntimeException("Marché introuvable : " + productID));
     }
 
     public List<Market> findByPrice(float price) {
         return marketRepository
-            .findByPrice(price);
+                .findByPrice(price);
     }
 
     public List<Market> findByQuantity(int quantity) {
         return marketRepository
-            .findByQuantity(quantity);
+                .findByQuantity(quantity);
     }
 
     public Market create(Market market) {
@@ -60,9 +56,12 @@ public class MarketService {
         validateMarketOfferForCreate(market);
         ensureProductCanBeSoldOnMarket(market.getProductId());
         syncMarketId(market);
+
+        // Si une offre existe déjà, la supprimer d'abord (mise à jour de l'offre)
         if (marketRepository.existsById(market.getMarketId())) {
-            throw new IllegalArgumentException("Offre marché déjà existante pour cet utilisateur / produit");
+            marketRepository.deleteById(market.getMarketId());
         }
+
         return marketRepository.save(market);
     }
 
@@ -70,8 +69,12 @@ public class MarketService {
         return marketRepository.findAll();
     }
 
-    public List<Market> findAllExceptOnesOfTheConnectedUser(Long id){
-        return marketRepository.findByMarketIdUserIdNot(id);
+    public List<Market> findAllExceptOnesOfTheConnectedUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof User currentUser)) {
+            throw new RuntimeException("Utilisateur non authentifié");
+        }
+        return marketRepository.findByMarketIdUserIdNot(currentUser.getId());
     }
 
     public Market update(Long uid, Long productId, Market modifiedMarket) {
@@ -90,8 +93,7 @@ public class MarketService {
             marketRepository.deleteByMarketIdUserIdAndMarketIdProductId(userId, productId);
         } catch (Exception e) {
             throw new RuntimeException(
-                "Impossible de retirer le produit du marché : " + e.getMessage()
-            );
+                    "Impossible de retirer le produit du marché : " + e.getMessage());
         }
     }
 
@@ -105,19 +107,30 @@ public class MarketService {
             return;
         }
         market.setMarketId(
-            new MarketID(market.getUserId(), market.getProductId())
-        );
+                new MarketID(market.getUserId(), market.getProductId()));
     }
 
     public void buyFromMarket(
-        Long buyerId,
-        Long sellerId,
-        Long productId,
-        Integer quantity
-    ) {
+            Long buyerId,
+            Long sellerId,
+            Long productId,
+            Integer quantity) {
         Market market = findById(new MarketID(sellerId, productId));
         Long resolvedBuyerId = resolveAuthenticatedBuyerId(buyerId);
         tradeService.buy(sellerId, resolvedBuyerId, productId, quantity, market.getUnitPrice());
+
+        int remainingQuantity = market.getQuantity() - quantity;
+        if (remainingQuantity < 0) {
+            throw new IllegalArgumentException("Quantité achetée supérieure à la quantité disponible");
+        }
+
+        if (remainingQuantity == 0) {
+            marketRepository.deleteById(market.getMarketId());
+            return;
+        }
+
+        market.setQuantity(remainingQuantity);
+        marketRepository.save(market);
     }
 
     private void applyAuthenticatedUserId(Market market) {
@@ -146,15 +159,15 @@ public class MarketService {
     }
 
     private void ensureProductCanBeSoldOnMarket(Long productId) {
-        // Business rule: eggs are cooperative-only products and cannot be listed on market.
+        // Business rule: eggs are cooperative-only products and cannot be listed on
+        // market.
         Product product = productService.findById(productId);
         String description = product.getDescription() == null
-            ? ""
-            : product.getDescription().toLowerCase();
+                ? ""
+                : product.getDescription().toLowerCase();
         if (description.contains("egg") || description.contains("oeuf")) {
             throw new IllegalArgumentException(
-                "Vous ne pouvez vendre ce produit qu'à la coopérative : " + product.getDescription()
-            );
+                    "Vous ne pouvez vendre ce produit qu'à la coopérative : " + product.getDescription());
         }
     }
 

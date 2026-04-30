@@ -43,6 +43,14 @@ public class ChickenService{
             );
     }
 
+    public List<Chicken> findByConnectedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof User currentUser)) {
+            throw new RuntimeException("Utilisateur non authentifié");
+        }
+        return chickenRepository.findByUserId(currentUser.getId());
+    }
+
     public Chicken getByName(String name) {
         return chickenRepository
             .findByName(name)

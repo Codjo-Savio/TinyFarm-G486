@@ -2,6 +2,7 @@ package com.api.tinyfarm.controller;
 
 import com.api.tinyfarm.model.Chicken;
 import com.api.tinyfarm.model.Cow;
+import com.api.tinyfarm.model.Rabbit;
 import com.api.tinyfarm.service.CowService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,20 +21,20 @@ public class CowController {
         this.cowService = cowService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<Cow>> getAll() {
-        try {
-            return ResponseEntity.ok(cowService.findAll());
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
     @GetMapping("/id/{id}")
     @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id)")
     public ResponseEntity<Cow> getById(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(cowService.findById(id));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<List<Cow>> getByUserId() {
+        try {
+            return ResponseEntity.ok(cowService.findByConnectedUserId());
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

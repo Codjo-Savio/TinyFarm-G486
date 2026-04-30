@@ -1,6 +1,7 @@
 package com.api.tinyfarm.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -98,8 +99,8 @@ public class MarketControllerTest extends AuthenticatedControllerTestSupport {
                 post("/api/market")
                         .with(authenticated())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(market))
-        ).andExpect(status().isCreated());
+                        .content(objectMapper.writeValueAsString(market)))
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -149,8 +150,8 @@ public class MarketControllerTest extends AuthenticatedControllerTestSupport {
                 put("/api/market/uid/1/pid/" + productId)
                         .with(authenticated())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updatedMarket))
-        ).andExpect(status().isOk());
+                        .content(objectMapper.writeValueAsString(updatedMarket)))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -214,19 +215,18 @@ public class MarketControllerTest extends AuthenticatedControllerTestSupport {
                 post("/api/market/buy")
                         .with(authenticated())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-        ).andExpect(status().isOk());
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
 
         User updatedSeller = userService.findById(seller.getId());
         User updatedBuyer = userService.findById(buyer.getId());
-        Stock updatedSellerStock = stockService.findById(seller.getId(), buyProductId);
         Stock updatedBuyerStock = stockService.findById(buyer.getId(), buyProductId);
         List<Market> updatedListing = marketService.findByUserId(seller.getId());
 
         assertEquals(126.0f, updatedSeller.getEcus());
         assertEquals(174.0f, updatedBuyer.getEcus());
-        assertEquals(8, updatedSellerStock.getQuantity());
         assertEquals(2, updatedBuyerStock.getQuantity());
-        assertEquals(5, updatedListing.getFirst().getQuantity());
+        assertEquals(1, updatedListing.size());
+        assertEquals(3, updatedListing.get(0).getQuantity());
     }
 }

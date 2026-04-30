@@ -1,12 +1,13 @@
 import { fetchApiWithCredentials } from "/utils/fetch.js";
 
+const snackbarElement = document.querySelector("tf-snackbar");
 let rabbits = [];
 
 async function initializeHutch() {
     const container = document.getElementById("game-grid");
 
     try {
-        const response = await fetchApiWithCredentials("/rabbits");
+        const response = await fetchApiWithCredentials("/rabbits/me");
 
         if (!response.ok) {
             throw new Error(`Erreur API : ${response.status}`);
@@ -51,9 +52,9 @@ function renderRabbitCard(rabbit) {
                         </div>
                     </div>
                     <div class="animal-gender">
-                        <span class="material-symbols-rounded">${rabbit.gender === "F" ? "female" : "male"}</span>
+                        <span class="material-symbols-rounded">${typeLabel !== "Lapereau" ? (rabbit.gender === "F" ? "female" : "male") : "question_mark"}</span>
                         <div class="animal-gender-text">
-                            <p>${genderLabel}</p>
+                            <p>${typeLabel !== "Lapereau" ? genderLabel : "Sexe inconnu"}</p>
                         </div>
                     </div>
                     <div class="animal-weight">
@@ -127,9 +128,16 @@ function updateActionMenuCosts() {
     const dirtyCount = rabbits.filter((r) => !r.clean).length;
 
     feedBtn.textContent = `$${hungryCount * 5} Nourrir`;
+    if (hungryCount <= 0) feedBtn.setAttribute("disabled", "");
+
     waterBtn.textContent = `$${thirstyCount * 2} Abreuver`;
+    if (thirstyCount <= 0) waterBtn.setAttribute("disabled", "");
+
     healBtn.textContent = `$${sickCount * 6} Soigner`;
+    if (sickCount <= 0) healBtn.setAttribute("disabled", "");
+
     cleanBtn.textContent = `$${dirtyCount * 3} Nettoyer`;
+    if (dirtyCount <= 0) cleanBtn.setAttribute("disabled", "");
 }
 
 async function performRabbitAction(rabbitId, action) {
@@ -140,8 +148,12 @@ async function performRabbitAction(rabbitId, action) {
     );
 
     if (!response.ok) {
+        snackbarElement.showSnackbar(`Impossible d'appliquer l'action.`, false);
         throw new Error(`Action ${action} impossible (${response.status})`);
     }
+
+    window.dispatchEvent(new CustomEvent("refresh-user-data"));
+    snackbarElement.showSnackbar(`Action appliquée avec succès.`);
 }
 
 async function fetchCurrentUserId() {

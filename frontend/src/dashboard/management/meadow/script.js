@@ -1,9 +1,9 @@
 import { fetchApiWithCredentials } from "/utils/fetch.js";
 
+const snackbarElement = document.querySelector("tf-snackbar");
 // Variables globales pour stocker les données des vaches et le lait
 let cows = [];
 let milk = 0;
-const isFakeMode = new URLSearchParams(window.location.search).get("fake") === "1";
 
 function createCowActionButton(action, cowId, label, isEnabled) {
     return `<tf-button data-action="${action}" data-cow-id="${cowId}"${isEnabled ? "" : " disabled=true"}>${label}</tf-button>`;
@@ -126,15 +126,7 @@ function normalizeCowsPayload(payload) {
 }
 
 async function fetchMeadowData() {
-    if (isFakeMode) {
-        const response = await fetchApiWithCredentials("/fakeapi/meadow.json");
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP (fake meadow) : ${response.status}`);
-        }
-        return normalizeCowsPayload(await response.json());
-    }
-
-    const response = await fetchApiWithCredentials("/cows");
+    const response = await fetchApiWithCredentials("/cows/me");
     if (!response.ok) {
         throw new Error(`Erreur HTTP : ${response.status}`);
     }
@@ -173,18 +165,23 @@ function updateActionMenuCosts() {
     const thirstyCows = cows.filter((cow) => !cow.wateredToday).length;
 
     feedBtn.textContent = `$${hungryCows * 5} Nourrir`;
+    if (hungryCows <= 0) feedBtn.setAttribute("disabled", "");
+
     waterBtn.textContent = `$${thirstyCows * 2} Abreuver`;
+    if (thirstyCows <= 0) waterBtn.setAttribute("disabled", "");
+
     healBtn.textContent = `$${unhealthyCows * 6} Soigner`;
+    if (unhealthyCows <= 0) healBtn.setAttribute("disabled", "");
+
     cleanBtn.textContent = `$${dirtyCows * 3} Nettoyer`;
+    if (dirtyCows <= 0) cleanBtn.setAttribute("disabled", "");
 }
 
 async function callCowActionApi(cow, action) {
-    if (isFakeMode) {
-        return;
-    }
-
     const endpointAction = action === "feed" ? "hay" : action;
-    const userIdQuery = cow.userId ? `?userId=${encodeURIComponent(cow.userId)}` : "";
+    const userIdQuery = cow.userId
+        ? `?userId=${encodeURIComponent(cow.userId)}`
+        : "";
     const response = await fetchApiWithCredentials(
         `/cows/${cow.id}/${endpointAction}${userIdQuery}`,
         "POST",
@@ -243,22 +240,25 @@ async function applyActionToCow(cowId, action) {
     }
 
     try {
-        if (isFakeMode) {
-            applyLocalState();
-        } else {
-            await callCowActionApi(cow, action);
-            applyLocalState();
-        }
+        await callCowActionApi(cow, action);
+        applyLocalState();
     } catch (error) {
-        console.error(`Impossible d'appliquer l'action ${action} sur ${cow.id} :`, error);
+        console.error(
+            `Impossible d'appliquer l'action ${action} sur ${cow.id} :`,
+            error,
+        );
+        snackbarElement.showSnackbar(`Impossible d'appliquer l'action.`, false);
     }
 
+    snackbarElement.showSnackbar(`Action appliquée avec succès.`);
     renderMeadow();
     refreshUserData();
 }
 
 async function onCowActionClick(event) {
-    const actionButton = event.target.closest("tf-button[data-action][data-cow-id]");
+    const actionButton = event.target.closest(
+        "tf-button[data-action][data-cow-id]",
+    );
     if (!actionButton) {
         return;
     }
@@ -277,16 +277,19 @@ async function feedAll() {
     for (const cow of cows) {
         if (!isCowFed(cow)) {
             try {
-                if (isFakeMode) {
-                    cow.fedToday = true;
-                    cow.hayToday = true;
-                } else {
-                    await callCowActionApi(cow, "feed");
-                    cow.fedToday = true;
-                    cow.hayToday = true;
-                }
+                await callCowActionApi(cow, "feed");
+                cow.fedToday = true;
+                cow.hayToday = true;
+                snackbarElement.showSnackbar(`Action appliquée avec succès.`);
             } catch (error) {
-                console.error(`Impossible de nourrir la vache ${cow.id} :`, error);
+                snackbarElement.showSnackbar(
+                    `Impossible d'appliquer l'action.`,
+                    false,
+                );
+                console.error(
+                    `Impossible de nourrir la vache ${cow.id} :`,
+                    error,
+                );
             }
         }
     }
@@ -298,13 +301,14 @@ async function waterAll() {
     for (const cow of cows) {
         if (!cow.wateredToday) {
             try {
-                if (isFakeMode) {
-                    cow.wateredToday = true;
-                } else {
-                    await callCowActionApi(cow, "water");
-                    cow.wateredToday = true;
-                }
+                await callCowActionApi(cow, "water");
+                cow.wateredToday = true;
+                snackbarElement.showSnackbar(`Action appliquée avec succès.`);
             } catch (error) {
+                snackbarElement.showSnackbar(
+                    `Impossible d'appliquer l'action.`,
+                    false,
+                );
                 console.error(
                     `Impossible d'abreuver la vache ${cow.id} :`,
                     error,
@@ -320,14 +324,18 @@ async function healAll() {
     for (const cow of cows) {
         if (!cow.healthy) {
             try {
-                if (isFakeMode) {
-                    cow.healthy = true;
-                } else {
-                    await callCowActionApi(cow, "heal");
-                    cow.healthy = true;
-                }
+                await callCowActionApi(cow, "heal");
+                cow.healthy = true;
+                snackbarElement.showSnackbar(`Action appliquée avec succès.`);
             } catch (error) {
-                console.error(`Impossible de soigner la vache ${cow.id} :`, error);
+                snackbarElement.showSnackbar(
+                    `Impossible d'appliquer l'action.`,
+                    false,
+                );
+                console.error(
+                    `Impossible de soigner la vache ${cow.id} :`,
+                    error,
+                );
             }
         }
     }
@@ -339,13 +347,14 @@ async function cleanAll() {
     for (const cow of cows) {
         if (!cow.clean) {
             try {
-                if (isFakeMode) {
-                    cow.clean = true;
-                } else {
-                    await callCowActionApi(cow, "clean");
-                    cow.clean = true;
-                }
+                await callCowActionApi(cow, "clean");
+                cow.clean = true;
+                snackbarElement.showSnackbar(`Action appliquée avec succès.`);
             } catch (error) {
+                snackbarElement.showSnackbar(
+                    `Impossible d'appliquer l'action.`,
+                    false,
+                );
                 console.error(
                     `Impossible de nettoyer la vache ${cow.id} :`,
                     error,
@@ -359,7 +368,9 @@ async function cleanAll() {
 
 initializeMeadow();
 
-document.querySelector("#game-grid").addEventListener("click", onCowActionClick);
+document
+    .querySelector("#game-grid")
+    .addEventListener("click", onCowActionClick);
 
 document.querySelector("#feed-btn").addEventListener("click", feedAll);
 document.querySelector("#water-btn").addEventListener("click", waterAll);

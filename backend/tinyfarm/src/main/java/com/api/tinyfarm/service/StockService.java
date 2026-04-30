@@ -3,8 +3,10 @@ package com.api.tinyfarm.service;
 import com.api.tinyfarm.model.*;
 import com.api.tinyfarm.repository.StockRepository;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +24,7 @@ public class StockService {
         return stockRepository.findAll();
     }
 
-    public Stock findById(Long userId, Long productId) {
+    public Stock findById(Long userId, Long productId){
         StockId id = new StockId(userId, productId);
         return stockRepository
             .findById(id)
@@ -83,12 +85,18 @@ public class StockService {
 
     public Stock update(Long userId, Long productId, Stock stock) {
         Stock existing = findById(userId, productId);
+
         if (stock.getQuantity() != null) {
+            if (stock.getQuantity() < 0) {
+                throw new IllegalArgumentException("Quantité invalide");
+            }
             existing.setQuantity(stock.getQuantity());
         }
+
         if (stock.getCollectible() != null) {
             existing.setCollectible(stock.getCollectible());
         }
+
         return stockRepository.save(existing);
     }
 
@@ -107,16 +115,53 @@ public class StockService {
 
     public void deleteByProduct(Long productId) {
         findByProduct(productId).forEach(s ->
-            stockRepository.deleteById(s.getId())
+                stockRepository.deleteById(s.getId())
         );
     }
 
-    public Market publishToMarket(Long productId, Integer quantity, Float unitPrice){
-            // Publishing converts stock intent into a market offer; market service enforces trade constraints.
-            Market market = new Market();
-            market.setProductId(productId);
-            market.setQuantity(quantity);
-            market.setUnitPrice(unitPrice);
-            return marketService.create(market);
+    @Transactional
+    public Market publishToMarket(Long productId, Integer quantity, Float unitPrice) {
+
+        Long userId = getALong(quantity, unitPrice);
+
+        Stock stock = findById(userId, productId);
+
+        if (stock.getQuantity() < quantity) {
+            throw new IllegalArgumentException("Stock insuffisant");
+        }
+
+        if (Objects.equals(stock.getQuantity(), quantity)) {
+            delete(userId, productId);
+        } else {
+            stock.setQuantity(stock.getQuantity() - quantity);
+            stockRepository.save(stock);
+        }
+
+        Market market = new Market();
+        market.setUserId(userId);
+        market.setProductId(productId);
+        market.setQuantity(quantity);
+        market.setUnitPrice(unitPrice);
+
+        return marketService.create(market);
+    }
+
+    private static Long getALong(Integer quantity, Float unitPrice) {
+        if (quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException("Quantité invalide");
+        }
+
+        if (unitPrice == null || unitPrice <= 0) {
+            throw new IllegalArgumentException("Prix invalide");
+        }
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (!(authentication.getPrincipal() instanceof User currentUser)) {
+            throw new IllegalStateException("Utilisateur non authentifié");
+        }
+
+        return currentUser.getId();
     }
 }

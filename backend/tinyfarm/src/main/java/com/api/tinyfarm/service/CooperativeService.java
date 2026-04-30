@@ -11,9 +11,9 @@ import com.api.tinyfarm.model.*;
 import com.api.tinyfarm.repository.CooperativeRepository;
 import com.api.tinyfarm.repository.ProductRepository;
 import com.api.tinyfarm.repository.RabbitRepository;
+import com.api.tinyfarm.repository.ChickenRepository;
 import com.api.tinyfarm.repository.StockRepository;
 import com.api.tinyfarm.utils.RandomNameProvider;
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -36,6 +36,8 @@ public class CooperativeService {
     private StockRepository stockRepository;
     @Autowired
     private RabbitRepository rabbitRepository;
+    @Autowired
+    private ChickenRepository chickenRepository;
 
     public Integer getMediumPriceForProduct(String description) {
         List<Float> prices = new ArrayList<>();
@@ -152,11 +154,10 @@ public class CooperativeService {
     }
 
     public void buyFromCooperative(
-        Long buyerId,
-        Long sellerId,
-        Long productId,
-        Integer quantity
-    ) {
+            Long buyerId,
+            Long sellerId,
+            Long productId,
+            Integer quantity) {
         validatePositiveQuantity(quantity);
         Long resolvedBuyerId = resolveAuthenticatedBuyerId(buyerId);
 
@@ -168,7 +169,14 @@ public class CooperativeService {
         debitBuyerForCooperativePurchase(buyer, averageUnitPrice, quantity);
 
         consumeOffersAndPaySellers(offers, averageUnitPrice, quantity);
-        addRabbitsIfNeeded(resolvedBuyerId, productId, quantity);
+        
+        Product product = getProductOrThrow(productId);
+        if (isRabbitProduct(product)) {
+            addRabbitsIfNeeded(resolvedBuyerId, productId, quantity);
+        }
+        if (isChickenProduct(product)) {
+            addChickensIfNeeded(resolvedBuyerId, productId, quantity);
+        }
     }
 
     private void validatePositiveQuantity(Integer quantity) {
@@ -179,8 +187,8 @@ public class CooperativeService {
 
     private Stock getSellerStockOrThrow(Long sellerId, Long productId) {
         return stockRepository
-            .findById(new StockId(sellerId, productId))
-            .orElseThrow(() -> new RuntimeException("Stock vendeur introuvable"));
+                .findById(new StockId(sellerId, productId))
+                .orElseThrow(() -> new RuntimeException("Stock vendeur introuvable"));
     }
 
     private void ensureStockQuantity(Stock sellerStock, Integer quantity) {
@@ -191,14 +199,14 @@ public class CooperativeService {
 
     private Product getProductOrThrow(Long productId) {
         return productRepository
-            .findById(productId)
-            .orElseThrow(() -> new RuntimeException("Produit introuvable : " + productId));
+                .findById(productId)
+                .orElseThrow(() -> new RuntimeException("Produit introuvable : " + productId));
     }
 
     private User getUserOrThrow(Long userId, String errorMessage) {
         return userRepository
-            .findById(userId)
-            .orElseThrow(() -> new RuntimeException(errorMessage));
+                .findById(userId)
+                .orElseThrow(() -> new RuntimeException(errorMessage));
     }
 
     private void debitOrCreditSellerStockAndEcus(Stock sellerStock, User seller, Integer quantity, float totalPrice) {
@@ -218,11 +226,11 @@ public class CooperativeService {
 
     private List<Cooperative> getSortedAvailableOffers(Long productId) {
         List<Cooperative> offers = cooperativeRepository
-            .findAllByCooperativeIdProductId(productId)
-            .stream()
-            .filter(offer -> offer.getQuantity() > 0 && offer.getPrice() != null && offer.getPrice() >= 0)
-            .sorted(Comparator.comparing(Cooperative::getPrice))
-            .toList();
+                .findAllByCooperativeIdProductId(productId)
+                .stream()
+                .filter(offer -> offer.getQuantity() > 0 && offer.getPrice() != null && offer.getPrice() >= 0)
+                .sorted(Comparator.comparing(Cooperative::getPrice))
+                .toList();
         if (offers.isEmpty()) {
             throw new RuntimeException("Aucune offre coopérative disponible pour ce produit");
         }
@@ -230,7 +238,8 @@ public class CooperativeService {
     }
 
     private void ensureRequestedQuantityAvailable(List<Cooperative> offers, Integer requestedQuantity) {
-        // A cooperative purchase is allowed only if the global available quantity can satisfy the request.
+        // A cooperative purchase is allowed only if the global available quantity can
+        // satisfy the request.
         int totalAvailableQuantity = offers.stream().mapToInt(Cooperative::getQuantity).sum();
         if (totalAvailableQuantity < requestedQuantity) {
             throw new RuntimeException("Quantité insuffisante dans les offres coopératives");
@@ -238,12 +247,13 @@ public class CooperativeService {
     }
 
     private float computeAverageUnitPrice(List<Cooperative> offers) {
-        // Business rule: all buyers pay one unique unit price, equal to the average listing price.
+        // Business rule: all buyers pay one unique unit price, equal to the average
+        // listing price.
         return (float) offers
-            .stream()
-            .mapToDouble(Cooperative::getPrice)
-            .average()
-            .orElseThrow(() -> new RuntimeException("Impossible de calculer le prix moyen"));
+                .stream()
+                .mapToDouble(Cooperative::getPrice)
+                .average()
+                .orElseThrow(() -> new RuntimeException("Impossible de calculer le prix moyen"));
     }
 
     private void debitBuyerForCooperativePurchase(User buyer, float averageUnitPrice, Integer quantity) {
@@ -263,8 +273,10 @@ public class CooperativeService {
         userRepository.save(buyer);
     }
 
-    private void consumeOffersAndPaySellers(List<Cooperative> offers, float averageUnitPrice, Integer requestedQuantity) {
-        // Business rule: cheapest offers are consumed first, then each selected seller is paid at average price.
+    private void consumeOffersAndPaySellers(List<Cooperative> offers, float averageUnitPrice,
+            Integer requestedQuantity) {
+        // Business rule: cheapest offers are consumed first, then each selected seller
+        // is paid at average price.
         int remainingToBuy = requestedQuantity;
         for (Cooperative offer : offers) {
             if (remainingToBuy == 0) {
@@ -305,8 +317,8 @@ public class CooperativeService {
 
     private Animal.AnimalGender resolveRabbitGender(Product product) {
         String description = product.getDescription() == null
-            ? ""
-            : product.getDescription().toLowerCase(Locale.ROOT);
+                ? ""
+                : product.getDescription().toLowerCase(Locale.ROOT);
         if (description.contains("male")) {
             return Animal.AnimalGender.M;
         }
@@ -325,38 +337,95 @@ public class CooperativeService {
 
         // Assign a random rabbit name based on inferred gender.
         rabbit.setName(
-            gender == Animal.AnimalGender.M
-                ? RandomNameProvider.getRandomMaleName()
-                : RandomNameProvider.getRandomFemaleName()
-        );
+                gender == Animal.AnimalGender.M
+                        ? RandomNameProvider.getRandomMaleName()
+                        : RandomNameProvider.getRandomFemaleName());
         return rabbit;
+    }
+
+    private void addChickensIfNeeded(Long buyerId, Long productId, Integer quantity) {
+        // Buying chicken products creates chicken entities directly for the buyer.
+        Product product = getProductOrThrow(productId);
+        if (!isChickenProduct(product)) {
+            return;
+        }
+
+        Animal.AnimalGender gender = resolveChickenGender(product);
+        for (int i = 0; i < quantity; i++) {
+            chickenRepository.save(getChicken(buyerId, gender));
+        }
+    }
+
+    private Animal.AnimalGender resolveChickenGender(Product product) {
+        String description = product.getDescription() == null
+                ? ""
+                : product.getDescription().toLowerCase(Locale.ROOT);
+        if (description.contains("male") || description.contains("coq") || description.contains("rooster")) {
+            return Animal.AnimalGender.M;
+        }
+        if (description.contains("female") || description.contains("femelle")) {
+            return Animal.AnimalGender.F;
+        }
+        return null;
+    }
+
+    private static Chicken getChicken(Long buyerId, Animal.AnimalGender gender) {
+        Chicken chicken = new Chicken();
+        chicken.setUserId(buyerId);
+        chicken.setAge(4);
+        chicken.setGender(gender);
+
+        // Assign a type to the chicken based on infered gender
+        chicken.setChickenType(
+                gender == Animal.AnimalGender.M
+                        ? Chicken.ChickenType.B
+                        : Chicken.ChickenType.L);
+
+        // Assign a random chicken name based on inferred gender.
+        chicken.setName(
+                gender == Animal.AnimalGender.M
+                        ? RandomNameProvider.getRandomMaleName()
+                        : RandomNameProvider.getRandomFemaleName());
+        return chicken;
     }
 
     private Float resolveCooperativeUnitPrice(Product product) {
         // Cooperative sell-back prices are fixed by product family.
         String description = product.getDescription() == null
-            ? ""
-            : product.getDescription().toLowerCase(Locale.ROOT);
+                ? ""
+                : product.getDescription().toLowerCase(Locale.ROOT);
 
         if (description.contains("egg") || description.contains("oeuf")) {
             return 8f;
         }
-        if (description.contains("rabbit") || description.contains("lapin")) {
+        if (isRabbitProduct(product)) {
             return 25f;
+        }
+        if (isChickenProduct(product)) {
+            return 15f;
         }
         if (description.contains("milk") || description.contains("lait")) {
             return 2f;
         }
         throw new IllegalArgumentException(
-            "Prix coopérative introuvable pour ce produit: configurez-le dans la coopérative"
-        );
+                "Prix coopérative introuvable pour ce produit: configurez-le dans la coopérative");
     }
 
     private boolean isRabbitProduct(Product product) {
         String description = product.getDescription() == null
-            ? ""
-            : product.getDescription().toLowerCase(Locale.ROOT);
+                ? ""
+                : product.getDescription().toLowerCase(Locale.ROOT);
         return description.contains("rabbit") || description.contains("lapin");
+    }
+
+    private boolean isChickenProduct(Product product) {
+        String description = product.getDescription() == null
+                ? ""
+                : product.getDescription().toLowerCase(Locale.ROOT);
+        return description.contains("chicken")
+                || description.contains("poule")
+                || description.contains("coq")
+                || description.contains("rooster");
     }
 
     // Cooperative opening hours are defined in AoE timezone (UTC-12).
@@ -386,7 +455,8 @@ public class CooperativeService {
     }
 
     public boolean isOpen() {
-        // Opening state is computed with AoE timezone (UTC-12), not the server local timezone.
+        // Opening state is computed with AoE timezone (UTC-12), not the server local
+        // timezone.
         ZonedDateTime now = ZonedDateTime.now(ZONE);
         LocalTime time = now.toLocalTime();
         DayOfWeek day = now.getDayOfWeek();
@@ -398,12 +468,9 @@ public class CooperativeService {
         if (cooperative == null) {
             throw new IllegalArgumentException("Offre coopérative manquante");
         }
-        Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
-        if (
-                authentication != null &&
-                        authentication.getPrincipal() instanceof User currentUser
-        ) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null &&
+                authentication.getPrincipal() instanceof User currentUser) {
             cooperative.setUserId(currentUser.getId());
         }
         if (cooperative.getUserId() == null) {
@@ -432,4 +499,5 @@ public class CooperativeService {
         cooperative.setCooperativeId(
                 new CooperativeID(cooperative.getUserId(), cooperative.getProductId()));
     }
+
 }
