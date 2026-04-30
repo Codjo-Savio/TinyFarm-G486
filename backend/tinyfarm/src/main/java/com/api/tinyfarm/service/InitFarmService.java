@@ -38,17 +38,16 @@ public class InitFarmService {
     private final CowRepository cowRepository;
 
     public InitFarmService(
-        StockService stockService,
-        ProductService productService,
-        RabbitService rabbitService,
-        ChickenService chickenService,
-        CowService cowService,
-        ProductRepository productRepository,
-        StockRepository stockRepository,
-        RabbitRepository rabbitRepository,
-        ChickenRepository chickenRepository,
-        CowRepository cowRepository
-    ) {
+            StockService stockService,
+            ProductService productService,
+            RabbitService rabbitService,
+            ChickenService chickenService,
+            CowService cowService,
+            ProductRepository productRepository,
+            StockRepository stockRepository,
+            RabbitRepository rabbitRepository,
+            ChickenRepository chickenRepository,
+            CowRepository cowRepository) {
         this.stockService = stockService;
         this.productService = productService;
         this.rabbitService = rabbitService;
@@ -109,10 +108,10 @@ public class InitFarmService {
     private void ensureStarterRabbits(Long userId, List<Rabbit> rabbits) {
         // Starter setup always injects a base population of lapereaux.
         Set<String> usedRabbitNames = rabbits.stream()
-            .map(Rabbit::getName)
-            .filter(name -> name != null && !name.isBlank())
-            .collect(Collectors.toCollection(HashSet::new));
-        for (int i = 0 ; i < STARTER_LAPEREAU_COUNT; i++) {
+                .map(Rabbit::getName)
+                .filter(name -> name != null && !name.isBlank())
+                .collect(Collectors.toCollection(HashSet::new));
+        for (int i = 0; i < STARTER_LAPEREAU_COUNT; i++) {
             Rabbit rabbit = new Rabbit();
             rabbit.setUserId(userId);
             rabbit.setName(RandomNameProvider.getRandomUnknownGenderName(usedRabbitNames));
@@ -167,7 +166,8 @@ public class InitFarmService {
     }
 
     private void ensureStarterStock(User owner, Map<String, Product> products) {
-        // Every starter product is initialized with quantity 100 if no stock entry exists yet.
+        // Every starter product is initialized with quantity 100 if no stock entry
+        // exists yet.
         for (Product product : products.values()) {
             StockId id = new StockId(owner.getId(), product.getId());
             if (stockRepository.existsById(id)) {
@@ -176,7 +176,7 @@ public class InitFarmService {
             Stock stock = new Stock();
             stock.setUserId(owner.getId());
             stock.setProductId(product.getId());
-            stock.setQuantity(100);
+            stock.setQuantity(2);
             try {
                 stockService.create(stock);
             } catch (Exception e) {

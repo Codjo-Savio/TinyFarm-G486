@@ -58,9 +58,16 @@
                             ><span class="material-symbols-rounded">pets</span>
                             <span id="rabbit-count">0</span>
                         </span>
-                        <tf-button icon="sell" variant="secondary"
-                            >Vendre</tf-button
+                        <tf-button
+                            icon="sell"
+                            variant="secondary"
+                            onclick="
+                                window.location.href =
+                                    '/dashboard/management/assets'
+                            "
                         >
+                            Vendre
+                        </tf-button>
                         <tf-menu id="actions-menu" offset-x="-233" offset-y="8">
                             <tf-button
                                 slot="menu-target"
