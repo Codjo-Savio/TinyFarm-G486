@@ -26,7 +26,6 @@ public class ProductServiceTest {
     void shouldCreateProduct() {
         Product product = new Product();
         product.setDescription("blé");
-        product.setPrice(25.0f);
 
         Product created = productService.add(product);
 
@@ -39,13 +38,11 @@ public class ProductServiceTest {
     void shouldReturnAllProducts() {
         Product product = new Product();
         product.setDescription("blé");
-        product.setPrice(25.0f);
 
         Product created = productService.add(product);
 
         Product anotherProduct = new Product();
         anotherProduct.setDescription("foin");
-        anotherProduct.setPrice(25.0f);
 
         Product anotherProductCreated = productService.add(anotherProduct);
 
@@ -56,7 +53,6 @@ public class ProductServiceTest {
     void shouldDeleteProduct(){
         Product product = new Product();
         product.setDescription("blé");
-        product.setPrice(25.0f);
 
         Product created = productService.add(product);
         productService.delete(created.getId());

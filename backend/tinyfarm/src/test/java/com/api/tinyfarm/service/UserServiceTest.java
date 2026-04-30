@@ -32,7 +32,7 @@ public class UserServiceTest {
         User created = userService.create(user);
 
         assertNotNull(created.getId());
-        assertEquals(1500, created.getEcus());
+        assertEquals(0, created.getEcus());
         assertEquals(1, created.getLevel());
     }
 
@@ -144,5 +144,40 @@ public class UserServiceTest {
         assertFalse(found.getHibernation());
         assertNull(found.getHibernationDate());
         assertEquals(1, userService.findAll().size());
+    }
+
+    @Test
+    void shouldResetRemainingPurchasesAtMidnightJob() {
+        User userOne = new User();
+        userOne.setName("Reset One");
+        userOne.setEmail("reset.one@gmail.com");
+        userOne.setGender(User.Gender.M);
+        userOne.setRemainingPurchases(2);
+        userService.create(userOne);
+
+        User userTwo = new User();
+        userTwo.setName("Reset Two");
+        userTwo.setEmail("reset.two@gmail.com");
+        userTwo.setGender(User.Gender.F);
+        userTwo.setRemainingPurchases(0);
+        userService.create(userTwo);
+
+        userService.resetRemainingPurchases();
+
+        assertEquals(12, userService.findByEmail("reset.one@gmail.com").getRemainingPurchases());
+        assertEquals(12, userService.findByEmail("reset.two@gmail.com").getRemainingPurchases());
+    }
+
+    @Test
+    void shouldReturnRemainingPurchasesForUser() {
+        User user = new User();
+        user.setName("Buyer");
+        user.setEmail("buyer@gmail.com");
+        user.setGender(User.Gender.F);
+        user.setRemainingPurchases(7);
+
+        User created = userService.create(user);
+
+        assertEquals(7, userService.getRemainingPurchases(created.getId()));
     }
 }

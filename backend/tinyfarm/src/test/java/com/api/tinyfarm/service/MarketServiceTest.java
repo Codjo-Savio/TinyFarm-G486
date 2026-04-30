@@ -4,6 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.api.tinyfarm.model.Market;
+import com.api.tinyfarm.model.Product;
+import com.api.tinyfarm.model.Stock;
+import com.api.tinyfarm.repository.MarketRepository;
+import com.api.tinyfarm.repository.ProductRepository;
+import com.api.tinyfarm.repository.StockRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,25 +21,58 @@ public class MarketServiceTest {
 
     @Autowired
     private MarketService marketService;
+    @Autowired
+    private MarketRepository marketRepository;
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private StockService stockService;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private StockRepository stockRepository;
+
+
+    private Long productId;
 
     @BeforeEach
     void setup() {
-        marketService.deleteAll();
+        marketRepository.deleteAll();
+        stockRepository.deleteAll();
+        productRepository.deleteAll();
+
+        Product product = new Product();
+        product.setDescription("Eau");
+
+        Product savedProduct = productService.create(product);
+        productId = savedProduct.getId();
+
+        try {
+            Stock stock = new Stock();
+            stock.setProductId(productId);
+            stock.setQuantity(200);
+            stockService.create(stock);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
+
+
 
     @Test
     void shouldCreateMarket() {
+
         Market market = new Market();
         market.setUserId(1L);
-        market.setProductId(10L);
-        market.setPrice(25.0f);
+        market.setProductId(productId);
+        market.setUnitPrice(25.0f);
         market.setQuantity(100);
 
         Market created = marketService.create(market);
 
         assertNotNull(created.getMarketId());
         assertEquals(1L, created.getUserId());
-        assertEquals(10L, created.getProductId());
+        assertEquals(productId, created.getProductId());
         assertEquals(100, created.getQuantity());
     }
 
@@ -42,12 +80,12 @@ public class MarketServiceTest {
     void shouldReturnMarketByProductId() {
         Market market = new Market();
         market.setUserId(1L);
-        market.setProductId(10L);
-        market.setPrice(25.0f);
+        market.setProductId(productId);
+        market.setUnitPrice(25.0f);
 
         marketService.create(market);
 
-        Market found = marketService.findByProductId(10L);
+        Market found = marketService.findByProductId(productId);
 
         assertNotNull(found);
         assertEquals(1L, found.getUserId());
@@ -57,11 +95,11 @@ public class MarketServiceTest {
     void shouldDeleteMarketByUserIdAndProductId() {
         Market market = new Market();
         market.setUserId(1L);
-        market.setProductId(10L);
-        market.setPrice(25.0f);
+        market.setProductId(productId);
+        market.setUnitPrice(25.0f);
         marketService.create(market);
 
-        marketService.deleteProductById(1L, 10L);
+        marketService.deleteProductById(1L, productId);
 
         assertEquals(0, marketService.findAll().size());
     }
@@ -70,8 +108,8 @@ public class MarketServiceTest {
     void shouldDeleteMarketByUserId() {
         Market market = new Market();
         market.setUserId(1L);
-        market.setProductId(10L);
-        market.setPrice(25.0f);
+        market.setProductId(productId);
+        market.setUnitPrice(25.0f);
         marketService.create(market);
 
         marketService.deleteByID(1L);

@@ -1,7 +1,5 @@
 package com.api.tinyfarm.model;
 
-import javax.annotation.processing.Generated;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,9 +21,6 @@ public class Product {
 
     @Column(name = "collection")
     Boolean collectible;
-
-    @Column(name = "price")
-    Float price;
 
     @Column(name = "coef")
     Integer coefficient;

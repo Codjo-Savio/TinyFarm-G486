@@ -43,7 +43,8 @@ public class ChickenServiceTest {
             2000F,
             false,
             null,
-            1
+            1,
+            12
         );
 
         Animal animal = new Animal();
@@ -76,7 +77,8 @@ public class ChickenServiceTest {
             2000F,
             false,
             null,
-            1
+            1,
+            12
         );
 
         Animal animal = new Animal();
@@ -230,7 +232,8 @@ public class ChickenServiceTest {
             2000F,
             false,
             null,
-            1
+            1,
+            12
         );
 
         Animal animal = new Animal();

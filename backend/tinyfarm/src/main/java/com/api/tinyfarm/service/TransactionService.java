@@ -46,6 +46,28 @@ public class TransactionService {
     }
 
     public Transaction create(Transaction transaction) {
+        // A transaction must represent a real exchange between two distinct users.
+        if (transaction == null) {
+            throw new IllegalArgumentException("Transaction manquante");
+        }
+        if (transaction.getId() != null && transactionRepository.existsById(transaction.getId())) {
+            throw new IllegalArgumentException("Transaction déjà existante : " + transaction.getId());
+        }
+        if (transaction.getSeller() == null || transaction.getBuyer() == null) {
+            throw new IllegalArgumentException("Acheteur/Vendeur manquant pour la transaction");
+        }
+        if (transaction.getSeller().equals(transaction.getBuyer())) {
+            throw new IllegalArgumentException("Le vendeur et l'acheteur doivent être différents");
+        }
+        if (transaction.getProduct() == null) {
+            throw new IllegalArgumentException("Produit manquant pour la transaction");
+        }
+        if (transaction.getQuantity() == null || transaction.getQuantity() <= 0) {
+            throw new IllegalArgumentException("Quantité transaction invalide");
+        }
+        if (transaction.getTotalPrice() < 0) {
+            throw new IllegalArgumentException("Montant transaction invalide");
+        }
         return transactionRepository.save(transaction);
     }
 

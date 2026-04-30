@@ -240,22 +240,6 @@
         </div>
     </div>
 </body>
-<script>
-    const button = document.getElementById('more-actions-btn');
-    const menu = document.getElementById('more-actions-content');
 
-    button.addEventListener('click', (event) => {
-        event.stopPropagation();
-        menu.classList.toggle('grid');
-    });
-
-    menu.addEventListener('click', (event) => {
-        event.stopPropagation();
-    });
-
-    document.addEventListener('click', () => {
-        menu.classList.remove('grid');
-    });
-</script>
 
 </html>

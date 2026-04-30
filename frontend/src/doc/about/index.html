@@ -8,7 +8,7 @@
         <!-- Components -->
         <script src="/components/tf-button.js"></script>
         <!-- Theme -->
-        <link rel="stylesheet" href="/styles/theme.css" />
+        <link rel="stylesheet" href="/utils/theme.css" />
         <!-- Font -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,12 +25,8 @@
             <tf-button
                 class="back-btn"
                 variant="secondary"
-                icon="arrow_left_alt"
-                onclick="
-                    window.location.href = window.location.search
-                        ? window.location.search.replace('?from=', '')
-                        : '/'
-                "
+                icon="keyboard_backspace"
+                onclick="window.history.back()"
                 >Retour</tf-button
             >
             <h1>À propos</h1>
@@ -46,8 +42,19 @@
                         le début du cursus de Licence Informatique.
                     </p>
                     <p>
-                        Ce projet s'inspire librement des principes du jeu My
-                        e-Farm.
+                        Ce projet s'inspire librement des principes du jeu
+                        <a href="https://api.myefarm.net/" target="_blank"
+                            >My e-farm</a
+                        >.
+                    </p>
+                    <p>
+                        Vous pouvez retrouver plus d'informations ainsi que le
+                        code source de l'application sur
+                        <a
+                            href="https://github.com/Codjo-Savio/TinyFarm-G486"
+                            target="_blank"
+                            >notre repo Github</a
+                        >.
                     </p>
                 </div>
             </div>
@@ -83,13 +90,6 @@
                 rassemble les contributions de plusieurs étudiants sur le
                 frontend, le backend, la base de données, les tests et la
                 documentation.
-            </p>
-            <p>
-                Merci à l'ensemble des contributrices et contributeurs du
-                projet, notamment Savio Amoussouvi, Maël Bonnet, Ethann Allain,
-                Noa Chupin, Tugderic, Sacha Guichard, Julien Paillard, Tyler
-                Boucher, Mewenn Le Buan, Killian Bienvenu, Evan Garrec et les
-                autres membres ayant participé aux développements et aux revues.
             </p>
         </div>
     </body>

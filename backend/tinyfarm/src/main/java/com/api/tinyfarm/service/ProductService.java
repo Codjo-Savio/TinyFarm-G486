@@ -27,6 +27,20 @@ public class ProductService {
     }
 
     public Product create(Product product) {
+        // Product descriptions are unique business keys in the catalog.
+        if (product == null) {
+            throw new IllegalArgumentException("Produit manquant");
+        }
+        if (product.getDescription() == null || product.getDescription().isBlank()) {
+            throw new IllegalArgumentException("Description produit manquante");
+        }
+        if (product.getId() != null && productRepository.existsById(product.getId())) {
+            throw new IllegalArgumentException("Produit déjà existant : " + product.getId());
+        }
+        List<Product> existingWithDescription = productRepository.findByDescription(product.getDescription());
+        if (!existingWithDescription.isEmpty()) {
+            throw new IllegalArgumentException("Produit déjà existant avec la même description");
+        }
         return productRepository.save(product);
     }
 
@@ -39,7 +53,6 @@ public class ProductService {
 
         // Update fields
         existing.setDescription(modifiedProduct.getDescription());
-        existing.setPrice(modifiedProduct.getPrice());
         existing.setCollectible(modifiedProduct.getCollectible());
         existing.setCoefficient(modifiedProduct.getCoefficient());
 
