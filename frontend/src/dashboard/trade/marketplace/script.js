@@ -283,7 +283,7 @@ async function initialiserBoutique() {
                     </div>
                     <div class="prod-action">
                         <span class="price">$${market.price}</span>
-                        <button class="btn-add" onclick="ajouterAuPanier(${market.productId}, ${market.userId})">Ajouter</button>
+                        <tf-button onclick="ajouterAuPanier(${market.productId}, ${market.userId})">Ajouter</tf-button>
                     </div>
                 </div>
             `;

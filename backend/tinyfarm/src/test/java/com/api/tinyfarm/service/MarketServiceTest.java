@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import com.api.tinyfarm.model.Market;
 import com.api.tinyfarm.model.Product;
 import com.api.tinyfarm.model.Stock;
+import com.api.tinyfarm.model.StockId;
+import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.MarketRepository;
 import com.api.tinyfarm.repository.ProductRepository;
 import com.api.tinyfarm.repository.StockRepository;
@@ -28,10 +30,11 @@ public class MarketServiceTest {
     @Autowired
     private StockService stockService;
     @Autowired
+    private UserService userService;
+    @Autowired
     private ProductRepository productRepository;
     @Autowired
     private StockRepository stockRepository;
-
 
     private Long productId;
 
@@ -56,8 +59,6 @@ public class MarketServiceTest {
             System.out.println(e.getMessage());
         }
     }
-
-
 
     @Test
     void shouldCreateMarket() {
@@ -115,5 +116,37 @@ public class MarketServiceTest {
         marketService.deleteByID(1L);
 
         assertEquals(0, marketService.findAll().size());
+    }
+
+    @Test
+    void shouldKeepMarketAdWhenQuantityRemainsAfterPurchase() {
+        User seller = new User();
+        seller.setName("Seller Market");
+        seller.setEmail("seller_market_partial@test.com");
+        seller.setGender(User.Gender.M);
+        seller.setEcus(100.0f);
+        seller = userService.create(seller);
+
+        User buyer = new User();
+        buyer.setName("Buyer Market");
+        buyer.setEmail("buyer_market_partial@test.com");
+        buyer.setGender(User.Gender.F);
+        buyer.setEcus(200.0f);
+        buyer = userService.create(buyer);
+
+        Market listing = new Market();
+        listing.setUserId(seller.getId());
+        listing.setProductId(productId);
+        listing.setUnitPrice(13.0f);
+        listing.setQuantity(5);
+        marketService.create(listing);
+
+        marketService.buyFromMarket(buyer.getId(), seller.getId(), productId, 2);
+
+        Market updatedListing = marketService.findByProductId(productId);
+        assertEquals(3, updatedListing.getQuantity());
+
+        Stock updatedBuyerStock = stockRepository.findById(new StockId(buyer.getId(), productId)).orElseThrow();
+        assertEquals(2, updatedBuyerStock.getQuantity());
     }
 }

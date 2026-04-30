@@ -99,8 +99,8 @@ public class MarketControllerTest extends AuthenticatedControllerTestSupport {
                 post("/api/market")
                         .with(authenticated())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(market))
-        ).andExpect(status().isCreated());
+                        .content(objectMapper.writeValueAsString(market)))
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -150,8 +150,8 @@ public class MarketControllerTest extends AuthenticatedControllerTestSupport {
                 put("/api/market/uid/1/pid/" + productId)
                         .with(authenticated())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(updatedMarket))
-        ).andExpect(status().isOk());
+                        .content(objectMapper.writeValueAsString(updatedMarket)))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -215,8 +215,8 @@ public class MarketControllerTest extends AuthenticatedControllerTestSupport {
                 post("/api/market/buy")
                         .with(authenticated())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))
-        ).andExpect(status().isOk());
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
 
         User updatedSeller = userService.findById(seller.getId());
         User updatedBuyer = userService.findById(buyer.getId());
@@ -226,6 +226,7 @@ public class MarketControllerTest extends AuthenticatedControllerTestSupport {
         assertEquals(126.0f, updatedSeller.getEcus());
         assertEquals(174.0f, updatedBuyer.getEcus());
         assertEquals(2, updatedBuyerStock.getQuantity());
-        assertTrue(updatedListing.isEmpty());
+        assertEquals(1, updatedListing.size());
+        assertEquals(3, updatedListing.get(0).getQuantity());
     }
 }
