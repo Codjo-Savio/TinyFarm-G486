@@ -56,10 +56,6 @@ async function fetchProducts() {
 }
 
 async function getCurrentBuyerId() {
-    if (currentUserId !== null) {
-        return currentUserId;
-    }
-
     const response = await fetchApiWithCredentials("/auth/me");
 
     if (!response.ok) {
