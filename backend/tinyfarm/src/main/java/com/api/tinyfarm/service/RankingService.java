@@ -12,6 +12,8 @@ import java.util.List;
 
 @Service
 public class RankingService {
+    private static final String EXCLUDED_RANKING_NAME = "Cooperative";
+
     @Autowired
     private RankingRepository rankingRepository;
     private List<FarmerRankingRequest> cachedRanking = new ArrayList<>();
@@ -41,24 +43,28 @@ public class RankingService {
     }
 
     // Compute ranking from aggregated stats.
-    public List<FarmerRankingRequest> computeRanking(List<Stats> stats){
+    public List<FarmerRankingRequest> computeRanking(List<Stats> stats) {
         // Composite score weights: production 50%, capacity 20%, ecus 30%.
-        if (stats.isEmpty()){
+        List<Stats> filteredStats = stats.stream()
+                .filter(s -> !isExcludedFromRanking(s.getName()))
+                .toList();
+
+        if (filteredStats.isEmpty()) {
             return List.of();
         }
-        double totalProduction = stats.stream()
+        double totalProduction = filteredStats.stream()
                 .mapToDouble(s -> safe(s.getProduction()))
                 .sum();
 
-        double totalCapacity = stats.stream()
+        double totalCapacity = filteredStats.stream()
                 .mapToDouble(s -> safe(s.getCapacity()))
                 .sum();
 
-        double totalEcus = stats.stream()
+        double totalEcus = filteredStats.stream()
                 .mapToDouble(s -> safe(s.getEcus()))
                 .sum();
 
-        List<FarmerRankingRequest> ranking = new java.util.ArrayList<>(stats.stream()
+        List<FarmerRankingRequest> ranking = new java.util.ArrayList<>(filteredStats.stream()
                 .map(s -> {
 
                     double productionScore = safeRatio(s.getProduction(), totalProduction) * 50;
@@ -97,7 +103,12 @@ public class RankingService {
 
     private double safeRatio(Number value, double total) {
         // Defensive ratio: null values or zero denominator contribute zero score.
-        if (value == null || total == 0) return 0;
+        if (value == null || total == 0)
+            return 0;
         return value.doubleValue() / total;
+    }
+
+    private boolean isExcludedFromRanking(String name) {
+        return name != null && EXCLUDED_RANKING_NAME.equalsIgnoreCase(name.trim());
     }
 }
