@@ -25,11 +25,6 @@ let dialoguePrixVente = null;
  * Utilitaires
  * ========================= */
 
-function utiliserModeFake() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("fake") === "1" || params.get("mockData") === "1";
-}
-
 function normaliserListe(source, cle) {
     if (Array.isArray(source)) {
         return source;
@@ -63,6 +58,17 @@ function normaliserNombre(value) {
 
 function echapperPourOnclick(value) {
     return String(value).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+}
+
+function estProduitReserveALaCooperative(nomProduit) {
+    const description = String(nomProduit).toLowerCase();
+    return description.includes("egg") || description.includes("oeuf");
+}
+
+function obtenirCanalVente(nomProduit) {
+    return estProduitReserveALaCooperative(nomProduit)
+        ? "cooperative"
+        : "market";
 }
 
 function afficherEtatInventaireVide(conteneur) {
@@ -173,55 +179,43 @@ function demanderPrixViaDialogue(nomProduit, valeurInitiale) {
  * Chargement des donnees
  * ========================= */
 
-async function chargerInventaireFake() {
-    const urlsCandidates = [
-        "/fakeapi/assets.json",
-        "../../../fakeapi/assets.json",
-    ];
-
-    for (const url of urlsCandidates) {
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                continue;
-            }
-
-            return await response.json();
-        } catch {
-            // continue to next candidate URL
-        }
-    }
-
-    throw new Error("Impossible de charger les donnees fake");
-}
-
 async function chargerInventaireReel() {
     const [meResponse, productsResponse] = await Promise.all([
         fetchApiWithCredentials("/auth/me"),
         fetchApiWithCredentials("/products"),
     ]);
 
-    if (meResponse.ok) {
-        const utilisateur = await meResponse.json();
-        idUtilisateurCourant = Number(utilisateur?.id) || null;
+    if (!meResponse.ok) {
+        throw new Error(`Impossible de récupérer l'utilisateur connecté (${meResponse.status})`);
     }
 
-    let products = [];
-    if (productsResponse.ok) {
-        const jsonProducts = await productsResponse.json();
-        products = Array.isArray(jsonProducts) ? jsonProducts : [];
+    if (!productsResponse.ok) {
+        throw new Error(`Impossible de récupérer les produits (${productsResponse.status})`);
     }
 
-    let stocks = [];
-    if (idUtilisateurCourant) {
-        const stocksResponse = await fetchApiWithCredentials(
-            `/stocks/user/${idUtilisateurCourant}`,
-        );
-        if (stocksResponse.ok) {
-            const jsonStocks = await stocksResponse.json();
-            stocks = Array.isArray(jsonStocks) ? jsonStocks : [];
-        }
+    const utilisateur = await meResponse.json();
+    idUtilisateurCourant = Number(utilisateur?.id) || null;
+
+    if (!idUtilisateurCourant) {
+        throw new Error("Utilisateur connecté invalide");
     }
+
+    const jsonProducts = await productsResponse.json();
+    const products = Array.isArray(jsonProducts) ? jsonProducts : [];
+
+    if (products.length === 0) {
+        throw new Error("Aucun produit n'a été renvoyé par l'API");
+    }
+
+    const stocksResponse = await fetchApiWithCredentials(
+        `/stocks/user/${idUtilisateurCourant}`,
+    );
+    if (!stocksResponse.ok) {
+        throw new Error(`Impossible de récupérer les stocks (${stocksResponse.status})`);
+    }
+
+    const jsonStocks = await stocksResponse.json();
+    const stocks = Array.isArray(jsonStocks) ? jsonStocks : [];
 
     return { products, stocks };
 }
@@ -284,10 +278,7 @@ async function initialiserBoutique() {
     const conteneur = document.getElementById("shop-container");
 
     try {
-        const modeFake = utiliserModeFake();
-        const inventaireRecu = modeFake
-            ? await chargerInventaireFake()
-            : await chargerInventaireReel();
+        const inventaireRecu = await chargerInventaireReel();
         inventaire = normaliserInventaireRecu(inventaireRecu);
 
         indexerInventaire(inventaire);
@@ -340,6 +331,7 @@ async function initialiserBoutique() {
             const valeurs = {
                 quantity: stockParId.get(idProduit) ?? 0,
                 price: normaliserNombre(produit?.price),
+                canal: obtenirCanalVente(nomProduit),
             };
 
             prixParNom.set(nomProduit.toLowerCase(), valeurs.price);
@@ -353,6 +345,11 @@ async function initialiserBoutique() {
                             ${valeurs.quantity}
                         </span>
                         <span class="prod-name">${nomProduit}</span>
+                        <span class="prod-market">${
+                            valeurs.canal === "cooperative"
+                                ? " • Coopérative"
+                                : " • Marché"
+                        }</span>
                     </div>
                     <div class="prod-action">
                         <tf-button variant="primary" ${valeurs.quantity <= 0 ? "disabled" : ""} onclick="ajouterAuPanier('${nomEchappe}')">Ajouter</tf-button>
@@ -365,6 +362,12 @@ async function initialiserBoutique() {
         conteneur.insertAdjacentHTML("beforeend", catalogueHTML.join(""));
     } catch (erreur) {
         console.error("Impossible de charger l'inventaire :", erreur);
+        if (snackbarElement) {
+            snackbarElement.showSnackbar(
+                "Erreur lors du chargement des données de gestion.",
+                false,
+            );
+        }
         conteneur.innerHTML = "<p>Erreur lors du chargement des produits.</p>";
     }
 }
@@ -480,18 +483,19 @@ function afficherPanier() {
     cartListElement.innerHTML = "";
 
     for (const [nom, item] of Object.entries(panier)) {
+        const estCooperatif = item.canal === "cooperative";
         const productHTML = `
                             <div class="cart-item">
                                     <span>${nom}</span>
-                                    <span>Prix unit.: $${item.prixVente.toFixed(2)}</span>
+                                    <span>${
+                                        estCooperatif
+                                            ? "Prix coopérative: fixé automatiquement"
+                                            : `Prix unit.: $${item.prixVente.toFixed(2)}`
+                                    }</span>
                                     <div class="qty-control">
-                                        <button class="btn-qty" onclick="modifierPrixPanier('${nom.replace(/'/g, "\\'")}')">
-                                            <span
-                                                class="material-symbols-rounded"
-                                            >
-                                                edit
-                                            </span>
-                                        </button>
+                                        ${estCooperatif ? "" : `<button class="btn-qty" onclick="modifierPrixPanier('${nom.replace(/'/g, "\\'")}')">
+                                            <span class="material-symbols-rounded">edit</span>
+                                        </button>`}
                                         <button class="btn-qty" onclick="retirerDuPanier('${nom.replace(/'/g, "\\'")}')">
                                             <span
                                                 class="material-symbols-rounded"
@@ -537,14 +541,19 @@ async function ajouterAuPanier(nomProduit) {
 
         panier[nomProduit].quantite++;
     } else {
-        const prixVente = await demanderPrixVente(nomProduit);
-        if (prixVente === null) {
+        const canal = obtenirCanalVente(nomProduit);
+        const prixVente = canal === "cooperative"
+            ? null
+            : await demanderPrixVente(nomProduit);
+
+        if (canal !== "cooperative" && prixVente === null) {
             return;
         }
 
         panier[nomProduit] = {
             quantite: 1,
             prixVente: prixVente,
+            canal: canal,
         };
     }
 
@@ -568,6 +577,14 @@ async function modifierPrixPanier(nomProduit) {
         return;
     }
 
+    if (item.canal === "cooperative") {
+        snackbarElement.showSnackbar(
+            "Le prix des ventes à la coopérative est fixé automatiquement.",
+            false,
+        );
+        return;
+    }
+
     const prix = await demanderPrixViaDialogue(nomProduit, item.prixVente);
     if (prix === null) {
         return;
@@ -581,7 +598,33 @@ async function modifierPrixPanier(nomProduit) {
  * Publication marche
  * ========================= */
 
+async function supprimerAncienneOffreMarche(userId, productId) {
+    try {
+        const deleteResponse = await fetch(
+            `${API_URL}/market/${userId}/${productId}`,
+            {
+                method: "DELETE",
+                credentials: "include",
+            }
+        );
+        if (deleteResponse.ok || deleteResponse.status === 404) {
+            console.log(`[Suppression] Ancienne offre supprimée (ID=${productId})`);
+            return true;
+        }
+        console.warn(`[Suppression] Échec: ${deleteResponse.status}`);
+        return false;
+    } catch (erreur) {
+        console.warn(`[Suppression] Erreur: ${erreur.message}`);
+        return false;
+    }
+}
+
 async function publierProduitAuMarche(payload) {
+    // Si userId est fourni, supprimer l'ancienne offre d'abord
+    if (payload.userId) {
+        await supprimerAncienneOffreMarche(payload.userId, payload.productId);
+    }
+
     const responseAvecUserId = await fetch(`${API_URL}/market/ad`, {
         method: "POST",
         credentials: "include",
@@ -608,15 +651,18 @@ async function publierProduitAuMarche(payload) {
     return responseSansUserId;
 }
 
-async function mettrePanierEnVente() {
-    if (utiliserModeFake()) {
-        snackbarElement.showSnackbar(
-            "Mode fake actif: la publication vers le marche n'est pas disponible.",
-            false,
-        );
-        return;
-    }
+async function publierProduitALaCooperative(payload) {
+    return await fetch(`${API_URL}/cooperative/sell`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+    });
+}
 
+async function mettrePanierEnVente() {
     const lignesPanier = Object.entries(panier);
     if (lignesPanier.length === 0) {
         snackbarElement.showSnackbar(
@@ -630,36 +676,72 @@ async function mettrePanierEnVente() {
         await chargerContextePublication();
     }
 
-    let succes = 0;
-    const erreurs = [];
-
+    // Fusionner les lignes du même produit (par productId)
+    const panierParProductId = new Map();
     for (const [nomProduit, item] of lignesPanier) {
         const productId = obtenirIdProduitParNom(nomProduit);
         if (!Number.isFinite(productId)) {
-            erreurs.push(`Produit introuvable dans l'API: ${nomProduit}`);
+            console.warn(`[Panier] Produit "${nomProduit}" introuvable dans l'API`);
             continue;
         }
+        
+        const existant = panierParProductId.get(productId);
+        if (existant) {
+            // Produit déjà dans la map, fusionner les quantités
+            console.log(`[Panier] Fusion: ${nomProduit} (ID=${productId}), ancien=${existant.quantite}, nouveau=+${item.quantite}`);
+            existant.quantite += item.quantite;
+        } else {
+            // Nouveau produit
+            console.log(`[Panier] Ajout: ${nomProduit} (ID=${productId}), quantité=${item.quantite}, canal=${item.canal || obtenirCanalVente(nomProduit)}`);
+            panierParProductId.set(productId, {
+                nomProduit,
+                productId,
+                quantite: item.quantite,
+                prixVente: item.prixVente,
+                canal: item.canal || obtenirCanalVente(nomProduit),
+            });
+        }
+    }
 
-        const payload = {
-            productId: productId,
-            userId: idUtilisateurCourant,
-            quantity: Number(item.quantite),
-            unitPrice: Number(item.prixVente),
-        };
+    let succes = 0;
+    const erreurs = [];
+
+    for (const item of panierParProductId.values()) {
+        const { nomProduit, productId, quantite, prixVente, canal } = item;
 
         try {
-            const response = await publierProduitAuMarche(payload);
+            console.log(`[Publication] "${nomProduit}" (ID=${productId}): quantité=${quantite}, canal=${canal}, userId=${idUtilisateurCourant}`);
+            
+            const response = canal === "cooperative"
+                ? await publierProduitALaCooperative({
+                      sellerId: idUtilisateurCourant,
+                      productId: productId,
+                      quantity: Number(quantite),
+                  })
+                : await publierProduitAuMarche({
+                      productId: productId,
+                      userId: idUtilisateurCourant,
+                      quantity: Number(quantite),
+                      unitPrice: Number(prixVente),
+                  });
+
+            console.log(`[Publication] Réponse: ${response.status} ${response.statusText}`);
+            
             if (!response.ok) {
+                const errorBody = await response.text();
+                console.error(`[Publication] Erreur body: ${errorBody}`);
                 erreurs.push(
-                    `Echec publication ${nomProduit} (${response.status})`,
+                    `Echec publication ${nomProduit} (${response.status}): ${errorBody || 'Erreur inconnue'}`,
                 );
                 continue;
             }
 
+            console.log(`[Publication] ✓ "${nomProduit}" publié avec succès`);
             succes++;
             delete panier[nomProduit];
         } catch (erreur) {
-            erreurs.push(`Erreur publication ${nomProduit}`);
+            console.error(`[Publication] Exception pour ${nomProduit}:`, erreur);
+            erreurs.push(`Erreur publication ${nomProduit}: ${erreur.message}`);
         }
     }
 
@@ -667,6 +749,11 @@ async function mettrePanierEnVente() {
 
     if (succes > 0 && erreurs.length === 0) {
         snackbarElement.showSnackbar("Produits publiés au marché avec succès.");
+        // Rafraîchir l'inventaire pour mettre à jour les stocks
+        console.log("[Rafraîchissement] Actualisation de l'inventaire...");
+        setTimeout(() => {
+            initialiserBoutique();
+        }, 500);
         return;
     }
 
@@ -675,10 +762,17 @@ async function mettrePanierEnVente() {
             `${succes} publication(s) réussie(s), ${erreurs.length} en échec.`,
             false,
         );
+        erreurs.forEach(e => console.error(`[Erreur] ${e}`));
+        // Rafraîchir même en cas d'erreurs partielles
+        console.log("[Rafraîchissement] Actualisation de l'inventaire après erreurs partielles...");
+        setTimeout(() => {
+            initialiserBoutique();
+        }, 500);
         return;
     }
 
     snackbarElement.showSnackbar("Aucune publication n'a abouti.", false);
+    erreurs.forEach(e => console.error(`[Erreur] ${e}`));
 }
 
 const boutonVente =

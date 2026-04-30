@@ -38,8 +38,7 @@ public class TradeService {
                               Long productId,
                               Integer quantity,
                               Float price) {
-        Stock sellerStock = removeFromSellerStock(sellerId, productId, quantity);
-        addToBuyerStock(buyerId, productId, quantity, sellerStock.getCollectible());
+        addToBuyerStock(buyerId, productId, quantity);
 
         User seller = getUserOrThrow(sellerId, "Vendeur introuvable");
         User buyer = getUserOrThrow(buyerId, "Acheteur introuvable");
@@ -48,19 +47,7 @@ public class TradeService {
         saveTransaction(sellerId, buyerId, productId, quantity, totalPrice);
     }
 
-    private Stock removeFromSellerStock(Long sellerId, Long productId, Integer quantity) {
-        Stock sellerStock = stockRepository
-            .findById(new StockId(sellerId, productId))
-            .orElseThrow(() -> new RuntimeException("Stock du vendeur non trouvé"));
-        if (sellerStock.getQuantity() < quantity) {
-            throw new RuntimeException("Quantité insuffisante dans le stock vendeur");
-        }
-        sellerStock.setQuantity(sellerStock.getQuantity() - quantity);
-        stockRepository.save(sellerStock);
-        return sellerStock;
-    }
-
-    private void addToBuyerStock(Long buyerId, Long productId, Integer quantity, Boolean collectible) {
+    private void addToBuyerStock(Long buyerId, Long productId, Integer quantity) {
         StockId buyerStockId = new StockId(buyerId, productId);
         Optional<Stock> buyerStock = stockRepository.findById(buyerStockId);
         if (buyerStock.isPresent()) {
@@ -73,7 +60,6 @@ public class TradeService {
         Stock newBuyerStock = new Stock();
         newBuyerStock.setId(buyerStockId);
         newBuyerStock.setQuantity(quantity);
-        newBuyerStock.setCollectible(collectible);
         stockRepository.save(newBuyerStock);
     }
 

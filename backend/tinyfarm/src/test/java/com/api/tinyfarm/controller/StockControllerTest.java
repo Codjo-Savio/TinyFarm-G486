@@ -275,4 +275,5 @@ public class StockControllerTest extends AuthenticatedControllerTestSupport {
             )
             .andExpect(status().isNotFound());
     }
+
 }
