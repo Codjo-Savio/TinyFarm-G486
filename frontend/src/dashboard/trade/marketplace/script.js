@@ -54,7 +54,7 @@ async function normalizeMarkets(marketsRaw) {
             const productId = Number(market.productId);
             const userName = await getUserNameById(userId);
             const productDetails = await (
-                await fetchApiWithCredentials(`/market/product/${productId}`)
+                await fetchApiWithCredentials(`/products/id/${productId}`)
             ).json();
 
             return {
