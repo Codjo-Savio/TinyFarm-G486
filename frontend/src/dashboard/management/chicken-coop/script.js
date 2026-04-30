@@ -3,6 +3,7 @@ import { fetchApiWithCredentials } from "/utils/fetch.js";
 const snackbarElement = document.querySelector("tf-snackbar");
 let chickens = [];
 let currentUserId = null;
+let currentEggCount = 0;
 
 async function fetchCurrentUserId() {
     if (currentUserId !== null) {
@@ -49,11 +50,8 @@ function renderChickenCoop() {
 
     let healthyCount = 0;
     let cleanCount = 0;
-    let eggCount = 0;
 
     for (const chicken of chickens) {
-        eggCount += Number(chicken.eggsLaid) || 0;
-
         const chickenTypeLabel =
             chicken.chickenType === "C"
                 ? "Poussin"
@@ -122,7 +120,7 @@ function renderChickenCoop() {
     document.getElementById("chicken-count").textContent = String(
         chickens.length,
     );
-    document.getElementById("egg-count").textContent = String(eggCount);
+    document.getElementById("egg-count").textContent = String(currentEggCount);
     document.getElementById("sick-count").textContent =
         (Math.round(
             ((chickens.length - healthyCount) / (chickens.length || 1)) * 100,
@@ -151,12 +149,28 @@ async function fetchChickenData() {
     return payload;
 }
 
+async function fetchEggCount() {
+    const response = await fetchApiWithCredentials("/chickens/eggs");
+
+    if (!response.ok) {
+        throw new Error(`Erreur HTTP : ${response.status}`);
+    }
+
+    const payload = await response.json();
+    return Number(payload) || 0;
+}
+
 async function initializeChickenCoop() {
     const container = document.getElementById("game-grid");
 
     try {
         await fetchCurrentUserId();
-        chickens = await fetchChickenData();
+        const [fetchedChickens, fetchedEggCount] = await Promise.all([
+            fetchChickenData(),
+            fetchEggCount(),
+        ]);
+        chickens = fetchedChickens;
+        currentEggCount = fetchedEggCount;
         renderChickenCoop();
     } catch (error) {
         console.error("Impossible de charger le poulailler :", error);
@@ -223,6 +237,12 @@ async function applyActionToChicken(chickenId, action) {
         throw error;
     }
 
+    try {
+        currentEggCount = await fetchEggCount();
+    } catch (error) {
+        console.error("Impossible de recuperer le nombre d'oeufs :", error);
+    }
+
     renderChickenCoop();
     window.dispatchEvent(new CustomEvent("refresh-user-data"));
 }
@@ -259,6 +279,12 @@ async function feedAll() {
         chicken.fedToday = true;
     }
 
+    try {
+        currentEggCount = await fetchEggCount();
+    } catch (error) {
+        console.error("Impossible de recuperer le nombre d'oeufs :", error);
+    }
+
     renderChickenCoop();
     window.dispatchEvent(new CustomEvent("refresh-user-data"));
 }
@@ -277,6 +303,12 @@ async function waterAll() {
         chicken.wateredToday = true;
     }
 
+    try {
+        currentEggCount = await fetchEggCount();
+    } catch (error) {
+        console.error("Impossible de recuperer le nombre d'oeufs :", error);
+    }
+
     renderChickenCoop();
     window.dispatchEvent(new CustomEvent("refresh-user-data"));
 }
@@ -293,6 +325,12 @@ async function healAll() {
         chicken.healthy = true;
     }
 
+    try {
+        currentEggCount = await fetchEggCount();
+    } catch (error) {
+        console.error("Impossible de recuperer le nombre d'oeufs :", error);
+    }
+
     renderChickenCoop();
     window.dispatchEvent(new CustomEvent("refresh-user-data"));
 }
@@ -307,6 +345,12 @@ async function cleanAll() {
     for (const chicken of eligibleChickens) {
         await performChickenAction(chicken.id, "clean");
         chicken.clean = true;
+    }
+
+    try {
+        currentEggCount = await fetchEggCount();
+    } catch (error) {
+        console.error("Impossible de recuperer le nombre d'oeufs :", error);
     }
 
     renderChickenCoop();

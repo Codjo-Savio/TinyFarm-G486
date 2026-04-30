@@ -7,11 +7,16 @@ import com.api.tinyfarm.model.Animal;
 import com.api.tinyfarm.model.Chicken;
 import com.api.tinyfarm.model.User;
 import com.api.tinyfarm.repository.UserRepository;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -36,16 +41,15 @@ public class ChickenServiceTest {
     @Test
     void shouldCreateChicken() {
         User user = new User(
-            2L,
-            "Brad",
-            "usertest@gmail.com",
-            User.Gender.M,
-            2000F,
-            false,
-            null,
-            1,
-            12
-        );
+                2L,
+                "Brad",
+                "usertest@gmail.com",
+                User.Gender.M,
+                2000F,
+                false,
+                null,
+                1,
+                12);
 
         Animal animal = new Animal();
         animal.setUserId(2L);
@@ -70,16 +74,15 @@ public class ChickenServiceTest {
     @Test
     void shouldReturnAllChickens() {
         User user = new User(
-            2L,
-            "Brad",
-            "usertest@gmail.com",
-            User.Gender.M,
-            2000F,
-            false,
-            null,
-            1,
-            12
-        );
+                2L,
+                "Brad",
+                "usertest@gmail.com",
+                User.Gender.M,
+                2000F,
+                false,
+                null,
+                1,
+                12);
 
         Animal animal = new Animal();
         animal.setUserId(2L);
@@ -99,6 +102,50 @@ public class ChickenServiceTest {
         Chicken created = chickenService.create(chicken);
 
         assertNotNull(chickenService.findAll());
+    }
+
+    @Test
+    void shouldReturnEggsOnlyForAuthenticatedUser() throws Exception {
+        User firstUser = new User();
+        firstUser.setName("Farmer One");
+        firstUser.setEmail("farmer-one@example.com");
+        firstUser.setEcus(100F);
+        firstUser = userRepository.save(firstUser);
+
+        User secondUser = new User();
+        secondUser.setName("Farmer Two");
+        secondUser.setEmail("farmer-two@example.com");
+        secondUser.setEcus(100F);
+        secondUser = userRepository.save(secondUser);
+
+        Field field = ChickenService.class.getDeclaredField(
+                "totalEggToReturnByUser");
+        field.setAccessible(true);
+
+        @SuppressWarnings("unchecked")
+        Map<Long, Integer> eggCounts = (Map<Long, Integer>) field.get(
+                chickenService);
+        eggCounts.clear();
+        eggCounts.put(firstUser.getId(), 4);
+        eggCounts.put(secondUser.getId(), 9);
+
+        try {
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                            firstUser,
+                            "password",
+                            List.of()));
+            assertEquals(4, chickenService.getEggNumber());
+
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(
+                            secondUser,
+                            "password",
+                            List.of()));
+            assertEquals(9, chickenService.getEggNumber());
+        } finally {
+            SecurityContextHolder.clearContext();
+        }
     }
 
     @Test
@@ -211,9 +258,9 @@ public class ChickenServiceTest {
 
         // Save original money minus feeding costs (100 - 3 - 3 = 94)
         Float initialEcus = userRepository
-            .findById(user.getId())
-            .get()
-            .getEcus();
+                .findById(user.getId())
+                .get()
+                .getEcus();
 
         chickenService.processEndOfDay(user.getId());
 
@@ -225,16 +272,15 @@ public class ChickenServiceTest {
     @Test
     void shouldDeleteChicken() {
         User user = new User(
-            2L,
-            "Brad",
-            "usertest@gmail.com",
-            User.Gender.M,
-            2000F,
-            false,
-            null,
-            1,
-            12
-        );
+                2L,
+                "Brad",
+                "usertest@gmail.com",
+                User.Gender.M,
+                2000F,
+                false,
+                null,
+                1,
+                12);
 
         Animal animal = new Animal();
         animal.setUserId(2L);
