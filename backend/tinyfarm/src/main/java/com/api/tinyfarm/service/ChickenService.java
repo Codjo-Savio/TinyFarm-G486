@@ -3,27 +3,29 @@ package com.api.tinyfarm.service;
 import com.api.tinyfarm.model.*;
 import com.api.tinyfarm.repository.ChickenRepository;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ChickenService{
+public class ChickenService {
 
     private final ChickenRepository chickenRepository;
     private final UserService userService;
     private final ProductService productService;
     private final CooperativeService cooperativeService;
     private final StockService stockService;
+    private final Map<Long, Integer> totalEggToReturnByUser = new ConcurrentHashMap<>();
 
     public ChickenService(
-        ChickenRepository chickenRepository,
-        UserService userService,
-        ProductService productService,
-        CooperativeService cooperativeService,
-        StockService stockService
-    ) {
+            ChickenRepository chickenRepository,
+            UserService userService,
+            ProductService productService,
+            CooperativeService cooperativeService,
+            StockService stockService) {
         this.chickenRepository = chickenRepository;
         this.userService = userService;
         this.productService = productService;
@@ -37,10 +39,8 @@ public class ChickenService{
 
     public Chicken findById(Long id) {
         return chickenRepository
-            .findById(id)
-            .orElseThrow(() ->
-                new RuntimeException("Poulet introuvable : " + id)
-            );
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("Poulet introuvable : " + id));
     }
 
     public List<Chicken> findByConnectedUserId() {
@@ -53,10 +53,8 @@ public class ChickenService{
 
     public Chicken getByName(String name) {
         return chickenRepository
-            .findByName(name)
-            .orElseThrow(() ->
-                new RuntimeException("Poulet introuvable : " + name)
-            );
+                .findByName(name)
+                .orElseThrow(() -> new RuntimeException("Poulet introuvable : " + name));
     }
 
     public Chicken create(Chicken chicken) {
@@ -109,12 +107,14 @@ public class ChickenService{
 
     public void deleteAll() {
         chickenRepository.deleteAll();
+        totalEggToReturnByUser.clear();
     }
 
     // --- Daily Actions ---
 
     public Chicken feedChicken(Long chickenId, Long userId) {
-        // Feeding costs 3 ecus and still respects the global authorized overdraft floor.
+        // Feeding costs 3 ecus and still respects the global authorized overdraft
+        // floor.
         Chicken chicken = findById(chickenId);
         User user = userService.findById(userId);
 
@@ -126,8 +126,7 @@ public class ChickenService{
             return chickenRepository.save(chicken);
         } else {
             throw new RuntimeException(
-                "Pas assez d'écus pour nourrir la volaille !"
-            );
+                    "Pas assez d'écus pour nourrir la volaille !");
         }
     }
 
@@ -144,8 +143,7 @@ public class ChickenService{
             return chickenRepository.save(chicken);
         } else {
             throw new RuntimeException(
-                "Pas assez d'écus pour abreuver la volaille !"
-            );
+                    "Pas assez d'écus pour abreuver la volaille !");
         }
     }
 
@@ -162,8 +160,7 @@ public class ChickenService{
             return chickenRepository.save(chicken);
         } else {
             throw new RuntimeException(
-                "Pas assez d'écus pour nettoyer la volaille !"
-            );
+                    "Pas assez d'écus pour nettoyer la volaille !");
         }
     }
 
@@ -181,15 +178,15 @@ public class ChickenService{
             return chickenRepository.save(chicken);
         } else {
             throw new RuntimeException(
-                "Pas assez d'écus pour soigner la volaille !"
-            );
+                    "Pas assez d'écus pour soigner la volaille !");
         }
     }
 
     // --- End of Day ---
 
     public void processEndOfDay(Long userId) {
-        // End-of-day applies survival, growth, reproduction eligibility and daily state reset rules.
+        // End-of-day applies survival, growth, reproduction eligibility and daily state
+        // reset rules.
         User user = userService.findById(userId);
         if (Boolean.FALSE.equals(user.getHibernation())) {
             long[] breeders = processAllChickensForEndOfDay(userId);
@@ -198,7 +195,8 @@ public class ChickenService{
     }
 
     private long[] processAllChickensForEndOfDay(Long userId) {
-        // Apply per-chicken daily lifecycle and return active breeder counters (roosters, hens).
+        // Apply per-chicken daily lifecycle and return active breeder counters
+        // (roosters, hens).
         List<Chicken> userChickens = chickenRepository.findByUserId(userId);
         long activeRoosters = 0;
         long activeHens = 0;
@@ -221,16 +219,18 @@ public class ChickenService{
             chickenRepository.save(chicken);
         }
 
-        return new long[] {activeRoosters, activeHens};
+        return new long[] { activeRoosters, activeHens };
     }
 
     private boolean isChickenDeadAfterHealthOrFoodRules(Chicken chicken) {
-        // Death can be triggered either by sickness progression or starvation progression.
+        // Death can be triggered either by sickness progression or starvation
+        // progression.
         return handleHealth(chicken) != 0 || handleFood(chicken) != 0;
     }
 
     private boolean isChickenDeadAfterWeightRules(Chicken chicken) {
-        // Weight is capped, and a chicken dies immediately when weight reaches zero or less.
+        // Weight is capped, and a chicken dies immediately when weight reaches zero or
+        // less.
         if (chicken.getWeight() > 3.5f) {
             chicken.setWeight(3.5f);
         }
@@ -266,17 +266,16 @@ public class ChickenService{
     }
 
     // Returns 1 when the chicken dies, 0 otherwise.
-    private int handleHealth(Chicken chicken){
+    private int handleHealth(Chicken chicken) {
         // A sick chicken accumulates sick days and dies on day 4 if not healed.
 
         int out = 0;
 
         if (chicken.getHealthy() != null && !chicken.getHealthy()) {
             chicken.setSickDays(
-                (chicken.getSickDays() == null
-                        ? 0
-                        : chicken.getSickDays()) + 1
-                );
+                    (chicken.getSickDays() == null
+                            ? 0
+                            : chicken.getSickDays()) + 1);
 
             // Sick chickens temporarily lose breeder status.
             if (chicken.getChickenType() == Chicken.ChickenType.L) {
@@ -296,17 +295,16 @@ public class ChickenService{
         return out;
     }
 
-    private int handleFood(Chicken chicken){
+    private int handleFood(Chicken chicken) {
         // Missing food causes escalating weight loss and death on day 4.
 
         int out = 0;
 
         if (chicken.getFedToday() != null && !chicken.getFedToday()) {
             chicken.setFastingDays(
-                (chicken.getFastingDays() == null
-                        ? 0
-                        : chicken.getFastingDays()) + 1
-                );
+                    (chicken.getFastingDays() == null
+                            ? 0
+                            : chicken.getFastingDays()) + 1);
 
             // Starving chickens temporarily lose breeder status.
             if (chicken.getChickenType() == Chicken.ChickenType.L) {
@@ -316,9 +314,12 @@ public class ChickenService{
             }
 
             float weightLoss = 0f;
-            if (chicken.getFastingDays() == 1) weightLoss = 0.2f;
-            else if (chicken.getFastingDays() == 2) weightLoss = 0.5f;
-            else if (chicken.getFastingDays() == 3) weightLoss = 1.0f;
+            if (chicken.getFastingDays() == 1)
+                weightLoss = 0.2f;
+            else if (chicken.getFastingDays() == 2)
+                weightLoss = 0.5f;
+            else if (chicken.getFastingDays() == 3)
+                weightLoss = 1.0f;
             else if (chicken.getFastingDays() >= 4) {
                 chickenRepository.delete(chicken);
                 return 1; // chicken dies
@@ -327,10 +328,8 @@ public class ChickenService{
         } else {
             chicken.setFastingDays(0);
             float weightGain = 0.5f; // Grain
-            if (
-                chicken.getWateredToday() != null &&
-                chicken.getWateredToday()
-            ) {
+            if (chicken.getWateredToday() != null &&
+                    chicken.getWateredToday()) {
                 weightGain += 0.15f; // Water bonus applies only when fed
             }
             chicken.setWeight(chicken.getWeight() + weightGain);
@@ -339,56 +338,46 @@ public class ChickenService{
         return out;
     }
 
-    private void handleType(Chicken chicken){
+    private void handleType(Chicken chicken) {
         // Type transitions depend on age, weight and productivity constraints.
 
         // Breeders revert to non-breeder status if they lose too much weight.
-        if (
-            chicken.getChickenType() == Chicken.ChickenType.L &&
-            chicken.getWeight() < 2.5f
-        ) {
+        if (chicken.getChickenType() == Chicken.ChickenType.L &&
+                chicken.getWeight() < 2.5f) {
             chicken.setChickenType(Chicken.ChickenType.H);
         }
 
-        if (
-            chicken.getChickenType() == Chicken.ChickenType.B &&
-            chicken.getWeight() < 2.5f
-        ) {
+        if (chicken.getChickenType() == Chicken.ChickenType.B &&
+                chicken.getWeight() < 2.5f) {
             chicken.setChickenType(Chicken.ChickenType.R);
         }
 
         // Transition from chick to young adult at day 4.
-        if (
-            chicken.getChickenType() == Chicken.ChickenType.C &&
-            chicken.getAge() == 4
-        ) {
+        if (chicken.getChickenType() == Chicken.ChickenType.C &&
+                chicken.getAge() == 4) {
             if (Math.random() > 0.5) {
                 chicken.setChickenType(Chicken.ChickenType.H);
             } else {
-               chicken.setChickenType(Chicken.ChickenType.R);
+                chicken.setChickenType(Chicken.ChickenType.R);
             }
         }
 
         // Transition to breeder state requires age and weight thresholds.
-        if (
-            chicken.getChickenType() == Chicken.ChickenType.H &&
-            chicken.getAge() >= 5 &&
-            chicken.getWeight() >= 2.5f
-        ) {
+        if (chicken.getChickenType() == Chicken.ChickenType.H &&
+                chicken.getAge() >= 5 &&
+                chicken.getWeight() >= 2.5f) {
             chicken.setChickenType(Chicken.ChickenType.L);
         }
-        if (
-            chicken.getChickenType() == Chicken.ChickenType.R &&
-            chicken.getAge() >= 5 &&
-            chicken.getWeight() >= 2.5f
-        ) {
+        if (chicken.getChickenType() == Chicken.ChickenType.R &&
+                chicken.getAge() >= 5 &&
+                chicken.getWeight() >= 2.5f) {
             chicken.setChickenType(Chicken.ChickenType.B);
         }
     }
 
-    int totalEggToReturn = 0;
     private void handleEggs(Long userId, long activeRoosters, long activeHens) {
-        // Each rooster can fertilize up to 5 hens; eggs are sold immediately to cooperative.
+        // Each rooster can fertilize up to 5 hens; eggs are sold immediately to
+        // cooperative.
         long matedHens = Math.min(activeHens, activeRoosters * 5);
         int totalEggs = 0;
 
@@ -413,27 +402,36 @@ public class ChickenService{
 
             cooperativeService.sellToCooperative(userId, egg.getId(), totalEggs);
         }
-        totalEggToReturn += totalEggs;
+        totalEggToReturnByUser.merge(userId, totalEggs, Integer::sum);
     }
 
-    public int getEggNumber(){
-        return totalEggToReturn;
+    public int getEggNumber() {
+        Long userId = getConnectedUserId();
+        return totalEggToReturnByUser.getOrDefault(userId, 0);
     }
 
-    public Product addEggAsProduct(){
+    private Long getConnectedUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof User currentUser)) {
+            throw new RuntimeException("Utilisateur non authentifié");
+        }
+        return currentUser.getId();
+    }
+
+    public Product addEggAsProduct() {
         Product egg = new Product();
         egg.setDescription("Oeuf");
         return productService.create(egg);
     }
 
-    public Stock addEggStock(Product egg, Long userId, Integer totalEggs){
+    public Stock addEggStock(Product egg, Long userId, Integer totalEggs) {
         Stock stock = new Stock();
         try {
             stock.setProductId(egg.getId());
             stock.setQuantity(totalEggs);
             stock.setUserId(userId);
             stockService.create(stock);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return stock;

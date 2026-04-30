@@ -312,7 +312,7 @@ class TfBottomActions extends HTMLElement {
         if (!this.overviewLoaded) {
             try {
                 const overview = await this.fetchTradeOverview();
-                this.coopInfosElement.textContent = `En stock : ${overview.cooperativeStock}`;
+                this.coopInfosElement.textContent = "Ouverte";
                 this.marketplaceInfosElement.textContent = `En stock : ${overview.marketStock}`;
                 if (!(await this.isCooperativeOpen())) {
                     this.coopLink.classList.add("closed");
