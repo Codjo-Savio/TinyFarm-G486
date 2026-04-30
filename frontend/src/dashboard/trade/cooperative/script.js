@@ -300,7 +300,7 @@ async function payerPanier() {
 
     if (!buyerId) {
         snackbarElement?.showSnackbar(
-            "Utilisateur non identifie. Impossible de proceder.",
+            "Utilisateur non identifié. Impossible de procéder.",
             false,
         );
         return;
@@ -352,32 +352,32 @@ async function payerPanier() {
 
         if (successCount > 0 && failureCount === 0) {
             snackbarElement?.showSnackbar(
-                `Paiement reussi ! ${successCount} achat(s) complete(s).`,
+                `Paiement réussi ! ${successCount} achat(s) complété(s).`,
             );
             Object.keys(panier).forEach((key) => delete panier[key]);
             displayPanier();
             await initialiserCooperative();
         } else if (successCount > 0) {
             snackbarElement?.showSnackbar(
-                `Paiement partiel : ${successCount} achat(s) valide(s), ${failureCount} en erreur.`,
+                `Paiement partiel : ${successCount} achat(s) validé(s), ${failureCount} en erreur.`,
                 false,
             );
             await initialiserCooperative();
         } else {
             snackbarElement?.showSnackbar(
-                "Aucun achat n'a pu etre complete.",
+                "Aucun achat n'a pu être complété.",
                 false,
             );
         }
     } catch (error) {
         console.error("Erreur paiement:", error);
         snackbarElement?.showSnackbar(
-            "Erreur lors du paiement. Veuillez reessayer.",
+            "Erreur lors du paiement. Veuillez réessayer.",
             false,
         );
     } finally {
+        payButton.removeAttribute("loading");
         await appbarElement?.update();
-        payButton?.removeAttribute("loading");
     }
 }
 

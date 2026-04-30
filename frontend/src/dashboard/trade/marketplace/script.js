@@ -500,8 +500,8 @@ async function payerPanier() {
             false,
         );
     } finally {
-        await appbarElement.update();
         payButton?.removeAttribute("loading");
+        await appbarElement.update();
     }
 }
 
