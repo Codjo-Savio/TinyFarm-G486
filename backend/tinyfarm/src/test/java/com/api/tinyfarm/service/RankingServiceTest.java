@@ -77,6 +77,19 @@ class RankingServiceTest {
     }
 
     @Test
+    void shouldExcludeCooperativeFromRankingAndTotals() {
+        Stats alice = stats(1L, "Alice", 100d, 10d, 100d);
+        Stats cooperative = stats(2L, "Cooperative", 900d, 900d, 900d);
+
+        List<FarmerRankingRequest> ranking = rankingService.computeRanking(List.of(alice, cooperative));
+
+        assertEquals(1, ranking.size());
+        assertEquals("Alice", ranking.get(0).getName());
+        assertEquals(1, ranking.get(0).getRank());
+        assertEquals(100.0, ranking.get(0).getScore(), 0.0001);
+    }
+
+    @Test
     void refreshNowShouldUpdateCachedRankingFromRepository() {
         Stats alice = stats(1L, "Alice", 100d, 10d, 100d);
         when(rankingRepository.getStats()).thenReturn(List.of(alice));
