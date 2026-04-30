@@ -456,5 +456,6 @@ async function payerPanier() {
 // Démarrage
 // =========================
 
+document.querySelector("#pay-btn").addEventListener("click", payerPanier);
 initialiserBoutique();
 displayPanier();
