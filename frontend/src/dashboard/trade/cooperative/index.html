@@ -9,6 +9,8 @@
         <script type="module" src="/components/tf-app-bar.js"></script>
         <script type="module" src="/components/tf-bottom-actions.js"></script>
         <script type="module" src="/components/tf-layout.js"></script>
+        <script type="module" src="/components/tf-button.js"></script>
+        <script type="module" src="/components/tf-snackbar.js"></script>
         <link rel="stylesheet" href="/utils/theme.css" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,28 +24,39 @@
     <body>
         <tf-layout>
             <tf-app-bar></tf-app-bar>
+            <tf-snackbar></tf-snackbar>
             <main class="container">
                 <div class="sub-header">
-                    <a onclick="window.history.back()" class="btn-back">
-                        <span class="material-symbols-rounded"
-                            >keyboard_backspace</span
-                        >
+                    <tf-button
+                        icon="keyboard_backspace"
+                        variant="secondary"
+                        onclick="window.history.back()"
+                    >
                         Retour
-                    </a>
+                    </tf-button>
                     <div class="market-stats">
-                        <!-- Statut ouvert/fermé -->
-                        <span id="coop-status"></span>
-                        <span>
-                            <span class="material-symbols-rounded"
+                        <span class="coop-status" id="coop-status"></span>
+                        <span class="purchase-info"
+                            ><span class="material-symbols-rounded"
                                 >shopping_cart</span
                             >
-                            Achats restants :
-                            <span id="remaining-purchases">-</span>
-                        </span>
-                        <span class="stock-info">
-                            <span class="material-symbols-rounded">store</span>
-                            En stock : <span id="stock-count">-</span>
-                        </span>
+                            Achats restants :</span
+                        >
+                        <span class="stock-info"
+                            ><span class="material-symbols-rounded">store</span>
+                            En stock :</span
+                        >
+
+                        <tf-button
+                            icon="sell"
+                            variant="secondary"
+                            onclick="
+                                window.location.href =
+                                    '/dashboard/management/assets'
+                            "
+                        >
+                            Vendre
+                        </tf-button>
                     </div>
                 </div>
 
@@ -54,30 +67,31 @@
                         <div class="cart-card">
                             <div class="cart-total-box">
                                 <div class="cart-icon-title">
-                                    <span class="material-symbols-rounded"
-                                        >shopping_cart</span
-                                    >
+                                    <span class="material-symbols-rounded">
+                                        shopping_cart
+                                    </span>
                                     Total
                                 </div>
                                 <div class="cart-actions">
-                                    <span class="total-price" id="total-price"
-                                        >0 écus</span
+                                    <span
+                                        class="total-price"
+                                        id="totalPrice"
+                                    ></span>
+                                    <tf-button
+                                        id="pay-btn"
+                                        icon="payment"
+                                        variant="primary"
                                     >
-                                    <button class="btn-pay" id="btn-pay">
                                         Payer
-                                    </button>
+                                    </tf-button>
                                 </div>
                             </div>
-                            <!-- Liste des articles du panier -->
-                            <div class="cart-list" id="cart-list">
-                                <p class="empty-cart">Votre panier est vide</p>
-                            </div>
+
+                            <div class="cart-list"></div>
                         </div>
                     </aside>
 
-                    <section class="right-panel" id="shop-container">
-                        <!-- Produits chargés dynamiquement -->
-                    </section>
+                    <section class="right-panel" id="shop-container"></section>
                 </div>
             </main>
             <tf-bottom-actions
