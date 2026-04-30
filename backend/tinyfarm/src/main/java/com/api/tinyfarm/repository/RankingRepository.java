@@ -19,7 +19,7 @@ public interface RankingRepository extends JpaRepository<User, Long> {
          FROM "user" u
          LEFT JOIN transaction t ON t.seller = u.uid
          LEFT JOIN animal a ON a.uid = u.uid
-         
+         WHERE u.email <> 'cooperative@system.local'
          GROUP BY u.uid, u.name, u.ecus
     """, nativeQuery = true)
     List<Stats> getStats();
