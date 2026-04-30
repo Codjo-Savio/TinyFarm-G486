@@ -386,6 +386,7 @@ public class ChickenService{
         }
     }
 
+    int totalEggToReturn = 0;
     private void handleEggs(Long userId, long activeRoosters, long activeHens) {
         // Each rooster can fertilize up to 5 hens; eggs are sold immediately to cooperative.
         long matedHens = Math.min(activeHens, activeRoosters * 5);
@@ -412,6 +413,11 @@ public class ChickenService{
 
             cooperativeService.sellToCooperative(userId, egg.getId(), totalEggs);
         }
+        totalEggToReturn += totalEggs;
+    }
+
+    public int getEggNumber(){
+        return totalEggToReturn;
     }
 
     public Product addEggAsProduct(){

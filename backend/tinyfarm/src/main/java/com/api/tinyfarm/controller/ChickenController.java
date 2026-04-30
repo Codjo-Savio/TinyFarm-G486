@@ -28,6 +28,15 @@ public class ChickenController {
         }
     }
 
+    @GetMapping("/eggs")
+    public ResponseEntity<Integer> getEggsNumber() {
+        try {
+            return ResponseEntity.ok(chickenService.getEggNumber());
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @GetMapping("/id/{id}")
     @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id)")
     public ResponseEntity<Chicken> getById(@PathVariable Long id) {
