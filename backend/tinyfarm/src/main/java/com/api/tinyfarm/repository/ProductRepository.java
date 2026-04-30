@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    // JpaRepository provides findById(Long id) by default, no need to redefine it.
-
     List<Product> findByCollectible(Boolean collectible);
 
     List<Product> findByCoefficient(Integer coefficient);

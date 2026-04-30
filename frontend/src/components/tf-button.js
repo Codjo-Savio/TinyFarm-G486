@@ -1,6 +1,6 @@
 class TfButton extends HTMLElement {
     static get observedAttributes() {
-        return ["variant", "disabled", "icon", "size", "loading"];
+        return ["variant", "disabled", "icon", "size", "loading", "icon-only"];
     }
 
     constructor() {
@@ -44,6 +44,7 @@ class TfButton extends HTMLElement {
 
             :host {
                 display: inline-block;
+                flex-shrink: 0;
             }
 
             button {
@@ -69,6 +70,10 @@ class TfButton extends HTMLElement {
 
             button:has(.material-symbols-rounded) {
                 padding-left: 12px
+            }
+
+            button.icon-only:has(.material-symbols-rounded) {
+                padding: 12px
             }
 
             button.primary {
@@ -194,6 +199,10 @@ class TfButton extends HTMLElement {
         return this.getAttribute("icon") || null;
     }
 
+    get iconOnly() {
+        return this.hasAttribute("icon-only");
+    }
+
     get size() {
         return this.getAttribute("size") || "normal";
     }
@@ -205,7 +214,7 @@ class TfButton extends HTMLElement {
 
         this.buttonElement.disabled = this.disabled || this.loading;
         this.buttonElement.className =
-            `${this.variant} ${this.size} ${this.loading ? "loading" : ""}`.trim();
+            `${this.variant} ${this.size} ${this.loading ? "loading" : ""} ${this.iconOnly ? "icon-only" : ""}`.trim();
 
         const currentIcon = this.buttonElement.querySelector(
             ".material-symbols-rounded",

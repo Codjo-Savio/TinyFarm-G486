@@ -8,7 +8,7 @@
         <!-- Components -->
         <script src="/components/tf-button.js"></script>
         <!-- Theme -->
-        <link rel="stylesheet" href="/styles/theme.css" />
+        <link rel="stylesheet" href="/utils/theme.css" />
         <!-- Font -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,12 +25,8 @@
             <tf-button
                 class="back-btn"
                 variant="secondary"
-                icon="arrow_left_alt"
-                onclick="
-                    window.location.href = window.location.search
-                        ? window.location.search.replace('?from=', '')
-                        : '/'
-                "
+                icon="keyboard_backspace"
+                onclick="window.history.back()"
                 >Retour</tf-button
             >
             <h1>Règles du jeu</h1>

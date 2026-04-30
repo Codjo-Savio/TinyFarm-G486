@@ -3,3 +3,5 @@ backend/tinyfarm/docker/secrets/
 backend/tinyfarm/src/main/resources/
 
 .env
+
+github-stats

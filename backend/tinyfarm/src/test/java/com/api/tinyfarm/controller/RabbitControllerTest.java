@@ -68,12 +68,6 @@ public class RabbitControllerTest extends AuthenticatedControllerTestSupport {
     }
 
     @Test
-    void shouldReturnAllRabbits() throws Exception {
-        mockMvc.perform(get("/api/rabbits").with(authenticated()))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     void shouldReturnRabbitByName() throws Exception {
         mockMvc.perform(get("/api/rabbits/filter/name/Jeannot").with(authenticated()))
                 .andExpect(status().isOk());

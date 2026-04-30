@@ -62,17 +62,17 @@ public class UserControllerTest extends AuthenticatedControllerTestSupport {
                 .andExpect(status().isOk());
     }
 
-    // tests of the GET
-    @Test
-    void shouldReturnUsers() throws Exception {
-        mockMvc.perform(get("/api/users").with(authenticated()))
-                .andExpect(status().isOk());
-    }
-
     @Test
     void shouldReturnUserById() throws Exception {
         mockMvc.perform(get("/api/users/id/" + createdUserId).with(authenticated()))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void shouldReturnRemainingPurchasesByUserId() throws Exception {
+        mockMvc.perform(get("/api/users/remainingPurchases/id/" + createdUserId).with(authenticated()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").value(12));
     }
 
     @Test

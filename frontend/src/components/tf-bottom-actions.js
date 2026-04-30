@@ -1,6 +1,6 @@
+import { fetchApiWithCredentials } from "/utils/fetch.js";
+
 class TfBottomActions extends HTMLElement {
-    FAKE_API_URL = "/fakeapi";
-    API_URL = window.apiUrl || "http://localhost:8080/api";
     timeIntervalId;
 
     static get observedAttributes() {
@@ -27,9 +27,25 @@ class TfBottomActions extends HTMLElement {
         return this.getAttribute("variant") || "normal";
     }
 
+    async fetchUserId() {
+        const currentUserRes = await fetchApiWithCredentials("/auth/me");
+        return (await currentUserRes.json()).id;
+    }
+
     async fetchTradeOverview() {
-        const res = await fetch(this.FAKE_API_URL + "/trade/overview.json");
-        return await res.json();
+        const coopRes = await fetchApiWithCredentials("/cooperative");
+        const marketRes = await fetchApiWithCredentials(
+            `/market/not?uid=${await this.fetchUserId()}`,
+        );
+        return {
+            cooperativeStock: Object.keys(await coopRes.json()).length,
+            marketStock: (await marketRes.json()).length,
+        };
+    }
+
+    async isCooperativeOpen() {
+        const coopRes = await fetchApiWithCredentials("/cooperative/isOpen");
+        return (await coopRes.text()) === "true";
     }
 
     getAoeTime() {
@@ -122,6 +138,17 @@ class TfBottomActions extends HTMLElement {
                 transform: translateY(-4px);
             }
 
+            .links > #coop.closed,
+            .links > #coop.closed:hover {
+                color: var(--color-secondary);
+                background-color: var(--color-surface-dark);
+                cursor: not-allowed;
+            }
+
+            .bottom-actions:not(.small) .links > #coop.closed:hover {
+                transform: none;
+            }
+
             .bottom-actions.small .links > a {
                 padding: 12px;
                 padding-left: 60px;
@@ -140,6 +167,10 @@ class TfBottomActions extends HTMLElement {
                 opacity: 0;
                 transition: opacity .3s;
                 pointer-events: none;
+            }
+
+            .bottom-actions.small .links > #coop.closed > .small-legend {
+                background-color: var(--color-surface-dark);
             }
 
             .bottom-actions .links > a > .small-legend {
@@ -217,7 +248,7 @@ class TfBottomActions extends HTMLElement {
         template.innerHTML = `
             <div class="bottom-actions">
                 <div class="links">
-                    <a id="coop" href="/dashboard/trade/cooperative?from=/dashboard">
+                    <a id="coop" href="/dashboard/trade/cooperative">
                         <span class="material-symbols-rounded large">
                             storefront
                         </span>
@@ -227,7 +258,7 @@ class TfBottomActions extends HTMLElement {
                         </div>
                         <div class="small-legend">Coopérative</div>
                     </a>
-                    <a id="marketplace" href="/dashboard/trade/marketplace?from=/dashboard">
+                    <a id="marketplace" href="/dashboard/trade/marketplace">
                         <span class="material-symbols-rounded large">
                             groups
                         </span>
@@ -283,8 +314,15 @@ class TfBottomActions extends HTMLElement {
         if (!this.overviewLoaded) {
             try {
                 const overview = await this.fetchTradeOverview();
-                this.coopInfosElement.textContent = `En stock : ${overview.cooperative.stock}`;
-                this.marketplaceInfosElement.textContent = `En stock : ${overview.marketplace.stock}`;
+                this.coopInfosElement.textContent = `En stock : ${overview.cooperativeStock}`;
+                this.marketplaceInfosElement.textContent = `En stock : ${overview.marketStock}`;
+                if (!(await this.isCooperativeOpen())) {
+                    this.coopLink.classList.add("closed");
+                    this.coopLink.removeAttribute("href");
+                    this.coopLink.querySelector(".small-legend").textContent =
+                        "Coopérative fermée";
+                    this.coopInfosElement.textContent = "Fermée";
+                }
                 this.overviewLoaded = true;
             } finally {
                 this.bottomActionsElement.classList.add("ready");
