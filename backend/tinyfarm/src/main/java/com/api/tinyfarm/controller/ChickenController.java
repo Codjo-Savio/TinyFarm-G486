@@ -29,6 +29,7 @@ public class ChickenController {
     }
 
     @GetMapping("/eggs")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Integer> getEggsNumber() {
         try {
             return ResponseEntity.ok(chickenService.getEggNumber());
@@ -65,17 +66,15 @@ public class ChickenController {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (Exception e) {
             return ResponseEntity.status(
-                HttpStatus.INTERNAL_SERVER_ERROR
-            ).build();
+                    HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @PutMapping("/id/{id}")
     @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id)")
     public ResponseEntity<Chicken> update(
-        @PathVariable Long id,
-        @RequestBody Chicken chicken
-    ) {
+            @PathVariable Long id,
+            @RequestBody Chicken chicken) {
         try {
             return ResponseEntity.ok(chickenService.update(id, chicken));
         } catch (Exception e) {
@@ -109,36 +108,32 @@ public class ChickenController {
     @PostMapping("/{id}/feed")
     @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Chicken> feedChicken(
-        @PathVariable Long id,
-        @RequestParam Long userId
-    ) {
+            @PathVariable Long id,
+            @RequestParam Long userId) {
         return ResponseEntity.ok(chickenService.feedChicken(id, userId));
     }
 
     @PostMapping("/{id}/water")
     @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Chicken> waterChicken(
-        @PathVariable Long id,
-        @RequestParam Long userId
-    ) {
+            @PathVariable Long id,
+            @RequestParam Long userId) {
         return ResponseEntity.ok(chickenService.waterChicken(id, userId));
     }
 
     @PostMapping("/{id}/clean")
     @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Chicken> cleanChicken(
-        @PathVariable Long id,
-        @RequestParam Long userId
-    ) {
+            @PathVariable Long id,
+            @RequestParam Long userId) {
         return ResponseEntity.ok(chickenService.cleanChicken(id, userId));
     }
 
     @PostMapping("/{id}/heal")
     @PreAuthorize("@securityAuthorizationService.ownsAnimal(authentication, #id) and @securityAuthorizationService.canAccessUser(authentication, #userId)")
     public ResponseEntity<Chicken> healChicken(
-        @PathVariable Long id,
-        @RequestParam Long userId
-    ) {
+            @PathVariable Long id,
+            @RequestParam Long userId) {
         return ResponseEntity.ok(chickenService.healChicken(id, userId));
     }
 

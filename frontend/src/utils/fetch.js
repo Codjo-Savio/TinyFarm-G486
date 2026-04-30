@@ -5,7 +5,12 @@ async function fetchApiWithCredentials(endpoint, method = "GET", body = null) {
     return await fetch(API_URL + normalized, {
         method: method,
         credentials: "include",
-        ...(body && { body: body }),
+        ...(body && {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+        }),
     });
 }
 

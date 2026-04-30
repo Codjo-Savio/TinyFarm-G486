@@ -70,16 +70,6 @@ async function fetchCooperativeOpenState() {
     return Boolean(await response.json());
 }
 
-function setTotalStock(totalStock) {
-    const stockInfo = document.querySelector(".stock-info");
-    if (!stockInfo) return;
-
-    stockInfo.innerHTML = `
-        <span class="material-symbols-rounded">store</span>
-        En stock : ${totalStock}
-    `;
-}
-
 function setRemainingPurchases(remainingPurchases) {
     const purchaseInfo = document.querySelector(".purchase-info");
     if (!purchaseInfo) return;
@@ -109,7 +99,7 @@ function renderEmptyCooperative(container, message) {
     container.innerHTML = `
         <div class="empty-market-state">
             <span class="material-symbols-rounded empty-market-icon">storefront</span>
-            <h2>Cooperative indisponible</h2>
+            <h2>Coopérative indisponible</h2>
             <p>${message}</p>
         </div>
     `;
@@ -177,7 +167,6 @@ function renderProducts() {
         );
 
     if (availableProducts.length === 0) {
-        setTotalStock(0);
         renderEmptyCooperative(
             container,
             "Aucun article disponible pour le moment.",
@@ -207,8 +196,6 @@ function renderProducts() {
 
         container.insertAdjacentHTML("beforeend", productHTML);
     });
-
-    setTotalStock(availableProducts.length);
 }
 
 function ajouterAuPanier(productId) {
@@ -270,10 +257,9 @@ async function initialiserCooperative() {
         setCooperativeStatus(isOpen);
 
         if (!isOpen) {
-            setTotalStock(0);
             renderEmptyCooperative(
                 container,
-                "La cooperative est fermee pour le moment.",
+                "La coopérative est fermée pour le moment.",
             );
             return;
         }
@@ -285,8 +271,7 @@ async function initialiserCooperative() {
 
         renderProducts();
     } catch (error) {
-        console.error("Impossible de charger la cooperative :", error);
-        setTotalStock(0);
+        console.error("Impossible de charger la coopérative :", error);
         renderEmptyCooperative(
             container,
             "Une erreur est survenue lors du chargement.",
@@ -300,7 +285,7 @@ async function payerPanier() {
 
     if (!buyerId) {
         snackbarElement?.showSnackbar(
-            "Utilisateur non identifie. Impossible de proceder.",
+            "Utilisateur non identifié. Impossible de procéder.",
             false,
         );
         return;
@@ -352,32 +337,32 @@ async function payerPanier() {
 
         if (successCount > 0 && failureCount === 0) {
             snackbarElement?.showSnackbar(
-                `Paiement reussi ! ${successCount} achat(s) complete(s).`,
+                `Paiement réussi ! ${successCount} achat(s) complété(s).`,
             );
             Object.keys(panier).forEach((key) => delete panier[key]);
             displayPanier();
             await initialiserCooperative();
         } else if (successCount > 0) {
             snackbarElement?.showSnackbar(
-                `Paiement partiel : ${successCount} achat(s) valide(s), ${failureCount} en erreur.`,
+                `Paiement partiel : ${successCount} achat(s) validé(s), ${failureCount} en erreur.`,
                 false,
             );
             await initialiserCooperative();
         } else {
             snackbarElement?.showSnackbar(
-                "Aucun achat n'a pu etre complete.",
+                "Aucun achat n'a pu être complété.",
                 false,
             );
         }
     } catch (error) {
         console.error("Erreur paiement:", error);
         snackbarElement?.showSnackbar(
-            "Erreur lors du paiement. Veuillez reessayer.",
+            "Erreur lors du paiement. Veuillez réessayer.",
             false,
         );
     } finally {
+        payButton.removeAttribute("loading");
         await appbarElement?.update();
-        payButton?.removeAttribute("loading");
     }
 }
 
