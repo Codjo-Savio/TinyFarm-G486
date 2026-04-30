@@ -480,3 +480,4 @@ document.querySelector("#pay-btn").addEventListener("click", payerPanier);
 initialiserBoutique();
 displayPanier();
 window.ajouterAuPanier = ajouterAuPanier;
+window.retirerDuPanier = retirerDuPanier;
